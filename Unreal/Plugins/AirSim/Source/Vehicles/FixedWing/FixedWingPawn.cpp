@@ -6,16 +6,18 @@
 
 AFixedWingPawn::AFixedWingPawn()
 {
-    pawn_events_.getActuatorSignal().connect_member(this, &AFixedWingPawn::setControlDeflection);
+    pawn_events_.getElevatorSignal().connect_member(this, &AFixedWingPawn::setElevatorDeflection);
+    pawn_events_.getAileronSignal().connect_member(this, &AFixedWingPawn::setAileronDeflection);
+    pawn_events_.getRudderSignal().connect_member(this, &AFixedWingPawn::setRudderDeflection);
 }
 
 void AFixedWingPawn::BeginPlay()
 {
     Super::BeginPlay();
 
-    for (auto i = 0; i < control_count; ++i) {
-        control_positions[i] = UAirBlueprintLib::GetActorComponent<UMovementComponent>(this, TEXT("Control") + FString::FromInt(i));
-    }
+        elevator_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Elevator-Position"));
+        aileron_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Aileron-Position"));
+        rudder_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Rudder-Position"));
 }
 
 void AFixedWingPawn::initializeForBeginPlay()
@@ -79,19 +81,54 @@ void AFixedWingPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
         HitNormal, NormalImpulse, Hit);
 }
 
-//TODO: Need to implement a method to deflect controls based on FixedWingControlsInfo in FixedWingPawnEvents.h
-void AFixedWingPawn::setControlDeflection(const std::vector<FixedWingPawnEvents::FixedWingControlsInfo>& control_infos)
+//TODO: Need to change the funtion decleration so that it is just a const not a templated vector
+void AFixedWingPawn::setElevatorDeflection(const std::vector<FixedWingPawnEvents::FixedWingElevatorInfo>& elevator_info)
 {
-	for(auto control_index = 0;
-		control_index < control_infos.size();
-        ++control_index)
+    auto comp = elevator_position_;
+	if (comp != nullptr)
 	{
-        auto comp = control_positions[control_index];
-		if (comp != nullptr)
+		// not sure how to do set the RotationRate.Yaw = elevator_info.at(0).elevator_speed; if mod(angle) < mod(command) else RotationRate.Yaw = 0
+		if(elevator_info.at(0).elevator_deflection == elevator_info.at(0).elevator_command)
 		{
-            comp->UpdatedComponent->ComponentVelocity =
-                control_infos.at(control_index).control_speed * 180.0f / M_PIf; // currently broken needs the velocity as a a vector not control speed!
+            comp->RotationRate.Yaw = 0;
 		}
+        else
+        {
+            comp->RotationRate.Yaw = elevator_info.at(0).elevator_speed; // should this be pitch, can probably tilt local control surface
+        }
+        
 	}
 }
 
+void AFixedWingPawn::setAileronDeflection(const std::vector<FixedWingPawnEvents::FixedWingAileronInfo>& aileron_info)
+{
+    auto comp = aileron_position_;
+    if (comp != nullptr)
+    {
+    	if(aileron_info.at(0).aileron_deflection == aileron_info.at(0).aileron_command)
+    	{
+            comp->RotationRate.Yaw = 0;
+    	}
+        else
+        {
+            comp->RotationRate.Yaw = aileron_info.at(0).aileron_speed;// should this be pitch? and do we need 2 of these components this may already be done to some extent?
+
+        }
+    }
+}
+
+void AFixedWingPawn::setRudderDeflection(const std::vector<FixedWingPawnEvents::FixedWingRudderInfo>& rudder_info)
+{
+    auto comp = rudder_position_;
+    if (comp != nullptr)
+    {
+    	if(rudder_info.at(0).rudder_command == rudder_info.at(0).rudder_deflection)
+    	{
+            comp->RotationRate.Yaw = 0;
+    	}
+        else
+        {
+            comp->RotationRate.Yaw = rudder_info.at(0).rudder_speed;
+        }
+    }
+}

@@ -33,19 +33,23 @@ public:
         return &pawn_events_;
     };
     //called by API to set control speed & deflection
-    void setControlDeflection(const std::vector<FixedWingPawnEvents::FixedWingControlsInfo>& control_infos);
-
+    void setElevatorDeflection(const std::vector<FixedWingPawnEvents::FixedWingElevatorInfo>& elevator_info);
+    void setAileronDeflection(const std::vector<FixedWingPawnEvents::FixedWingAileronInfo>& aileron_info);
+    void setRudderDeflection(const std::vector<FixedWingPawnEvents::FixedWingRudderInfo>& rudder_info);
 
 private: //variables
     //Unreal components
-    static constexpr size_t control_count = 3; // 3 controls for 3 control surfaces
+    //static constexpr size_t control_count = 3; // 3 controls for 3 control surfaces
     UPROPERTY() APIPCamera* camera_front_left_;
     UPROPERTY() APIPCamera* camera_front_right_;
     UPROPERTY() APIPCamera* camera_front_center_;
     UPROPERTY() APIPCamera* camera_back_center_;
     UPROPERTY() APIPCamera* camera_bottom_center_;
 
-    UPROPERTY() UMovementComponent* control_positions[control_count];
-
+    //UPROPERTY() UMovementComponent* control_positions[control_count];
+    UPROPERTY() URotatingMovementComponent* elevator_position_;
+    UPROPERTY() URotatingMovementComponent* aileron_position_;
+    UPROPERTY() URotatingMovementComponent* rudder_position_;
+	
     FixedWingPawnEvents pawn_events_;
 };

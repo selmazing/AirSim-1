@@ -23,7 +23,9 @@ public:
     typedef msr::airlib::UpdatableObject UpdatableObject;
     typedef msr::airlib::Pose Pose;
 
-    typedef FixedWingPawnEvents::FixedWingControlsInfo FixedWingControlsInfo;
+    typedef FixedWingPawnEvents::FixedWingElevatorInfo FixedWingElevatorInfo;
+    typedef FixedWingPawnEvents::FixedWingAileronInfo FixedWingAileronInfo;
+    typedef FixedWingPawnEvents::FixedWingRudderInfo FixedWingRudderInfo;
 
 public:
     virtual void initialize() override;
@@ -58,11 +60,13 @@ public:
 
 private:
     std::unique_ptr<msr::airlib::FixedWingApiBase> vehicle_api_;
-    std::unique_ptr<msr::airlib::FixedWingApiBase> vehicle_params_;
+    std::unique_ptr<msr::airlib::FixedWingParams> vehicle_params_;
 
     std::unique_ptr<FixedWing> fixedwing_physics_body_;
     unsigned int control_count;
-    std::vector<FixedWingControlsInfo> control_actuator_info_;
+    std::vector<FixedWingElevatorInfo> elevator_info_;
+    std::vector<FixedWingAileronInfo> aileron_info_;
+    std::vector<FixedWingRudderInfo> rudder_info_;
 
     //show info on collision response from physics engine
     CollisionResponse collision_response;
