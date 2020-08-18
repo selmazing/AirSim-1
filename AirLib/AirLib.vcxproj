@@ -126,6 +126,16 @@
     <ClInclude Include="include\vehicles\multirotor\firmwares\simple_flight\firmware\StdPidIntegrator.hpp" />
     <ClInclude Include="include\vehicles\multirotor\firmwares\simple_flight\firmware\VelocityController.hpp" />
     <ClInclude Include="include\vehicles\multirotor\firmwares\simple_flight\SimpleFlightApi.hpp" />
+
+    <ClInclude Include="include\vehicles\fixedwing\firmwares\mavlink\MavLinkFixedWingApi.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\firmwares\mavlink\Px4FixedWingParams.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingApiBase.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingCommon.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibAdaptors.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibAdaptors.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibServer.hpp" />
+
+
     <ClInclude Include="include\physics\DebugPhysicsBody.hpp" />
     <ClInclude Include="include\physics\PhysicsBodyWorld.hpp" />
     <ClInclude Include="include\physics\PhysicsWorld.hpp" />
@@ -170,18 +180,27 @@
     <ClInclude Include="include\vehicles\multirotor\MultiRotorParamsFactory.hpp" />
     <ClInclude Include="include\vehicles\multirotor\RotorActuator.hpp" />
     <ClInclude Include="include\vehicles\multirotor\RotorParams.hpp" />
+
+    <ClInclude Include="include\vehicles\fixedwing\DynamicForces.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\DynamicParams.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\FixedWingParams.hpp" />
+    <ClInclude Include="include\vehilces\fixedwing\FixedWingParamsFactory.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\FixedWingPhysicsBody.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\api\RpcLibClientBase.cpp" />
     <ClCompile Include="src\api\RpcLibServerBase.cpp" />
     <ClCompile Include="src\vehicles\multirotor\api\MultirotorApiBase.cpp" />
+    <ClCompile Include="src\vehicles\fixedwing\api\FixedWingApiBase.cpp" />
     <ClCompile Include="src\safety\ObstacleMap.cpp" />
     <ClCompile Include="src\safety\SafetyEval.cpp" />
     <ClCompile Include="src\common\common_utils\FileSystem.cpp" />
     <ClCompile Include="src\vehicles\car\api\CarRpcLibClient.cpp" />
     <ClCompile Include="src\vehicles\car\api\CarRpcLibServer.cpp" />
     <ClCompile Include="src\vehicles\multirotor\api\MultirotorRpcLibClient.cpp" />
+    <ClCompile Include="src\vehicles\fixedwing\api\FixedWingRpcLibClient.cpp" />
     <ClCompile Include="src\vehicles\multirotor\api\MultirotorRpcLibServer.cpp" />
+    <ClCompile Include="src\vehicles\fixedwing\api\FixedWingRpcLibServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MavLinkCom\MavLinkCom.vcxproj">
