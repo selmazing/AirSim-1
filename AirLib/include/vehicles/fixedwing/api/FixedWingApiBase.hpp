@@ -25,18 +25,15 @@ protected: //must be implemented
 
     /************************* low level move APIs *********************************/
     virtual void commandControls(float elevator, float aileron, float rudder, float tla) = 0;
-    virtual void commandRollPitchYawrateThrottle(float roll, float pitch, float yaw_rate, float throttle) = 0;
-    virtual void commandRollPitchYawZ(float roll, float pitch, float yaw, float z) = 0;
-    virtual void commandRollPitchYawThrottle(float roll, float pitch, float yaw, float throttle) = 0;
-    virtual void commandRollPitchYawrateZ(float roll, float pitch, float yaw_rate, float z) = 0;
-    virtual void commandAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z) = 0;
-    virtual void commandAngleRatesThrottle(float roll_rate, float pitch_rate, float yaw_rate, float throttle) = 0;
-    virtual void commandVelocity(float vx, float vy, float vz, const YawMode& yaw_mode) = 0;
-    virtual void commandVelocityZ(float vx, float vy, float z, const YawMode& yaw_mode) = 0;
-    virtual void commandPosition(float x, float y, float z, const YawMode& yaw_mode) = 0;
+    virtual void commandRollPitchYawHold(float roll, float pitch, float yaw, float tla) = 0; // maintain a selected attitude & TLA
+    virtual void commandAltitudeHold(float roll, float pitch, float yaw, float z) = 0; // hold a set alt -z in NED earth co-ord, TLA defined in MavLinkFixedWingApi.hpp
+    virtual void commandAngleRates(float roll_rate, float pitch_rate, float yaw_rate, float tla) = 0; // maintains a set angular rate [p, q, r]
+    virtual void commandVelocityHold(float vx, float vy, float vz) = 0; // maintain linear velocity along different axis
+    virtual void commandVelocityAltitudeHold(float vx, float vy, float z) = 0; // maintain velocity at a fixed altitude
+    virtual void commandPositionHold(float x, float y, float z) = 0; // maintain a fixed position, only makes sense on ground, or if error is large as can't hover
 
     /************************* set Controller Gains APIs *********************************/
-    virtual void setControllerGains(uint8_t controllerType, const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) = 0;
+    virtual void setControllerGains(uint8_t controllerType, const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) = 0; // setsup a simple PID controller
 
     /************************* State APIs *********************************/
     virtual Kinematics::State getKinematicsEstimated() const = 0;
@@ -89,29 +86,16 @@ public: //these APIs uses above low level APIs
     virtual bool land(float timeout_sec);
     virtual bool goHome(float timeout_sec);
 
-    virtual bool moveControls(float elevator, float aileron, float rudder, float tla, float duration);
-    virtual bool moveByRollPitchYawZ(float roll, float pitch, float yaw, float z, float duration);
-    virtual bool moveByRollPitchYawThrottle(float roll, float pitch, float yaw, float throttle, float duration);
-    virtual bool moveByRollPitchYawrateThrottle(float roll, float pitch, float yaw_rate, float throttle, float duration);
-    virtual bool moveByRollPitchYawrateZ(float roll, float pitch, float yaw_rate, float z, float duration);
-    virtual bool moveByAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z, float duration);
-    virtual bool moveByAngleRatesThrottle(float roll_rate, float pitch_rate, float yaw_rate, float throttle, float duration);
-
-	/* Given the FixedWing vehicle can't stop I think some of these move APIs will not make sense, perhaps it should be more fly to position then proceed to hold?*/
-    virtual bool moveByVelocity(float vx, float vy, float vz, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode); // This is from multirotor is DrivetrainType needed?
-    virtual bool moveByVelocityZ(float vx, float vy, float z, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode); // This is from multirotor is DrivetrainType needed?
-    virtual bool moveOnPath(const vector<Vector3r>& path, float velocity, float timeout_sec, DrivetrainType drivetrain, const YawMode& yaw_mode,
-        float lookahead, float adaptive_lookahead); // This is from multirotor is DrivetrainType needed?
-    virtual bool moveToPosition(float x, float y, float z, float velocity, float timeout_sec, DrivetrainType drivetrain,
-        const YawMode& yaw_mode, float lookahead, float adaptive_lookahead); // This is from multirotor is DrivetrainType needed?
+    virtual bool moveByControls(float elevator, float aileron, float rudder, float tla, float duration); // most basic move order based on controls
+    virtual bool moveByRollPitchYaw(float roll, float pitch, float yaw, float tla, float duration); // move by attitude commands
+    virtual bool moveByAngleRates(float roll_rate, float pitch_rate, float yaw_rate, float tla, float duration); // move by angular rates [p,q,r] & TLA
+    virtual bool moveByVelocity(float vx, float vy, float vz, float duration); // move based on the aircraft's velocity eg V/S mode
+    virtual bool moveOnPath(const vector<Vector3r>& path, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // move along a path [vector<Vector3r>& path]
+    virtual bool moveToPosition(float x, float y, float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // move to a fixed position [x, y, z]
+    virtual bool moveToAlt(float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // Flight Level Change (FLC) mode, velocity should be from pitot though
+    virtual bool moveByManual(float vx_max, float vy_max, float z_min, float duration); // manually moves adjusted from MultiRotor not sure quite how this works?
 	
-    virtual bool moveToZ(float z, float velocity, float timeout_sec, const YawMode& yaw_mode,
-        float lookahead, float adaptive_lookahead);
-	
-    virtual bool moveByManual(float vx_max, float vy_max, float z_min, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode); // This is from multirotor is DrivetrainType needed?
-	
-    virtual bool rotateToYaw(float yaw, float timeout_sec, float margin);
-    virtual RCData estimateRCTrims(float trimduration = 1, float minCountForTrim = 10, float maxTrim = 100);
+    virtual RCData estimateRCTrims(float trimduration = 1, float minCountForTrim = 10, float maxTrim = 100); // estimate how to trim the remote control
     
     /************************* set angle gain APIs *********************************/
     virtual void setAngleLevelControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd); 
@@ -149,19 +133,14 @@ protected: //utility methods
     typedef std::function<bool()> WaitFunction;
 
     //*********************************safe wrapper around low level commands***************************************************
-    virtual void moveByRollPitchYawZInternal(float roll, float pitch, float yaw, float z);
-    virtual void moveByRollPitchYawThrottleInternal(float roll, float pitch, float yaw, float throttle);
-    virtual void moveByRollPitchYawrateThrottleInternal(float roll, float pitch, float yaw_rate, float throttle);
-    virtual void moveByRollPitchYawrateZInternal(float roll, float pitch, float yaw_rate, float z);
-    virtual void moveByAngleRatesZInternal(float roll_rate, float pitch_rate, float yaw_rate, float z);
-    virtual void moveByAngleRatesThrottleInternal(float roll_rate, float pitch_rate, float yaw_rate, float throttle);
-    virtual void moveByVelocityInternal(float vx, float vy, float vz, const YawMode& yaw_mode);
-    virtual void moveByVelocityZInternal(float vx, float vy, float z, const YawMode& yaw_mode);
-    virtual void moveToPositionInternal(const Vector3r& dest, const YawMode& yaw_mode);
+    virtual bool moveByAttitudeInternal(float roll, float pitch, float yaw, float tla);
+    virtual bool moveByAngleRatesInternal(float roll_rate, float pitch_rate, float yaw_rate, float tla);
+    virtual bool moveByVelocityInternal(float vx, float vy, float vz);
+    virtual bool moveToPositionInternal(const Vector3r& dest);
 
     /************* safety checks & emergency maneuvers ************/
 	//TODO: Consider adding in a min velocity 5% stall for the glide performance
-    virtual bool emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& result);
+    virtual bool emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& result); // a go-around of some form for a fixed wing aircraft
     virtual bool safetyCheckVelocity(const Vector3r& velocity);
     virtual bool safetyCheckVelocityZ(float vx, float vy, float z);
     virtual bool safetyCheckDestination(const Vector3r& dest_loc);
@@ -328,9 +307,9 @@ private: //types
 private: //methods
     float setNextPathPosition(const vector<Vector3r>& path, const vector<PathSegment>& path_segs,
         const PathPosition& cur_path_loc, float next_dist, PathPosition& next_path_loc);
-    void adjustYaw(const Vector3r& heading, DrivetrainType drivetrain, YawMode& yaw_mode);
-    void adjustYaw(float x, float y, DrivetrainType drivetrain, YawMode& yaw_mode);
-    void moveToPathPosition(const Vector3r& dest, float velocity, DrivetrainType drivetrain, /* pass by value */ YawMode yaw_mode, float last_z);
+    void adjustYaw(const Vector3r& heading);
+    void adjustYaw(float x, float y);
+    void moveToPathPosition(const Vector3r& dest, float velocity, float last_z);
     bool isYawWithinMargin(float yaw_target, float margin) const;
 
 private: //variables
@@ -341,7 +320,7 @@ private: //variables
     float obs_avoidance_vel_ = 0.5f;
 
     //TODO: This should be a variable as we will need a landing control for the aircraft, so it does NOT crash!!!
-    float landing_vel_ = 0.2f; //velocity to use for landing
+    float landing_vel_ = 0.2f; //velocity to use for landing <-- This may be ok for a multirotor but will probably stall a fixedwing
     float approx_zero_vel_ = 0.05f;
     float approx_zero_angular_vel_ = 0.01f;
 };

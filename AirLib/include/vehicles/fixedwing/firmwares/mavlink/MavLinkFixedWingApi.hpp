@@ -237,15 +237,43 @@ public: //methods
         updateState();
         return VectorMath::toQuaternion(current_state_.attitude.pitch, current_state_.attitude.roll, current_state_.attitude.yaw);
     }
-
-	// Take a closer look at this its a problem with the scope but is quite an important failure. 
+ 
     virtual LandedState getLandedState() const override
     {
         updateState();
         return current_state_.controls.landed ? LandedState::Landed : LandedState::Flying;
     }
 
-    virtual real_T getActuation(unsigned int rotor_index) const override
+	// get the actuation from the control_surface
+	virtual real_T getElevatorSignal() const override
+	{
+        if (!is_simulation_mode_)
+            throw std::logic_error("Attempt to read elevator signal while not in simulation mode");
+
+        std::lock_guard<std::mutex> guard(hil_controls_mutex_);
+        return control_surfaces_[1];
+	}
+	
+    virtual real_T getAileronSignal() const override
+    {
+        if (!is_simulation_mode_)
+            throw std::logic_error("Attempt to read aileron signal while not in simulation mode");
+
+        std::lock_guard<std::mutex> guard(hil_controls_mutex_);
+        return control_surfaces_[0];
+    }
+	
+    virtual real_T getRudderSignal() const override
+    {
+        if (!is_simulation_mode_)
+            throw std::logic_error("Attempt to read rudder signal while not in simulation mode");
+
+        std::lock_guard<std::mutex> guard(hil_controls_mutex_);
+        return control_surfaces_[2];
+    }
+
+	
+    /*virtual real_T getActuation(unsigned int rotor_index) const override
     {
         if (!is_simulation_mode_)
             throw std::logic_error("Attempt to read motor controls while not in simulation mode");
@@ -256,7 +284,7 @@ public: //methods
     virtual size_t getActuatorCount() const override
     {
         return ControlSurfacesCount;
-    }
+    }*/
 
     virtual bool armDisarm(bool arm) override
     {
@@ -301,6 +329,7 @@ public: //methods
         }
     }
 
+	//TODO: Update for a fixedwing takeoff, yaw = 0, set q to constant rot rate @ Vrot. Controls adjusted for wind!
     virtual bool takeoff(float timeout_sec) override
     {
         SingleCall lock(this);
@@ -326,6 +355,7 @@ public: //methods
         return waitForZ(timeout_sec, z, getDistanceAccuracy());
     }
 
+	//TODO: Update for a fixedwing landing, maintain RoD to touchdown point then autoflare etc. 
     virtual bool land(float timeout_sec) override
     {
         SingleCall lock(this);
@@ -489,74 +519,53 @@ protected: //methods
         Utils::log("Not Implemented: commandControls", Utils::kLogLevelInfo);
     }
 
-    virtual void commandRollPitchYawZ(float roll, float pitch, float yaw, float z) override
-    {
-        if (target_height_ != -z) {
-            // these PID values are for the multirotor in simulation and will need tuning
-        	// TODO: calculate PID values
-            thrust_controller_.setPoint(-z, .05f, .005f, 0.09f);
-            target_height_ = -z;
-        }
-        checkValidVehicle();
-        auto state = mav_vehicle_->getVehicleState();
-        float thrust = 0.21f + thrust_controller_.control(-state.local_est.pos.z);
-        mav_vehicle_->moveByAttitude(roll, pitch, yaw, 0, 0, 0, thrust);
-    }
-    virtual void commandRollPitchYawrateZ(float roll, float pitch, float yaw_rate, float z) override
-    {
-        if (target_height_ != -z) {
-            thrust_controller_.setPoint(-z, .05f, .005f, 0.09f);
-            target_height_ = -z;
-        }
-        checkValidVehicle();
-        auto state = mav_vehicle_->getVehicleState();
-        float thrust = 0.21f + thrust_controller_.control(-state.local_est.pos.z);
-        mav_vehicle_->moveByAttitude(roll, pitch, 0, 0, 0, yaw_rate, thrust);
-    }
-    virtual void commandRollPitchYawThrottle(float roll, float pitch, float yaw, float throttle) override
+    virtual void commandRollPitchYawHold(float roll, float pitch, float yaw, float tla) override
     {
         checkValidVehicle();
-        mav_vehicle_->moveByAttitude(roll, pitch, yaw, 0, 0, 0, throttle);
-    }
-    virtual void commandRollPitchYawrateThrottle(float roll, float pitch, float yaw_rate, float throttle) override
-    {
-        checkValidVehicle();
-        mav_vehicle_->moveByAttitude(roll, pitch, 0, 0, 0, yaw_rate, throttle);
-    }
-    virtual void commandAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z) override
-    {
-        if (target_height_ != -z) {
-            thrust_controller_.setPoint(-z, .05f, .005f, 0.09f);
-            target_height_ = -z;
-        }
-        checkValidVehicle();
-        auto state = mav_vehicle_->getVehicleState();
-        float thrust = 0.21f + thrust_controller_.control(-state.local_est.pos.z);
-        mav_vehicle_->moveByAttitude(0, 0, 0, roll_rate, pitch_rate, yaw_rate, thrust);
-    }
-    virtual void commandAngleRatesThrottle(float roll_rate, float pitch_rate, float yaw_rate, float throttle) override
-    {
-        checkValidVehicle();
-        mav_vehicle_->moveByAttitude(0, 0, 0, roll_rate, pitch_rate, yaw_rate, throttle);
+        mav_vehicle_->moveByAttitude(roll, pitch, 0, 0, 0, 0, tla); 
     }
 
-    virtual void commandVelocity(float vx, float vy, float vz, const YawMode& yaw_mode) override
+	// Not sure if this makes sense should I define a climb speed Vy and then set the aircraft to that if it does not match? setting thrust alone will not work!
+	virtual void commandAltitudeHold(float roll, float pitch, float yaw, float z) override
     {
+	    if (target_height_ != z)
+	    {
+	    	//TODO: Tune these variables
+            tla_controller_.setPoint(-z, 0.05f, .005f, 0.10f);
+            target_height_ = -z;
+	    }
         checkValidVehicle();
-        float yaw = yaw_mode.yaw_or_rate * M_PIf / 180;
-        mav_vehicle_->moveByLocalVelocity(vx, vy, vz, !yaw_mode.is_rate, yaw);
+        auto state = mav_vehicle_->getVehicleState();
+        float TLA = 0.10f + tla_controller_.control(-state.local_est.pos.z);
+        mav_vehicle_->moveByAttitude(roll, pitch, yaw, 0, 0, 0, TLA);
     }
-    virtual void commandVelocityZ(float vx, float vy, float z, const YawMode& yaw_mode) override
+	
+	
+    virtual void commandAngleRates(float roll_rate, float pitch_rate, float yaw_rate, float tla) override
     {
         checkValidVehicle();
-        float yaw = yaw_mode.yaw_or_rate * M_PIf / 180;
-        mav_vehicle_->moveByLocalVelocityWithAltHold(vx, vy, z, !yaw_mode.is_rate, yaw);
+        mav_vehicle_->moveByAttitude(0, 0, 0, roll_rate, pitch_rate, yaw_rate, tla);
     }
-    virtual void commandPosition(float x, float y, float z, const YawMode& yaw_mode) override
+
+	// Integrated into moveByLocalVelocity is moveByLocalVelocity, this holds YawMode as an important variable perhaps this should be redefined
+    virtual void commandVelocityHold(float vx, float vy, float vz) override
     {
         checkValidVehicle();
-        float yaw = yaw_mode.yaw_or_rate * M_PIf / 180;
-        mav_vehicle_->moveToLocalPosition(x, y, z, !yaw_mode.is_rate, yaw);
+        mav_vehicle_->moveByLocalVelocity(vx, vy, vz, false, 0);
+    }
+
+	// Similar to problems as described above
+	virtual void commandVelocityAltitudeHold(float vx, float vy, float z) override
+    {
+        checkValidVehicle();
+        mav_vehicle_->moveByLocalVelocityWithAltHold(vx, vy, z, false, 0);
+    }
+
+	// again same as above
+    virtual void commandPositionHold(float x, float y, float z) override
+    {
+        checkValidVehicle();
+        mav_vehicle_->moveToLocalPosition(x, y, z, false, 0);
     }
 
     virtual const FixedWingApiParams& GetFixedWingApiParams() const override
@@ -1454,7 +1463,10 @@ private: //methods
         current_state_ = mavlinkcom::VehicleState();
         target_height_ = 0;
         is_api_control_enabled_ = false;
-        thrust_controller_ = PidController();
+        elevator_controller_ = PidController();
+        aileron_controller_ = PidController();
+        rudder_controller_ = PidController();
+        tla_controller_ = PidController();
         Utils::setValue(control_surfaces_, 0.0f);
         was_reset_ = false;
         received_actuator_controls_ = false;
@@ -1555,7 +1567,10 @@ private: //variables
     std::shared_ptr<mavlinkcom::MavLinkVehicle> mav_vehicle_;
     float target_height_;
     bool is_api_control_enabled_;
-    PidController thrust_controller_;
+    PidController elevator_controller_;
+    PidController aileron_controller_;
+    PidController rudder_controller_;
+    PidController tla_controller_;
     common_utils::Timer hil_message_timer_;
     common_utils::Timer gcs_message_timer_;
 

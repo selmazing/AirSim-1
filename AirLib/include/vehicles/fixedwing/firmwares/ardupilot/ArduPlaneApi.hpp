@@ -97,17 +97,22 @@ public:
         return vehicle_params_->getSensors();
     }
 
-public: //TODO:MultirotorApiBase implementation
-    virtual real_T getActuation(unsigned int control_index) const override
+public:
+    virtual real_T getElevatorSignal() const 
     {
-        return control_surfaces_[control_index];
+        return elevator_deflection_;
     }
 
-    virtual size_t getActuatorCount() const override
+	virtual real_T getAileronSignal() const
     {
-        return vehicle_params_->getParams().control_count;
+        return aileron_deflection_;
     }
 
+	virtual real_T getRudderSignal() const
+    {
+        return rudder_deflection_;
+    }
+	
     virtual void moveByRC(const RCData& rc_data) override
     {
         setRCData(rc_data);
@@ -208,84 +213,54 @@ protected:
         Utils::log("Not Implemented: commandControls", Utils::kLogLevelInfo);
     }
 
-    virtual void commandRollPitchYawrateThrottle(float roll, float pitch, float yaw_rate, float throttle) override
+    virtual void commandAttitudeHold(float roll, float pitch, float yaw, float tla) override
     {
         unused(roll);
         unused(pitch);
-        unused(yaw_rate);
-        unused(throttle);
-        Utils::log("Not Implemented: commandRollPitchYawrateThrottle", Utils::kLogLevelInfo);
+        unused(yaw);
+        unused(tla);
+        Utils::log("Not Implemented: commandAttititudeHold", Utils::kLogLevelInfo);
     }
 
-    virtual void commandRollPitchYawZ(float roll, float pitch, float yaw, float z) override
+    virtual void commandAltitudeHold(float roll, float pitch, float yaw, float z) override
     {
         unused(roll);
         unused(pitch);
         unused(yaw);
         unused(z);
-        Utils::log("Not Implemented: commandRollPitchYawZ", Utils::kLogLevelInfo);
+        Utils::log("Not Implemented: commandAltitudeHold", Utils::kLogLevelInfo);
     }
 
-    virtual void commandRollPitchYawThrottle(float roll, float pitch, float yaw, float throttle) override
-    {
-        unused(roll);
-        unused(pitch);
-        unused(yaw);
-        unused(throttle);
-        Utils::log("Not Implemented: commandRollPitchYawThrottle", Utils::kLogLevelInfo);
-    }
-
-    virtual void commandRollPitchYawrateZ(float roll, float pitch, float yaw_rate, float z) override
-    {
-        unused(roll);
-        unused(pitch);
-        unused(yaw_rate);
-        unused(z);
-        Utils::log("Not Implemented: commandRollPitchYawrateZ", Utils::kLogLevelInfo);
-    }
-
-    virtual void commandAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z) override
+    virtual void commandAngleRates(float roll_rate, float pitch_rate, float yaw_rate, float tla) override
     {
         unused(roll_rate);
         unused(pitch_rate);
         unused(yaw_rate);
-        unused(z);
-        Utils::log("Not Implemented: commandAngleRatesZ", Utils::kLogLevelInfo);
+        unused(tla);
+        Utils::log("Not Implemented: commandAngleRates", Utils::kLogLevelInfo);
     }
 
-    virtual void commandAngleRatesThrottle(float roll_rate, float pitch_rate, float yaw_rate, float throttle) override
-    {
-        unused(roll_rate);
-        unused(pitch_rate);
-        unused(yaw_rate);
-        unused(throttle);
-        Utils::log("Not Implemented: commandAngleRatesZ", Utils::kLogLevelInfo);
-    }
-
-    virtual void commandVelocity(float vx, float vy, float vz, const YawMode& yaw_mode) override
+    virtual void commandVelocityHold(float vx, float vy, float vz) override
     {
         unused(vx);
         unused(vy);
         unused(vz);
-        unused(yaw_mode);
-        Utils::log("Not Implemented: commandVelocity", Utils::kLogLevelInfo);
+        Utils::log("Not Implemented: commandVelocityHold", Utils::kLogLevelInfo);
     }
 
-    virtual void commandVelocityZ(float vx, float vy, float z, const YawMode& yaw_mode) override
+    virtual void commandVelocityAltitudeHold(float vx, float vy, float vz) override
     {
         unused(vx);
         unused(vy);
-        unused(z);
-        unused(yaw_mode);
+        unused(vz);
         Utils::log("Not Implemented: commandVelocityZ", Utils::kLogLevelInfo);
     }
 
-    virtual void commandPosition(float x, float y, float z, const YawMode& yaw_mode) override
+    virtual void commandPositionHold(float x, float y, float z) override
     {
         unused(x);
         unused(y);
         unused(z);
-        unused(yaw_mode);
         Utils::log("Not Implemented: commandPosition", Utils::kLogLevelInfo);
     }
 
@@ -438,7 +413,7 @@ private:
 	void recvControlDeflection()
     {
 	    //Receive control surface data
-        ControlDeflectionMessage pkt;
+        PlaneControlMessage pkt;
         int recv_ret = udpSocket_->recv(&pkt, sizeof(pkt), 100);
 	    while (recv_ret != sizeof(pkt))
 	    {
@@ -453,19 +428,21 @@ private:
             recv_ret = udpSocket_->recv(&pkt, sizeof(pkt), 100);
 	    }
 
-    	for (auto i = 0; i < kArduPilotControlCount; ++i)
-    	{
-            control_surfaces_[i] = pkt.angle[i];
-    	}
+        elevator_deflection_ = pkt.elevator_deflection;
+        aileron_deflection_ = pkt.aileron_deflection;
+        rudder_deflection_ = pkt.rudder_deflection;
     	
     }
 
 private:
+	// This is inheited from Multirotor for ArduCopter, think this needs to reflect controls in SITL ArduPlane
     static const int kArduPilotControlCount = 11;
 	
-    struct ControlDeflectionMessage
+    struct PlaneControlMessage
     {
-        uint16_t angle[kArduPilotControlCount];
+        float elevator_deflection;
+        float aileron_deflection;
+        float rudder_deflection;
     };
 
     std::shared_ptr<mavlinkcom::UdpSocket> udpSocket_;
@@ -481,7 +458,9 @@ private:
     RCData last_rcData_;
     bool is_rc_connected_;
 
-    float control_surfaces_[kArduPilotControlCount];
+    float elevator_deflection_;
+    float aileron_deflection_;
+    float rudder_deflection_;
 };
 
 }} //namespace

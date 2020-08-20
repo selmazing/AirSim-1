@@ -127,13 +127,13 @@
     <ClInclude Include="include\vehicles\multirotor\firmwares\simple_flight\firmware\VelocityController.hpp" />
     <ClInclude Include="include\vehicles\multirotor\firmwares\simple_flight\SimpleFlightApi.hpp" />
 
-    <ClInclude Include="include\vehicles\fixedwing\firmwares\mavlink\MavLinkFixedWingApi.hpp" />
+    <!-- <ClInclude Include="include\vehicles\fixedwing\firmwares\mavlink\MavLinkFixedWingApi.hpp" />
     <ClInclude Include="include\vehicles\fixedwing\firmwares\mavlink\Px4FixedWingParams.hpp" />
     <ClInclude Include="include\vehicles\fixedwing\api\FixedWingApiBase.hpp" />
     <ClInclude Include="include\vehicles\fixedwing\api\FixedWingCommon.hpp" />
     <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibAdaptors.hpp" />
     <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibAdaptors.hpp" />
-    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibServer.hpp" />
+    <ClInclude Include="include\vehicles\fixedwing\api\FixedWingRpcLibServer.hpp" /> -->
 
 
     <ClInclude Include="include\physics\DebugPhysicsBody.hpp" />
@@ -181,11 +181,11 @@
     <ClInclude Include="include\vehicles\multirotor\RotorActuator.hpp" />
     <ClInclude Include="include\vehicles\multirotor\RotorParams.hpp" />
 
-    <ClInclude Include="include\vehicles\fixedwing\DynamicForces.hpp" />
-    <ClInclude Include="include\vehicles\fixedwing\DynamicParams.hpp" />
-    <ClInclude Include="include\vehicles\fixedwing\FixedWingParams.hpp" />
-    <ClInclude Include="include\vehilces\fixedwing\FixedWingParamsFactory.hpp" />
-    <ClInclude Include="include\vehicles\fixedwing\FixedWingPhysicsBody.hpp" />
+    <!-- <ClInclude Include="include\vehicles\fixedwing\DynamicForces.hpp" /> -->
+    <!-- <ClInclude Include="include\vehicles\fixedwing\DynamicParams.hpp" /> -->
+    <!-- <ClInclude Include="include\vehicles\fixedwing\FixedWingParams.hpp" /> -->
+    <!-- <ClInclude Include="include\vehilces\fixedwing\FixedWingParamsFactory.hpp" /> -->
+    <!-- <ClInclude Include="include\vehicles\fixedwing\FixedWingPhysicsBody.hpp" /> -->
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\api\RpcLibClientBase.cpp" />

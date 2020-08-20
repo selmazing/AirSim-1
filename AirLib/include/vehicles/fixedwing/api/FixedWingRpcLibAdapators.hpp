@@ -17,14 +17,14 @@
 #include "common/common_utils/WindowsApisCommonPost.hpp"
 
 namespace msr { namespace airlib_rpclib {
-
+    //Left in but this shouldn't be used for a fixedwing aircraft. 
 class FixedWingRpcLibAdapators : public RpcLibAdapatorsBase {
 public:
     struct YawMode {
         bool is_rate = true;
         float yaw_or_rate = 0;
         MSGPACK_DEFINE_MAP(is_rate, yaw_or_rate);
-    
+    	
         YawMode()
         {}
 
