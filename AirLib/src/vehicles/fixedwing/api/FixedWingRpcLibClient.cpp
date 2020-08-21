@@ -7,7 +7,7 @@
 #ifndef AIRLIB_NO_RPC
 //if using Unreal Build system then include precompiled header file first
 
-#include "vehicles/fixedwing/api/FixedWingRpcClient.hpp"
+#include "vehicles/fixedwing/api/FixedWingRpcLibClient.hpp"
 
 #include "common/Common.hpp"
 #include <thread>
@@ -36,7 +36,7 @@ STRICT_MODE_OFF
 STRICT_MODE_ON
 #ifdef _MSC_VER
 __pragma(warning( disable : 4239))
-#endif			  
+#endif
 
 
 namespace msr { namespace airlib {
@@ -86,13 +86,13 @@ FixedWingRpcLibClient* FixedWingRpcLibClient::moveByAttitudeAsync(float roll, fl
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveByAttitudeAsync", roll, pitch, yaw, tla, duration, vehicle_name);
     return this;
 }
-	
+
 FixedWingRpcLibClient* FixedWingRpcLibClient::moveByAngleRatesAsync(float roll_rate, float pitch_rate, float yaw_rate, float tla, float duration, const std::string& vehicle_name = "")
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveByAngleRatesAsync", roll_rate, pitch_rate, yaw_rate, tla, duration, vehicle_name);
     return this;
 }
-	
+
 FixedWingRpcLibClient* FixedWingRpcLibClient::moveByVelocityAsync(float vx, float vy, float vz, float duration, const std::string& vehicle_name = "")
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveByVelocityAsync", vx, vy, vz, duration, vehicle_name);
