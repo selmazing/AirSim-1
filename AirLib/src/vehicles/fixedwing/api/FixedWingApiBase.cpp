@@ -24,7 +24,7 @@ bool FixedWingApiBase::takeoff(float timeout_sec)
     SingleTaskCall lock(this);
 
     auto kinematics = getKinematicsEstimated();
-    if (kinematics.twist.linear.norm() > approx_zero_vel_) {
+    if (kinematics.twist.linear.norm() > approx_zero_vel_) { 
         throw VehicleMoveException(Utils::stringf(
             "Cannot perform takeoff because vehicle is already moving with velocity %f m/s",
             kinematics.twist.linear.norm()));
@@ -32,7 +32,7 @@ bool FixedWingApiBase::takeoff(float timeout_sec)
 
     bool ret = moveToPosition(kinematics.pose.position.x(),
         kinematics.pose.position.y(), kinematics.pose.position.z() + getTakeoffZ(),
-        0.5f, timeout_sec, -1, 1);
+        0.5f, timeout_sec, DrivetrainType::MaxDegreeOfFreedom, YawMode::Zero(), -1, 1);
 
     //last command is to hold on to position
     //commandPosition(0, 0, getTakeoffZ(), YawMode::Zero());
@@ -48,7 +48,7 @@ bool FixedWingApiBase::land(float timeout_sec)
     int near_zero_vel_count = 0;
 
     return waitForFunction([&]() {
-        moveByVelocityInternal(0, 0, landing_vel_);
+        moveByVelocityInternal(0, 0, landing_vel_, YawMode::Zero());
 
         float z_vel = getVelocity().z();
         if (z_vel <= approx_zero_vel_)
@@ -59,7 +59,7 @@ bool FixedWingApiBase::land(float timeout_sec)
         if (near_zero_vel_count > 10)
             return true;
         else {
-            moveByVelocityInternal(0, 0, landing_vel_);
+            moveByVelocityInternal(0, 0, landing_vel_, YawMode::Zero());
             return false;
         }
     }, timeout_sec).isComplete();
@@ -69,7 +69,7 @@ bool FixedWingApiBase::goHome(float timeout_sec)
 {
     SingleTaskCall lock(this);
 
-    return moveToPosition(0, 0, 0, 0.5f, timeout_sec, -1, 1);
+    return moveToPosition(0, 0, 0, 0.5f, timeout_sec, DrivetrainType::MaxDegreeOfFreedom, YawMode::Zero(), -1, 1);
 }
 
 bool FixedWingApiBase::moveByMotorPWMs(float front_right_pwm, float rear_left_pwm, float front_left_pwm, float rear_right_pwm, float duration)
@@ -223,7 +223,7 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
     else {
         //if auto mode requested for lookahead then calculate based on velocity
         lookahead = getAutoLookahead(velocity, adaptive_lookahead);
-        Utils::log(Utils::stringf("lookahead = %f, adaptive_lookahead = %f", lookahead, adaptive_lookahead));
+        Utils::log(Utils::stringf("lookahead = %f, adaptive_lookahead = %f", lookahead, adaptive_lookahead));        
     }
 
     //add current position as starting point
@@ -241,14 +241,14 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
         path_segs.push_back(path_seg);
         path3d.push_back(point);
     }
-    //add last segment as zero length segment so we have equal number of segments and points.
+    //add last segment as zero length segment so we have equal number of segments and points. 
     //path_segs[i] refers to segment that starts at point i
     path_segs.push_back(PathSegment(point, point, velocity, path_length));
 
     //when path ends, we want to slow down
     /* float breaking_dist = 0;
     if (velocity > getMultirotorApiParams().breaking_vel) {
-        breaking_dist = Utils::clip(velocity * getMultirotorApiParams().vel_to_breaking_dist,
+        breaking_dist = Utils::clip(velocity * getMultirotorApiParams().vel_to_breaking_dist, 
             getMultirotorApiParams().min_breaking_dist, getMultirotorApiParams().max_breaking_dist);
     } */
     //else no need to change velocities for last segments
@@ -280,7 +280,7 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
         }
 
         //send drone command to get to next lookahead
-        moveToPathPosition(next_path_loc.position, seg_velocity, drivetrain,
+        moveToPathPosition(next_path_loc.position, seg_velocity, drivetrain, 
             yaw_mode, path_segs.at(cur_path_loc.seg_index).start_z);
 
         //sleep for rest of the cycle
@@ -302,7 +302,7 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
 
         Note that PC could be at any angle relative to PN, including 0 or -ve. We increase lookahead distance
         by the amount of |PC|. For this, we project PC on to PN to get vector PC' and length of
-        CC'is our adaptive lookahead error by which we will increase lookahead distance.
+        CC'is our adaptive lookahead error by which we will increase lookahead distance. 
 
         For next iteration, we first update our current position by goal_dist and then
         set next goal by the amount lookahead + lookahead_error.
@@ -325,7 +325,7 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
             const Vector3r& actual_vect = getPosition() - cur_path_loc.position;
 
             //project actual vector on goal vector
-            const Vector3r& goal_normalized = goal_vect.normalized();
+            const Vector3r& goal_normalized = goal_vect.normalized();    
             goal_dist = actual_vect.dot(goal_normalized); //dist could be -ve if drone moves away from goal
 
             //if adaptive lookahead is enabled the calculate lookahead error (see above fig)
@@ -340,8 +340,8 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
                         throw std::runtime_error("lookahead error is continually increasing so we do not have safe control, aborting moveOnPath operation");
                     }
                 }
-                else {
-                    lookahead_error_increasing = 0;
+                else { 
+                    lookahead_error_increasing = 0; 
                 }
                 lookahead_error = error;
             }
@@ -411,7 +411,7 @@ bool FixedWingApiBase::moveByManual(float vx_max, float vy_max, float z_min, flo
 
         RCData rc_data = getRCData();
         TTimeDelta age = clock()->elapsedSince(rc_data.timestamp);
-        if (rc_data.is_valid && (rc_data.timestamp == 0 || age <= kMaxMessageAge)) { //if rc message timestamp is not set OR is not too old
+        if (rc_data.is_valid && (rc_data.timestamp == 0 || age <= kMaxMessageAge)) { //if rc message timestamp is not set OR is not too old 
             if (rc_data_trims_.is_valid)
                 rc_data.subtract(rc_data_trims_);
 
@@ -480,32 +480,32 @@ bool FixedWingApiBase::rotateByYawRate(float yaw_rate, float duration)
 
     auto start_pos = getPosition();
     YawMode yaw_mode(true, yaw_rate);
-
+    
     return waitForFunction([&]() {
         moveToPositionInternal(start_pos, yaw_mode);
         return false; //keep moving until timeout
     }, duration).isTimeout();
 }
 
-void FixedWingApiBase::setAngleLevelControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd)
+void FixedWingApiBase::setAngleLevelControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) 
 {
     uint8_t controller_type = 2;
     setControllerGains(controller_type, kp, ki, kd);
 }
 
-void FixedWingApiBase::setAngleRateControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd)
+void FixedWingApiBase::setAngleRateControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) 
 {
     uint8_t controller_type = 3;
     setControllerGains(controller_type, kp, ki, kd);
 }
 
-void FixedWingApiBase::setVelocityControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd)
+void FixedWingApiBase::setVelocityControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) 
 {
     uint8_t controller_type = 4;
     setControllerGains(controller_type, kp, ki, kd);
 }
 
-void FixedWingApiBase::setPositionControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd)
+void FixedWingApiBase::setPositionControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) 
 {
     uint8_t controller_type = 5;
     setControllerGains(controller_type, kp, ki, kd);
@@ -755,7 +755,7 @@ bool FixedWingApiBase::safetyCheckDestination(const Vector3r& dest_pos)
 
     const auto& result = safety_eval_ptr_->isSafeDestination(getPosition(), dest_pos, getOrientation());
     return emergencyManeuverIfUnsafe(result);
-}
+}    
 
 float FixedWingApiBase::setNextPathPosition(const vector<Vector3r>& path, const vector<PathSegment>& path_segs,
     const PathPosition& cur_path_loc, float next_dist, PathPosition& next_path_loc)

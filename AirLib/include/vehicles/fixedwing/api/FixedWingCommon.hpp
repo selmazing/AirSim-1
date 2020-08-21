@@ -9,6 +9,11 @@ namespace msr
 {
 	namespace airlib
 	{
+		//enum class LandedState : uint {
+		//	Landed = 0,
+		//	Flying = 1
+		//}; // Included in multirotor under namespace msr::airlib--> Need to change name potentially
+
 		//properties of vehicle
 		struct FixedWingApiParams
 		{
@@ -20,7 +25,7 @@ namespace msr
 			float max_breaking_dist = 3; //min breaking distance
 			float breaking_vel = 1.0f;
 			float min_vel_for_breaking = 3;
-
+			
 
 			/*what is the differential positional accuracy of cur_loc?
 			this is not same as GPS accuracy because translational errors
@@ -81,7 +86,7 @@ namespace msr
 				return kinematics_estimated.pose.orientation;
 			};
 		};
-
+		
 	}
 }
 
