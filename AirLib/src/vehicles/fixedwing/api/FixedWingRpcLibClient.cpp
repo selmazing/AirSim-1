@@ -122,23 +122,23 @@ FixedWingRpcLibClient* FixedWingRpcLibClient::moveByManualAsync(float vx_max, fl
     return this;
 }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::rotateToYawAsync(float yaw, float timeout_sec, float margin, const std::string& vehicle_name)
-{
-    pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("rotateToYaw", yaw, timeout_sec, margin, vehicle_name);
-    return this;
-}
+// FixedWingRpcLibClient* FixedWingRpcLibClient::rotateToYawAsync(float yaw, float timeout_sec, float margin, const std::string& vehicle_name)
+// {
+//     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("rotateToYaw", yaw, timeout_sec, margin, vehicle_name);
+//     return this;
+// }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::rotateByYawRateAsync(float yaw_rate, float duration, const std::string& vehicle_name)
-{
-    pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("rotateByYawRate", yaw_rate, duration, vehicle_name);
-    return this;
-}
+// FixedWingRpcLibClient* FixedWingRpcLibClient::rotateByYawRateAsync(float yaw_rate, float duration, const std::string& vehicle_name)
+// {
+//     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("rotateByYawRate", yaw_rate, duration, vehicle_name);
+//     return this;
+// }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::hoverAsync(const std::string& vehicle_name)
-{
-    pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("hover", vehicle_name);
-    return this;
-}
+// FixedWingRpcLibClient* FixedWingRpcLibClient::hoverAsync(const std::string& vehicle_name)
+// {
+//     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("hover", vehicle_name);
+//     return this;
+// }
 
 void FixedWingRpcLibClient::setAngleLevelControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd, const std::string& vehicle_name)
 {
