@@ -1,4 +1,4 @@
-#include "FixedWingPawn.h"
+#include "FixedWingpawn.h"
 #include "Components/StaticMeshComponent.h"
 #include "AirBlueprintLib.h"
 #include "common/CommonStructs.hpp"
@@ -15,13 +15,13 @@ void AFixedWingPawn::BeginPlay()
 {
     Super::BeginPlay();
 
-    elevator_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Elevator-Position"));
-    aileron_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Aileron-Position"));
-    rudder_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Rudder-Position"));
+        elevator_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Elevator-Position"));
+        aileron_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Aileron-Position"));
+        rudder_position_ = UAirBlueprintLib::GetActorComponent<URotatingMovementComponent>(this, TEXT("Rudder-Position"));
 }
 
 void AFixedWingPawn::initializeForBeginPlay()
-{
+{    
     //get references of existing camera
     camera_front_right_ = Cast<APIPCamera>(
         (UAirBlueprintLib::GetActorComponent<UChildActorComponent>(this, TEXT("FrontRightCamera")))->GetChildActor());
@@ -74,7 +74,7 @@ const common_utils::UniqueValueMap<std::string, APIPCamera*> AFixedWingPawn::get
     return cameras;
 }
 
-void AFixedWingPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation,
+void AFixedWingPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, 
     FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
     pawn_events_.getCollisionSignal().emit(MyComp, Other, OtherComp, bSelfMoved, HitLocation,
@@ -96,7 +96,7 @@ void AFixedWingPawn::setElevatorDeflection(const std::vector<FixedWingPawnEvents
         {
             comp->RotationRate.Yaw = elevator_info.at(0).elevator_speed; // should this be pitch, can probably tilt local control surface
         }
-
+        
 	}
 }
 
