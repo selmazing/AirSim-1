@@ -42,95 +42,92 @@ FixedWingRpcLibServer::FixedWingRpcLibServer(ApiProvider* api_provider, string s
         : RpcLibServerBase(api_provider, server_address, port)
 {
     (static_cast<rpc::server*>(getServer()))->
-        bind("takeoff", [&](float timeout_sec, const std::string& vehicle_name) -> bool { 
-        return getVehicleApi(vehicle_name)->takeoff(timeout_sec); 
+        bind("takeoff", [&](float timeout_sec, const std::string& vehicle_name) -> bool {
+        return getVehicleApi(vehicle_name)->takeoff(timeout_sec);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("land", [&](float timeout_sec, const std::string& vehicle_name) -> bool { 
-        return getVehicleApi(vehicle_name)->land(timeout_sec); 
+        bind("land", [&](float timeout_sec, const std::string& vehicle_name) -> bool {
+        return getVehicleApi(vehicle_name)->land(timeout_sec);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("goHome", [&](float timeout_sec, const std::string& vehicle_name) -> bool { 
-        return getVehicleApi(vehicle_name)->goHome(timeout_sec); 
+        bind("goHome", [&](float timeout_sec, const std::string& vehicle_name) -> bool {
+        return getVehicleApi(vehicle_name)->goHome(timeout_sec);
     });
     (static_cast<rpc::server*>(getServer()))->
         bind("moveControls", [&](float elevator, float aileron, float rudder, float tla, float duration, const std::string& vehicle_name) ->
-        bool { return getVehicleApi(vehicle_name)->moveControls(elevator, aileron, rudder, tla, duration);
+        bool { return getVehicleApi(vehicle_name)->moveByControls(elevator, aileron, rudder, tla, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
         bind("moveByRollPitchYawZ", [&](float roll, float pitch, float yaw, float z, float duration, const std::string& vehicle_name) ->
         bool { return getVehicleApi(vehicle_name)->moveByRollPitchYawZ(roll, pitch, yaw, z, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByRollPitchYawThrottle", [&](float roll, float pitch, float yaw, float throttle, float duration, 
-            const std::string& vehicle_name) -> bool { 
-                return getVehicleApi(vehicle_name)->moveByRollPitchYawThrottle(roll, pitch, yaw, throttle, duration); 
+        bind("moveByRollPitchYawThrottle", [&](float roll, float pitch, float yaw, float throttle, float duration,
+            const std::string& vehicle_name) -> bool {
+                return getVehicleApi(vehicle_name)->moveByRollPitchYawThrottle(roll, pitch, yaw, throttle, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByRollPitchYawrateThrottle", [&](float roll, float pitch, float yaw_rate, float throttle, float duration, 
-            const std::string& vehicle_name) -> bool { 
-                return getVehicleApi(vehicle_name)->moveByRollPitchYawrateThrottle(roll, pitch, yaw_rate, throttle, duration); 
+        bind("moveByRollPitchYawrateThrottle", [&](float roll, float pitch, float yaw_rate, float throttle, float duration,
+            const std::string& vehicle_name) -> bool {
+                return getVehicleApi(vehicle_name)->moveByRollPitchYawrateThrottle(roll, pitch, yaw_rate, throttle, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByRollPitchYawrateZ", [&](float roll, float pitch, float yaw_rate, float z, float duration, 
-            const std::string& vehicle_name) -> bool { 
-                return getVehicleApi(vehicle_name)->moveByRollPitchYawrateZ(roll, pitch, yaw_rate, z, duration); 
+        bind("moveByRollPitchYawrateZ", [&](float roll, float pitch, float yaw_rate, float z, float duration,
+            const std::string& vehicle_name) -> bool {
+                return getVehicleApi(vehicle_name)->moveByRollPitchYawrateZ(roll, pitch, yaw_rate, z, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByAngleRatesZ", [&](float roll_rate, float pitch_rate, float yaw_rate, float z, float duration, 
-            const std::string& vehicle_name) -> bool { 
-                return getVehicleApi(vehicle_name)->moveByAngleRatesZ(roll_rate, pitch_rate, yaw_rate, z, duration); 
+        bind("moveByAngleRatesZ", [&](float roll_rate, float pitch_rate, float yaw_rate, float z, float duration,
+            const std::string& vehicle_name) -> bool {
+                return getVehicleApi(vehicle_name)->moveByAngleRatesZ(roll_rate, pitch_rate, yaw_rate, z, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByAngleRatesThrottle", [&](float roll_rate, float pitch_rate, float yaw_rate, float throttle, float duration, 
-            const std::string& vehicle_name) -> bool { 
-                return getVehicleApi(vehicle_name)->moveByAngleRatesThrottle(roll_rate, pitch_rate, yaw_rate, throttle, duration); 
+        bind("moveByAngleRatesThrottle", [&](float roll_rate, float pitch_rate, float yaw_rate, float throttle, float duration,
+            const std::string& vehicle_name) -> bool {
+                return getVehicleApi(vehicle_name)->moveByAngleRatesThrottle(roll_rate, pitch_rate, yaw_rate, throttle, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByVelocity", [&](float vx, float vy, float vz, float duration, DrivetrainType drivetrain, 
-            const FixedWingRpcLibAdapators::YawMode& yaw_mode, const std::string& vehicle_name) -> bool { 
-        return getVehicleApi(vehicle_name)->moveByVelocity(vx, vy, vz, duration, drivetrain, yaw_mode.to()); 
+        bind("moveByVelocity", [&](float vx, float vy, float vz, float duration, const std::string& vehicle_name) -> bool {
+        return getVehicleApi(vehicle_name)->moveByVelocity(vx, vy, vz, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByVelocityZ", [&](float vx, float vy, float z, float duration, DrivetrainType drivetrain, 
+        bind("moveByVelocityZ", [&](float vx, float vy, float z, float duration, DrivetrainType drivetrain,
             const FixedWingRpcLibAdapators::YawMode& yaw_mode, const std::string& vehicle_name) -> bool {
-            return getVehicleApi(vehicle_name)->moveByVelocityZ(vx, vy, z, duration, drivetrain, yaw_mode.to()); 
+            return getVehicleApi(vehicle_name)->moveByVelocityZ(vx, vy, z, duration, drivetrain, yaw_mode.to());
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveOnPath", [&](const vector<FixedWingRpcLibAdapators::Vector3r>& path, float velocity, float timeout_sec, DrivetrainType drivetrain, const FixedWingRpcLibAdapators::YawMode& yaw_mode,
+        bind("moveOnPath", [&](const vector<FixedWingRpcLibAdapators::Vector3r>& path, float velocity, float timeout_sec,
         float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {
             vector<Vector3r> conv_path;
             FixedWingRpcLibAdapators::to(path, conv_path);
-            return getVehicleApi(vehicle_name)->moveOnPath(conv_path, velocity, timeout_sec, drivetrain, yaw_mode.to(), lookahead, adaptive_lookahead);
-        });
-    (static_cast<rpc::server*>(getServer()))->
-        bind("moveToPosition", [&](float x, float y, float z, float velocity, float timeout_sec, DrivetrainType drivetrain,
-        const FixedWingRpcLibAdapators::YawMode& yaw_mode, float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {
-        return getVehicleApi(vehicle_name)->moveToPosition(x, y, z, velocity, timeout_sec, drivetrain, yaw_mode.to(), lookahead, adaptive_lookahead); 
+            return getVehicleApi(vehicle_name)->moveOnPath(conv_path, velocity, timeout_sec, lookahead, adaptive_lookahead);
     });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveToZ", [&](float z, float velocity, float timeout_sec, const FixedWingRpcLibAdapators::YawMode& yaw_mode, 
-            float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {
-        return getVehicleApi(vehicle_name)->moveToZ(z, velocity, timeout_sec, yaw_mode.to(), lookahead, adaptive_lookahead); 
+        bind("moveToPosition", [&](float x, float y, float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {
+        return getVehicleApi(vehicle_name)->moveToPosition(x, y, z, velocity, timeout_sec, lookahead, adaptive_lookahead);
     });
+    // (static_cast<rpc::server*>(getServer()))->
+    //     bind("moveToZ", [&](float z, float velocity, float timeout_sec, const FixedWingRpcLibAdapators::YawMode& yaw_mode,
+    //         float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {
+    //     return getVehicleApi(vehicle_name)->moveToZ(z, velocity, timeout_sec, yaw_mode.to(), lookahead, adaptive_lookahead);
+    // });
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByManual", [&](float vx_max, float vy_max, float z_min, float duration, DrivetrainType drivetrain, 
-            const FixedWingRpcLibAdapators::YawMode& yaw_mode, const std::string& vehicle_name) -> bool {
-        return getVehicleApi(vehicle_name)->moveByManual(vx_max, vy_max, z_min, duration, drivetrain, yaw_mode.to()); 
+        bind("moveByManual", [&](float vx_max, float vy_max, float z_min, float duration, const std::string& vehicle_name) -> bool {
+        return getVehicleApi(vehicle_name)->moveByManual(vx_max, vy_max, z_min, duration);
     });
 
-    (static_cast<rpc::server*>(getServer()))->
-        bind("rotateToYaw", [&](float yaw, float timeout_sec, float margin, const std::string& vehicle_name) -> bool {
-        return getVehicleApi(vehicle_name)->rotateToYaw(yaw, timeout_sec, margin); 
-    });
-    (static_cast<rpc::server*>(getServer()))->
-        bind("rotateByYawRate", [&](float yaw_rate, float duration, const std::string& vehicle_name) -> bool {
-        return getVehicleApi(vehicle_name)->rotateByYawRate(yaw_rate, duration); 
-    });
-    (static_cast<rpc::server*>(getServer()))->
-        bind("hover", [&](const std::string& vehicle_name) -> bool {
-        return getVehicleApi(vehicle_name)->hover(); 
-    });
+    // (static_cast<rpc::server*>(getServer()))->
+    //     bind("rotateToYaw", [&](float yaw, float timeout_sec, float margin, const std::string& vehicle_name) -> bool {
+    //     return getVehicleApi(vehicle_name)->rotateToYaw(yaw, timeout_sec, margin);
+    // });
+    // (static_cast<rpc::server*>(getServer()))->
+    //     bind("rotateByYawRate", [&](float yaw_rate, float duration, const std::string& vehicle_name) -> bool {
+    //     return getVehicleApi(vehicle_name)->rotateByYawRate(yaw_rate, duration);
+    // });
+    // (static_cast<rpc::server*>(getServer()))->
+    //     bind("hover", [&](const std::string& vehicle_name) -> bool {
+    //     return getVehicleApi(vehicle_name)->hover();
+    // });
     (static_cast<rpc::server*>(getServer()))->
         bind("setAngleLevelControllerGains", [&](const vector<float>& kp, const vector<float>& ki, const vector<float>& kd, const std::string& vehicle_name) -> void {
             getVehicleApi(vehicle_name)->setAngleLevelControllerGains(kp, ki, kd);
@@ -149,15 +146,15 @@ FixedWingRpcLibServer::FixedWingRpcLibServer(ApiProvider* api_provider, string s
     });
     (static_cast<rpc::server*>(getServer()))->
         bind("moveByRC", [&](const FixedWingRpcLibAdapators::RCData& data, const std::string& vehicle_name) -> void {
-        getVehicleApi(vehicle_name)->moveByRC(data.to()); 
+        getVehicleApi(vehicle_name)->moveByRC(data.to());
     });
 
     (static_cast<rpc::server*>(getServer()))->
         bind("setSafety", [&](uint enable_reasons, float obs_clearance, const SafetyEval::ObsAvoidanceStrategy& obs_startegy,
-        float obs_avoidance_vel, const FixedWingRpcLibAdapators::Vector3r& origin, float xy_length, 
+        float obs_avoidance_vel, const FixedWingRpcLibAdapators::Vector3r& origin, float xy_length,
             float max_z, float min_z, const std::string& vehicle_name) -> bool {
         return getVehicleApi(vehicle_name)->setSafety(SafetyEval::SafetyViolationType(enable_reasons), obs_clearance, obs_startegy,
-            obs_avoidance_vel, origin.to(), xy_length, max_z, min_z); 
+            obs_avoidance_vel, origin.to(), xy_length, max_z, min_z);
     });
 
     //getters
