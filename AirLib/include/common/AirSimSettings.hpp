@@ -31,6 +31,7 @@ public: //types
     static constexpr char const * kVehicleTypePhysXCar = "physxcar";
     static constexpr char const * kVehicleTypeArduRover = "ardurover";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
+    static constexpr char const * kVehicleTypeArduPlane = "arduplane";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -522,7 +523,7 @@ private:
                 physics_engine_name = "PhysX"; //this value is only informational for now
         }
     }
-    
+
     void loadLevelSettings(const Settings& settings_json)
     {
         level_name = settings_json.getString("Default Environment", "");
@@ -720,7 +721,7 @@ private:
         auto vehicle_type = Utils::toLower(settings_json.getString("VehicleType", ""));
 
         std::unique_ptr<VehicleSetting> vehicle_setting;
-        if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo 
+        if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo
             || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover)
             vehicle_setting = createMavLinkVehicleSetting(settings_json);
         //for everything else we don't need derived class yet

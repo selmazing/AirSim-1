@@ -14,9 +14,9 @@ UCLASS()
 class AIRSIM_API AFixedWingPawn : public APawn
 {
     GENERATED_BODY()
-	
+
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debugging")
+    // UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debugging")
 
     AFixedWingPawn();
     virtual void BeginPlay() override;
@@ -46,10 +46,10 @@ private: //variables
     UPROPERTY() APIPCamera* camera_back_center_;
     UPROPERTY() APIPCamera* camera_bottom_center_;
 
-    //UPROPERTY() UMovementComponent* control_positions[control_count];
+    // UPROPERTY() UMovementComponent* control_positions[control_count];
     UPROPERTY() URotatingMovementComponent* elevator_position_;
     UPROPERTY() URotatingMovementComponent* aileron_position_;
     UPROPERTY() URotatingMovementComponent* rudder_position_;
-	
+
     FixedWingPawnEvents pawn_events_;
 };
