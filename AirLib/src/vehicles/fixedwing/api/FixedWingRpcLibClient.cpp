@@ -87,36 +87,36 @@ FixedWingRpcLibClient* FixedWingRpcLibClient::moveByAttitudeAsync(float roll, fl
     return this;
 }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::moveByAngleRatesAsync(float roll_rate, float pitch_rate, float yaw_rate, float tla, float duration, const std::string& vehicle_name = "")
+FixedWingRpcLibClient* FixedWingRpcLibClient::moveByAngleRatesAsync(float roll_rate, float pitch_rate, float yaw_rate, float tla, float duration, const std::string& vehicle_name)
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveByAngleRatesAsync", roll_rate, pitch_rate, yaw_rate, tla, duration, vehicle_name);
     return this;
 }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::moveByVelocityAsync(float vx, float vy, float vz, float duration, const std::string& vehicle_name = "")
+FixedWingRpcLibClient* FixedWingRpcLibClient::moveByVelocityAsync(float vx, float vy, float vz, float duration, const std::string& vehicle_name)
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveByVelocityAsync", vx, vy, vz, duration, vehicle_name);
     return this;
 }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::moveOnPathAsync(const vector<Vector3r>& path, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name = "")
+FixedWingRpcLibClient* FixedWingRpcLibClient::moveOnPathAsync(const vector<Vector3r>& path, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name)
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveOnPathAsync", path, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name);
     return this;
 }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::moveToPositionAsync(float x, float y, float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name = "")
+FixedWingRpcLibClient* FixedWingRpcLibClient::moveToPositionAsync(float x, float y, float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name)
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveToPositionAsync", x, y, z, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name);
     return this;
 }
 
-FixedWingRpcLibClient* FixedWingRpcLibClient::moveToAltAsync(float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name = "")
+FixedWingRpcLibClient* FixedWingRpcLibClient::moveToAltAsync(float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name)
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveToAltAsync", z, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name);
     return this;
 }
-FixedWingRpcLibClient* FixedWingRpcLibClient::moveByManualAsync(float vx_max, float vy_max, float z_min, float duration, const std::string& vehicle_name = "")
+FixedWingRpcLibClient* FixedWingRpcLibClient::moveByManualAsync(float vx_max, float vy_max, float z_min, float duration, const std::string& vehicle_name)
 {
     pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveToAltAsync", vx_max, vy_max, z_min, duration, vehicle_name);
     return this;
