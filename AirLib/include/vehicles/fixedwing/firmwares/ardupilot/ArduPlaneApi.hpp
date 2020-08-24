@@ -51,7 +51,7 @@ public:
 public:
     virtual void resetImplementation() override
     {
-        ArduPlaneApi::resetImplementation();
+        FixedWingApiBase::resetImplementation();
 
         // Reset state
     }
@@ -59,7 +59,7 @@ public:
     // Update sensor data & send to Ardupilot
     virtual void update() override
     {
-        ArduPlaneApi::update();
+        FixedWingApiBase::update();
 
         sendSensors();
         recvControlDeflection();
