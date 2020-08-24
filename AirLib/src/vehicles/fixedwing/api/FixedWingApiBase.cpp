@@ -633,7 +633,7 @@ RCData FixedWingApiBase::estimateRCTrims(float trimduration, float minCountForTr
     return rc_data_trims_;
 }
 
-void FixedWingApiBase::moveToPathPosition(const Vector3r& dest, float velocity, DrivetrainType drivetrain, /* pass by value */ YawMode yaw_mode, float last_z)
+void FixedWingApiBase::moveToPathPosition(const Vector3r& dest, float velocity, float last_z)
 {
     unused(last_z);
     //validate dest
