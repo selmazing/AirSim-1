@@ -57,44 +57,44 @@ FixedWingRpcLibServer::FixedWingRpcLibServer(ApiProvider* api_provider, string s
         bind("moveControls", [&](float elevator, float aileron, float rudder, float tla, float duration, const std::string& vehicle_name) ->
         bool { return getVehicleApi(vehicle_name)->moveByControls(elevator, aileron, rudder, tla, duration);
     });
-    (static_cast<rpc::server*>(getServer()))->
+    /*(static_cast<rpc::server*>(getServer()))->
         bind("moveByRollPitchYawZ", [&](float roll, float pitch, float yaw, float z, float duration, const std::string& vehicle_name) ->
         bool { return getVehicleApi(vehicle_name)->moveByRollPitchYawZ(roll, pitch, yaw, z, duration);
-    });
+    });*/
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByRollPitchYawThrottle", [&](float roll, float pitch, float yaw, float throttle, float duration,
+        bind("moveByRollPitchYaw", [&](float roll, float pitch, float yaw, float tla , float duration,
             const std::string& vehicle_name) -> bool {
-                return getVehicleApi(vehicle_name)->moveByRollPitchYawThrottle(roll, pitch, yaw, throttle, duration);
+                return getVehicleApi(vehicle_name)->moveByRollPitchYaw(roll, pitch, yaw, tla, duration);
     });
-    (static_cast<rpc::server*>(getServer()))->
+    /*(static_cast<rpc::server*>(getServer()))->
         bind("moveByRollPitchYawrateThrottle", [&](float roll, float pitch, float yaw_rate, float throttle, float duration,
             const std::string& vehicle_name) -> bool {
                 return getVehicleApi(vehicle_name)->moveByRollPitchYawrateThrottle(roll, pitch, yaw_rate, throttle, duration);
-    });
-    (static_cast<rpc::server*>(getServer()))->
+    });*/
+    /*(static_cast<rpc::server*>(getServer()))->
         bind("moveByRollPitchYawrateZ", [&](float roll, float pitch, float yaw_rate, float z, float duration,
             const std::string& vehicle_name) -> bool {
                 return getVehicleApi(vehicle_name)->moveByRollPitchYawrateZ(roll, pitch, yaw_rate, z, duration);
-    });
-    (static_cast<rpc::server*>(getServer()))->
+    });*/
+    /*(static_cast<rpc::server*>(getServer()))->
         bind("moveByAngleRatesZ", [&](float roll_rate, float pitch_rate, float yaw_rate, float z, float duration,
             const std::string& vehicle_name) -> bool {
                 return getVehicleApi(vehicle_name)->moveByAngleRatesZ(roll_rate, pitch_rate, yaw_rate, z, duration);
-    });
+    });*/
     (static_cast<rpc::server*>(getServer()))->
-        bind("moveByAngleRatesThrottle", [&](float roll_rate, float pitch_rate, float yaw_rate, float throttle, float duration,
+        bind("moveByAngleRates", [&](float roll_rate, float pitch_rate, float yaw_rate, float tla, float duration,
             const std::string& vehicle_name) -> bool {
-                return getVehicleApi(vehicle_name)->moveByAngleRatesThrottle(roll_rate, pitch_rate, yaw_rate, throttle, duration);
+                return getVehicleApi(vehicle_name)->moveByAngleRates(roll_rate, pitch_rate, yaw_rate, tla, duration);
     });
     (static_cast<rpc::server*>(getServer()))->
         bind("moveByVelocity", [&](float vx, float vy, float vz, float duration, const std::string& vehicle_name) -> bool {
         return getVehicleApi(vehicle_name)->moveByVelocity(vx, vy, vz, duration);
     });
-    (static_cast<rpc::server*>(getServer()))->
+    /*(static_cast<rpc::server*>(getServer()))->
         bind("moveByVelocityZ", [&](float vx, float vy, float z, float duration, DrivetrainType drivetrain,
             const FixedWingRpcLibAdapators::YawMode& yaw_mode, const std::string& vehicle_name) -> bool {
             return getVehicleApi(vehicle_name)->moveByVelocityZ(vx, vy, z, duration, drivetrain, yaw_mode.to());
-    });
+    });*/
     (static_cast<rpc::server*>(getServer()))->
         bind("moveOnPath", [&](const vector<FixedWingRpcLibAdapators::Vector3r>& path, float velocity, float timeout_sec,
         float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {

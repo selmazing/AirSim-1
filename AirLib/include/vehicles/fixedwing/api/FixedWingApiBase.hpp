@@ -134,7 +134,7 @@ protected: //utility methods
     typedef std::function<bool()> WaitFunction;
 
     //*********************************safe wrapper around low level commands***************************************************
-    virtual bool moveByAttitudeInternal(float roll, float pitch, float yaw, float tla);
+    virtual bool moveByRollPitchYawInternal(float roll, float pitch, float yaw, float tla);
     virtual bool moveByAngleRatesInternal(float roll_rate, float pitch_rate, float yaw_rate, float tla);
     virtual bool moveByVelocityInternal(float vx, float vy, float vz);
     virtual bool moveToPositionInternal(const Vector3r& dest);

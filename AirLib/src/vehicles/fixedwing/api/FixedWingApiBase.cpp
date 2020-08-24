@@ -72,7 +72,7 @@ bool FixedWingApiBase::goHome(float timeout_sec)
     return moveToPosition(0, 0, 0, 0.5f, timeout_sec, -1, 1);
 }
 
-bool FixedWingApiBase::moveByMotorPWMs(float front_right_pwm, float rear_left_pwm, float front_left_pwm, float rear_right_pwm, float duration)
+bool FixedWingApiBase::moveByControls(float elevator, float aileron, float rudder, float tla, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -80,12 +80,12 @@ bool FixedWingApiBase::moveByMotorPWMs(float front_right_pwm, float rear_left_pw
         return true;
 
     return waitForFunction([&]() {
-        commandMotorPWMs(front_right_pwm, rear_left_pwm, front_left_pwm, rear_right_pwm);
+        commandControls(elevator, aileron, rudder, tla);
         return false; //keep moving until timeout
     }, duration).isTimeout();
 }
 
-bool FixedWingApiBase::moveByRollPitchYawZ(float roll, float pitch, float yaw, float z, float duration)
+bool FixedWingApiBase::moveByRollPitchYaw(float roll, float pitch, float yaw, float tla, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -93,25 +93,12 @@ bool FixedWingApiBase::moveByRollPitchYawZ(float roll, float pitch, float yaw, f
         return true;
 
     return waitForFunction([&]() {
-        moveByRollPitchYawZInternal(roll, pitch, yaw, z);
+        moveByRollPitchYawInternal(roll, pitch, yaw, tla);
         return false; //keep moving until timeout
     }, duration).isTimeout();
 }
 
-bool FixedWingApiBase::moveByRollPitchYawThrottle(float roll, float pitch, float yaw, float throttle, float duration)
-{
-    SingleTaskCall lock(this);
-
-    if (duration <= 0)
-        return true;
-
-    return waitForFunction([&]() {
-        moveByRollPitchYawThrottleInternal(roll, pitch, yaw, throttle);
-        return false; //keep moving until timeout
-    }, duration).isTimeout();
-}
-
-bool FixedWingApiBase::moveByRollPitchYawrateThrottle(float roll, float pitch, float yaw_rate, float throttle, float duration)
+/*bool FixedWingApiBase::moveByRollPitchYawrateThrottle(float roll, float pitch, float yaw_rate, float throttle, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -122,9 +109,9 @@ bool FixedWingApiBase::moveByRollPitchYawrateThrottle(float roll, float pitch, f
         moveByRollPitchYawrateThrottleInternal(roll, pitch, yaw_rate, throttle);
         return false; //keep moving until timeout
     }, duration).isTimeout();
-}
+}*/
 
-bool FixedWingApiBase::moveByRollPitchYawrateZ(float roll, float pitch, float yaw_rate, float z, float duration)
+/*bool FixedWingApiBase::moveByRollPitchYawrateZ(float roll, float pitch, float yaw_rate, float z, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -135,9 +122,9 @@ bool FixedWingApiBase::moveByRollPitchYawrateZ(float roll, float pitch, float ya
         moveByRollPitchYawrateZInternal(roll, pitch, yaw_rate, z);
         return false; //keep moving until timeout
     }, duration).isTimeout();
-}
+}*/
 
-bool FixedWingApiBase::moveByAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z, float duration)
+/*bool FixedWingApiBase::moveByAngleRatesZ(float roll_rate, float pitch_rate, float yaw_rate, float z, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -148,9 +135,9 @@ bool FixedWingApiBase::moveByAngleRatesZ(float roll_rate, float pitch_rate, floa
         moveByAngleRatesZInternal(roll_rate, pitch_rate, yaw_rate, z);
         return false; //keep moving until timeout
     }, duration).isTimeout();
-}
+}*/
 
-bool FixedWingApiBase::moveByAngleRatesThrottle(float roll_rate, float pitch_rate, float yaw_rate, float throttle, float duration)
+bool FixedWingApiBase::moveByAngleRates(float roll_rate, float pitch_rate, float yaw_rate, float tla, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -158,28 +145,28 @@ bool FixedWingApiBase::moveByAngleRatesThrottle(float roll_rate, float pitch_rat
         return true;
 
     return waitForFunction([&]() {
-        moveByAngleRatesThrottleInternal(roll_rate, pitch_rate, yaw_rate, throttle);
+        moveByAngleRatesInternal(roll_rate, pitch_rate, yaw_rate, tla);
         return false; //keep moving until timeout
     }, duration).isTimeout();
 }
 
-bool FixedWingApiBase::moveByVelocity(float vx, float vy, float vz, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode)
+bool FixedWingApiBase::moveByVelocity(float vx, float vy, float vz, float duration)
 {
     SingleTaskCall lock(this);
 
     if (duration <= 0)
         return true;
 
-    YawMode adj_yaw_mode(yaw_mode.is_rate, yaw_mode.yaw_or_rate);
-    adjustYaw(vx, vy, drivetrain, adj_yaw_mode);
+    // YawMode adj_yaw_mode(yaw_mode.is_rate, yaw_mode.yaw_or_rate);
+    // adjustYaw(vx, vy, drivetrain, adj_yaw_mode);
 
     return waitForFunction([&]() {
-        moveByVelocityInternal(vx, vy, vz, adj_yaw_mode);
+        moveByVelocityInternal(vx, vy, vz);
         return false; //keep moving until timeout
     }, duration).isTimeout();
 }
 
-bool FixedWingApiBase::moveByVelocityZ(float vx, float vy, float z, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode)
+/*bool FixedWingApiBase::moveByVelocityZ(float vx, float vy, float z, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode)
 {
     SingleTaskCall lock(this);
 
@@ -193,10 +180,9 @@ bool FixedWingApiBase::moveByVelocityZ(float vx, float vy, float z, float durati
         moveByVelocityZInternal(vx, vy, z, adj_yaw_mode);
         return false; //keep moving until timeout
     }, duration).isTimeout();
-}
+}*/
 
-bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, float timeout_sec, DrivetrainType drivetrain, const YawMode& yaw_mode,
-    float lookahead, float adaptive_lookahead)
+bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead)
 {
     SingleTaskCall lock(this);
 
@@ -207,8 +193,8 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
     }
 
     //validate yaw mode
-    if (drivetrain == DrivetrainType::ForwardOnly && yaw_mode.is_rate)
-        throw std::invalid_argument("Yaw cannot be specified as rate if drivetrain is ForwardOnly");
+    /*if (drivetrain == DrivetrainType::ForwardOnly && yaw_mode.is_rate)
+        throw std::invalid_argument("Yaw cannot be specified as rate if drivetrain is ForwardOnly");*/
 
     //validate and set auto-lookahead value
     float command_period_dist = velocity * getCommandPeriod();
@@ -273,15 +259,14 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
         ) { //current position is approximately at the last end point
 
         float seg_velocity = path_segs.at(next_path_loc.seg_index).seg_velocity;
-        float path_length_remaining = path_length - path_segs.at(cur_path_loc.seg_index).seg_path_length - cur_path_loc.offset;
+        /*float path_length_remaining = path_length - path_segs.at(cur_path_loc.seg_index).seg_path_length - cur_path_loc.offset;
         if (seg_velocity > getFixedWingApiParams().min_vel_for_breaking && path_length_remaining <= breaking_dist) {
             seg_velocity = getFixedWingApiParams().breaking_vel;
             //Utils::logMessage("path_length_remaining = %f, Switched to breaking vel %f", path_length_remaining, seg_velocity);
-        }
+        }*/
 
         //send drone command to get to next lookahead
-        moveToPathPosition(next_path_loc.position, seg_velocity, drivetrain,
-            yaw_mode, path_segs.at(cur_path_loc.seg_index).start_z);
+        moveToPathPosition(next_path_loc.position, seg_velocity, path_segs.at(cur_path_loc.seg_index).start_z);
 
         //sleep for rest of the cycle
         if (!waiter.sleep())
@@ -375,16 +360,15 @@ bool FixedWingApiBase::moveOnPath(const vector<Vector3r>& path, float velocity, 
     return waiter.isComplete();
 }
 
-bool FixedWingApiBase::moveToPosition(float x, float y, float z, float velocity, float timeout_sec, DrivetrainType drivetrain,
-    const YawMode& yaw_mode, float lookahead, float adaptive_lookahead)
+bool FixedWingApiBase::moveToPosition(float x, float y, float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead)
 {
     SingleTaskCall lock(this);
 
     vector<Vector3r> path{ Vector3r(x, y, z) };
-    return moveOnPath(path, velocity, timeout_sec, drivetrain, yaw_mode, lookahead, adaptive_lookahead);
+    return moveOnPath(path, velocity, timeout_sec, lookahead, adaptive_lookahead);
 }
 
-bool FixedWingApiBase::moveToZ(float z, float velocity, float timeout_sec, const YawMode& yaw_mode,
+/*bool FixedWingApiBase::moveToZ(float z, float velocity, float timeout_sec, const YawMode& yaw_mode,
     float lookahead, float adaptive_lookahead)
 {
     SingleTaskCall lock(this);
@@ -392,13 +376,13 @@ bool FixedWingApiBase::moveToZ(float z, float velocity, float timeout_sec, const
     Vector2r cur_xy(getPosition().x(), getPosition().y());
     vector<Vector3r> path { Vector3r(cur_xy.x(), cur_xy.y(), z) };
     return moveOnPath(path, velocity, timeout_sec, DrivetrainType::MaxDegreeOfFreedom, yaw_mode, lookahead, adaptive_lookahead);
-}
+}*/
 
-bool FixedWingApiBase::moveByManual(float vx_max, float vy_max, float z_min, float duration, DrivetrainType drivetrain, const YawMode& yaw_mode)
+/* bool FixedWingApiBase::moveByManual(float vx_max, float vy_max, float z_min, float duration)
 {
     SingleTaskCall lock(this);
 
-    const float kMaxMessageAge = 0.1f /* 0.1 sec */, kMaxRCValue = 10000;
+    const float kMaxMessageAge = 0.1f, kMaxRCValue = 10000;
 
     if (duration <= 0)
         return true;
@@ -420,14 +404,14 @@ bool FixedWingApiBase::moveByManual(float vx_max, float vy_max, float z_min, flo
             Vector3r vel_body = VectorMath::transformToBodyFrame(vel_word, starting_quaternion, true);
 
             //find yaw as per terrain and remote setting
-            YawMode adj_yaw_mode(yaw_mode.is_rate, yaw_mode.yaw_or_rate);
+            /*YawMode adj_yaw_mode(yaw_mode.is_rate, yaw_mode.yaw_or_rate);
             adj_yaw_mode.yaw_or_rate += rc_data.yaw * 100.0f / kMaxRCValue;
-            adjustYaw(vel_body, drivetrain, adj_yaw_mode);
+            adjustYaw(vel_body, drivetrain, adj_yaw_mode);*/ /*
 
             //execute command
             try {
                 float vz = (rc_data.throttle / kMaxRCValue) * z_min + getPosition().z();
-                moveByVelocityZInternal(vel_body.x(), vel_body.y(), vz, adj_yaw_mode);
+                moveByVelocityZInternal(vel_body.x(), vel_body.y(), vz);
             }
             catch (const FixedWingApiBase::UnsafeMoveException& ex) {
                 Utils::log(Utils::stringf("Safety violation: %s", ex.result.message.c_str()), Utils::kLogLevelWarn);
@@ -440,9 +424,9 @@ bool FixedWingApiBase::moveByManual(float vx_max, float vy_max, float z_min, flo
 
     //if timeout occurred then command completed successfully otherwise it was interrupted
     return waiter.isTimeout();
-}
+} */
 
-bool FixedWingApiBase::rotateToYaw(float yaw, float timeout_sec, float margin)
+/*bool FixedWingApiBase::rotateToYaw(float yaw, float timeout_sec, float margin)
 {
     SingleTaskCall lock(this);
 
@@ -469,9 +453,9 @@ bool FixedWingApiBase::rotateToYaw(float yaw, float timeout_sec, float margin)
         // yaw is not within margin
         return false; //keep moving until timeout
     }, timeout_sec).isComplete();
-}
+}*/
 
-bool FixedWingApiBase::rotateByYawRate(float yaw_rate, float duration)
+/*bool FixedWingApiBase::rotateByYawRate(float yaw_rate, float duration)
 {
     SingleTaskCall lock(this);
 
@@ -485,7 +469,7 @@ bool FixedWingApiBase::rotateByYawRate(float yaw_rate, float duration)
         moveToPositionInternal(start_pos, yaw_mode);
         return false; //keep moving until timeout
     }, duration).isTimeout();
-}
+}*/
 
 void FixedWingApiBase::setAngleLevelControllerGains(const vector<float>& kp, const vector<float>& ki, const vector<float>& kd)
 {
@@ -511,12 +495,12 @@ void FixedWingApiBase::setPositionControllerGains(const vector<float>& kp, const
     setControllerGains(controller_type, kp, ki, kd);
 }
 
-bool FixedWingApiBase::hover()
+/*bool FixedWingApiBase::hover()
 {
     SingleTaskCall lock(this);
 
     return moveToZ(getPosition().z(), 0.5f, Utils::max<float>(), YawMode{ true,0 }, 1.0f, false);
-}
+}*/
 
 void FixedWingApiBase::moveByRC(const RCData& rc_data)
 {
@@ -525,58 +509,58 @@ void FixedWingApiBase::moveByRC(const RCData& rc_data)
     throw VehicleCommandNotImplementedException("moveByRC API is not implemented for this aircraft");
 }
 
-void FixedWingApiBase::moveByVelocityInternal(float vx, float vy, float vz, const YawMode& yaw_mode)
+void FixedWingApiBase::moveByVelocityInternal(float vx, float vy, float vz)
 {
     if (safetyCheckVelocity(Vector3r(vx, vy, vz)))
-        commandVelocity(vx, vy, vz, yaw_mode);
+        commandVelocityHold(vx, vy, vz);
 }
 
-void FixedWingApiBase::moveByVelocityZInternal(float vx, float vy, float z, const YawMode& yaw_mode)
+/*void FixedWingApiBase::moveByVelocityZInternal(float vx, float vy, float z)
 {
     if (safetyCheckVelocityZ(vx, vy, z))
         commandVelocityZ(vx, vy, z, yaw_mode);
-}
+}*/
 
-void FixedWingApiBase::moveToPositionInternal(const Vector3r& dest, const YawMode& yaw_mode)
+void FixedWingApiBase::moveToPositionInternal(const Vector3r& dest)
 {
     if (safetyCheckDestination(dest))
-        commandPosition(dest.x(), dest.y(), dest.z(), yaw_mode);
+        commandPositionHold(dest.x(), dest.y(), dest.z());
 }
 
-void FixedWingApiBase::moveByRollPitchYawZInternal(float roll, float pitch, float yaw, float z)
+/*void FixedWingApiBase::moveByRollPitchYawZInternal(float roll, float pitch, float yaw, float z)
 {
     if (safetyCheckVelocity(getVelocity()))
         commandRollPitchYawZ(roll, pitch, yaw, z);
-}
+}*/
 
-void FixedWingApiBase::moveByRollPitchYawThrottleInternal(float roll, float pitch, float yaw, float throttle)
+void FixedWingApiBase::moveByRollPitchYawInternal(float roll, float pitch, float yaw, float tla)
 {
     if (safetyCheckVelocity(getVelocity()))
-        commandRollPitchYawThrottle(roll, pitch, yaw, throttle);
+        commandRollPitchYawHold(roll, pitch, yaw, tla);
 }
 
-void FixedWingApiBase::moveByRollPitchYawrateThrottleInternal(float roll, float pitch, float yaw_rate, float throttle)
+/*void FixedWingApiBase::moveByRollPitchYawrateThrottleInternal(float roll, float pitch, float yaw_rate, float throttle)
 {
     if (safetyCheckVelocity(getVelocity()))
         commandRollPitchYawrateThrottle(roll, pitch, yaw_rate, throttle);
-}
+}*/
 
-void FixedWingApiBase::moveByRollPitchYawrateZInternal(float roll, float pitch, float yaw_rate, float z)
+/*void FixedWingApiBase::moveByRollPitchYawrateZInternal(float roll, float pitch, float yaw_rate, float z)
 {
     if (safetyCheckVelocity(getVelocity()))
         commandRollPitchYawrateZ(roll, pitch, yaw_rate, z);
-}
+}*/
 
-void FixedWingApiBase::moveByAngleRatesZInternal(float roll_rate, float pitch_rate, float yaw_rate, float z)
+/*void FixedWingApiBase::moveByAngleRatesZInternal(float roll_rate, float pitch_rate, float yaw_rate, float z)
 {
     if (safetyCheckVelocity(getVelocity()))
         commandAngleRatesZ(roll_rate, pitch_rate, yaw_rate, z);
-}
+}*/
 
-void FixedWingApiBase::moveByAngleRatesThrottleInternal(float roll_rate, float pitch_rate, float yaw_rate, float throttle)
+void FixedWingApiBase::moveByAngleRatesInternal(float roll_rate, float pitch_rate, float yaw_rate, float tla)
 {
     if (safetyCheckVelocity(getVelocity()))
-        commandAngleRatesThrottle(roll_rate, pitch_rate, yaw_rate, throttle);
+        commandAngleRates(roll_rate, pitch_rate, yaw_rate, tla);
 }
 
 //executes a given function until it returns true. Each execution is spaced apart at command period.
@@ -657,7 +641,7 @@ void FixedWingApiBase::moveToPathPosition(const Vector3r& dest, float velocity, 
         throw std::invalid_argument(VectorMath::toString(dest, "dest vector cannot have NaN: "));
 
     //what is the distance we will travel at this velocity?
-    float expected_dist = velocity * getCommandPeriod();
+    float expected_dist = velocity * getCommandPeriod(); // not sure why not declared need to look at multirotor
 
     //get velocity vector
     const Vector3r cur = getPosition();
@@ -665,7 +649,7 @@ void FixedWingApiBase::moveToPathPosition(const Vector3r& dest, float velocity, 
     float cur_dest_norm = cur_dest.norm();
 
     //yaw for the direction of travel
-    adjustYaw(cur_dest, drivetrain, yaw_mode);
+    //adjustYaw(cur_dest, drivetrain, yaw_mode);
 
     //find velocity vector
     Vector3r velocity_vect;
@@ -684,10 +668,11 @@ void FixedWingApiBase::moveToPathPosition(const Vector3r& dest, float velocity, 
 
     //send commands
     //try to maintain altitude if path was in XY plan only, velocity based control is not as good
-    if (std::abs(cur.z() - dest.z()) <= getDistanceAccuracy()) //for paths in XY plan current code leaves z untouched, so we can compare with strict equality
+    /*if (std::abs(cur.z() - dest.z()) <= getDistanceAccuracy()) //for paths in XY plan current code leaves z untouched, so we can compare with strict equality
         moveByVelocityZInternal(velocity_vect.x(), velocity_vect.y(), dest.z(), yaw_mode);
-    else
-        moveByVelocityInternal(velocity_vect.x(), velocity_vect.y(), velocity_vect.z(), yaw_mode);
+    else*/
+	
+    moveByVelocityInternal(velocity_vect.x(), velocity_vect.y(), velocity_vect.z());
 }
 
 bool FixedWingApiBase::setSafety(SafetyEval::SafetyViolationType enable_reasons, float obs_clearance, SafetyEval::ObsAvoidanceStrategy obs_startegy,
@@ -705,7 +690,7 @@ bool FixedWingApiBase::setSafety(SafetyEval::SafetyViolationType enable_reasons,
     return true;
 }
 
-bool FixedWingApiBase::emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& result)
+/*bool FixedWingApiBase::emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& result)
 {
     if (!result.is_safe) {
         if (result.reason == SafetyEval::SafetyViolationType_::Obstacle) {
@@ -715,7 +700,7 @@ bool FixedWingApiBase::emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& r
                 Vector3r avoidance_vel = getObsAvoidanceVelocity(result.cur_risk_dist, obs_avoidance_vel_) * result.suggested_vec;
 
                 //use the unchecked command
-                commandVelocityZ(avoidance_vel.x(), avoidance_vel.y(), getPosition().z(), YawMode::Zero());
+                commandVelocityHold(avoidance_vel.x(), avoidance_vel.y(), getPosition().z(), YawMode::Zero());
 
                 //tell caller not to execute planned command
                 return false;
@@ -724,38 +709,38 @@ bool FixedWingApiBase::emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& r
         }
         //otherwise there is some other reason why we are in unsafe situation
         //send last command to come to full stop
-        commandVelocity(0, 0, 0, YawMode::Zero());
+        commandVelocityHold(0, 0, 0);
         throw UnsafeMoveException(result);
     }
     //else no unsafe situation
 
     return true;
-}
+}*/
 
-bool FixedWingApiBase::safetyCheckVelocity(const Vector3r& velocity)
+/*bool FixedWingApiBase::safetyCheckVelocity(const Vector3r& velocity)
 {
     if (safety_eval_ptr_ == nullptr) //safety checks disabled
         return true;
 
     const auto& result = safety_eval_ptr_->isSafeVelocity(getPosition(), velocity, getOrientation());
     return emergencyManeuverIfUnsafe(result);
-}
-bool FixedWingApiBase::safetyCheckVelocityZ(float vx, float vy, float z)
+}*/
+/*bool FixedWingApiBase::safetyCheckVelocityZ(float vx, float vy, float z)
 {
     if (safety_eval_ptr_ == nullptr) //safety checks disabled
         return true;
 
     const auto& result = safety_eval_ptr_->isSafeVelocityZ(getPosition(), vx, vy, z, getOrientation());
     return emergencyManeuverIfUnsafe(result);
-}
-bool FixedWingApiBase::safetyCheckDestination(const Vector3r& dest_pos)
+}*/
+/*bool FixedWingApiBase::safetyCheckDestination(const Vector3r& dest_pos)
 {
     if (safety_eval_ptr_ == nullptr) //safety checks disabled
         return true;
 
     const auto& result = safety_eval_ptr_->isSafeDestination(getPosition(), dest_pos, getOrientation());
     return emergencyManeuverIfUnsafe(result);
-}
+}*/
 
 float FixedWingApiBase::setNextPathPosition(const vector<Vector3r>& path, const vector<PathSegment>& path_segs,
     const PathPosition& cur_path_loc, float next_dist, PathPosition& next_path_loc)
@@ -791,7 +776,7 @@ float FixedWingApiBase::setNextPathPosition(const vector<Vector3r>& path, const 
     return next_dist;
 }
 
-void FixedWingApiBase::adjustYaw(const Vector3r& heading, DrivetrainType drivetrain, YawMode& yaw_mode)
+/*void FixedWingApiBase::adjustYaw(const Vector3r& heading, DrivetrainType drivetrain, YawMode& yaw_mode)
 {
     //adjust yaw for the direction of travel in forward-only mode
     if (drivetrain == DrivetrainType::ForwardOnly && !yaw_mode.is_rate) {
@@ -803,17 +788,17 @@ void FixedWingApiBase::adjustYaw(const Vector3r& heading, DrivetrainType drivetr
             yaw_mode.setZeroRate(); //don't change existing yaw if heading is too small because that can generate random result
     }
     //else no adjustment needed
-}
+}*/
 
-void FixedWingApiBase::adjustYaw(float x, float y, DrivetrainType drivetrain, YawMode& yaw_mode) {
+/*void FixedWingApiBase::adjustYaw(float x, float y, DrivetrainType drivetrain, YawMode& yaw_mode) {
     adjustYaw(Vector3r(x, y, 0), drivetrain, yaw_mode);
-}
+}*/
 
-bool FixedWingApiBase::isYawWithinMargin(float yaw_target, float margin) const
+/*bool FixedWingApiBase::isYawWithinMargin(float yaw_target, float margin) const
 {
     const float yaw_current = VectorMath::getYaw(getOrientation()) * 180 / M_PIf;
     return std::abs(yaw_current - yaw_target) <= margin;
-}
+}*/
 
 float FixedWingApiBase::getAutoLookahead(float velocity, float adaptive_lookahead,
         float max_factor, float min_factor) const
