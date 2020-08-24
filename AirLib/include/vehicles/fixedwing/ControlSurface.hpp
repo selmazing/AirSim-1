@@ -1,0 +1,118 @@
+#ifndef msr_airlib_controlsurface_hpp
+#define msr_airlib_controlsurface_hpp
+
+#include "common/Common.hpp"
+#include <limits>
+#include "physics/Environment.hpp"
+#include "physics/Kinematics.hpp"
+#include "common/FirstOrderFilter.hpp"
+#include "physics/PhysicsBodyVertex.hpp"
+#include "AircraftParams.hpp"
+
+namespace msr
+{
+	namespace airlib
+	{
+		/* Aircraft gets control deflection signal as input which changes the balance of forces on the aircraft*/
+		class ControlSurface : public PhysicsBodyVertex
+		{
+		public: //types
+			struct Output
+			{
+				// control terms
+				real_T control_signal_filtered; 
+				real_T control_signal_input;
+				real_T control_speed;
+				real_T control_deflection;
+			};
+		public: //methods
+			
+			ControlSurface()
+			{
+				// Default constructor
+			}
+
+			ControlSurface(const Vector3r& position, const Vector3r& normal, const Environment* environment, uint id = -1 )
+			{
+				initialize(position, normal, environment, id);
+			}
+			void initialize(const Vector3r& position, const Vector3r& normal, const Environment* environment, uint id = -1)
+			{
+				id_ = id;
+				environment_ = environment;
+				air_density_sea_level_ = EarthUtils::getAirDensity(0.0f);
+
+				// hardcoded time-constant for now, should probably have another hpp class with the control surface properties
+				control_signal_filter_.initialize(0.005f, 0, 0);
+
+				PhysicsBodyVertex::initialize(position, normal); // call base initializer
+			}
+
+			// set elevator signal from -1 to 1 for full deflection at limit
+			void setControlSignal(real_T control_signal)
+			{
+				control_signal_filter_.setInput(Utils::clip(control_signal, -1.0f, 1.0f));
+			}
+
+			Output getOutput() const
+			{
+				return output_;
+			}
+
+			/* Start: update state implementation*/
+			virtual void resetImplementation() override
+			{
+				PhysicsBodyVertex::resetImplementation();
+				updateEnvironmentalFactors();
+				control_signal_filter_.reset();
+				setOutput(output_, control_signal_filter_);
+			}
+
+			virtual void update() override
+			{
+				updateEnvironmentalFactors();
+				PhysicsBodyVertex::update();
+				setOutput(output_, control_signal_filter_);
+				control_signal_filter_.update();
+			}
+
+			virtual void reportState(StateReporter& reporter) override
+			{
+				reporter.writeValue("Elevator-Ctrl-in", output_.control_signal_input);
+				reporter.writeValue("Elevator-Ctrl-fl", output_.control_signal_filtered);
+				reporter.writeValue("Elevator-Control-Deflection", output_.control_deflection);
+				reporter.writeValue("Elevator-Control-Speed", output_.control_speed);
+			}
+			/* End: update state implementation*/
+			
+		private: // methods
+
+			//calculates all the forces
+			virtual void setOutput(Output& output, const FirstOrderFilter<real_T>& control_signal_filter)
+			{
+				output.control_signal_input = control_signal_filter_.getInput();
+				output.control_signal_filtered = control_signal_filter_.getOutput();
+			}
+
+			void updateEnvironmentalFactors()
+			{
+				air_density_ratio_ = environment_->getState().air_density / air_density_sea_level_; // Sigma ratio
+				forward_velocity_ = kinematics_->getState().twist.linear(0); // Indicated Airspeed
+				dyn_pressure_ = 0.5 * environment_->getState().air_density * forward_velocity_ * forward_velocity_;
+			}
+
+		private: //fields
+			uint id_; // for debug messages
+			FirstOrderFilter<real_T> control_signal_filter_;
+			const Environment* environment_ = nullptr;
+			const Kinematics* kinematics_ = nullptr;
+			real_T air_density_sea_level_, air_density_ratio_, dyn_pressure_, forward_velocity_;
+			Output output_;
+			
+			
+		};
+	}
+}
+
+#endif
+

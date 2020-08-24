@@ -1,5 +1,5 @@
-#ifndef msr_airlib_DynamicParams_hpp
-#define msr_airlib_DynamicParams_hpp
+#ifndef msr_airlib_aircraftparams_hpp
+#define msr_airlib_aircraftparams_hpp
 
 #include "common/Common.hpp"
 
@@ -46,6 +46,28 @@ namespace msr
 			real_T main_plane_area = 0; // S, area of main wing [m^2]
 			real_T horizontal_tail_plane_area = 0; // S_hT, area of horizontal tailplane
 			real_T vertical_tail_plane_area = 0; // S_vT, area of vertical tailplane
+		};
+
+		// Aero angles
+		struct AoA
+		{
+			real_T alpha;
+			real_T psi; // aero roll?
+			real_T beta;
+			Vector3r aero_axis;
+		};
+
+		// Aero Forces and Moments
+		struct AeroFM
+		{
+			real_T lift;
+			real_T drag;
+			real_T thrust;
+			real_T weight;
+			real_T side_force;
+			real_T pitch_mom;
+			real_T roll_mom;
+			real_T yaw_mom;
 		};
 	}
 }

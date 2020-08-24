@@ -2,7 +2,7 @@
 #define msr_airlib_FixedWingParameters_hpp
 
 #include "common/Common.hpp"
-#include "DynamicParams.hpp"
+#include "AircraftParams.hpp"
 #include "api/FixedWingApiBase.hpp"
 #include "sensors/SensorCollection.hpp"
 #include "sensors/SensorFactory.hpp"
@@ -22,6 +22,7 @@ namespace msr
 				real_T mass; // operational aircraft mass [kg]
 				Matrix3x3r inertia; // operational inertia matrix
 				LinearAeroDerivatives derivatives; // initialize aerodynamic derivatives
+				Dimensions dimensions; // aircraft reference dimensions
 
 				/*parameters set with defaults*/
 				real_T restitution = 0.55f; // needed for FixedWingPawnSimApi.cpp API creation
@@ -84,6 +85,7 @@ namespace msr
 		protected:
 			void setupFrameGenericAircraft(Params& params)
 			{
+				// Basic Parameters //
 				params.mass = 10.0f; //mass in [kg]
 				params.inertia(0, 0) = 100.0f; // Ixx [Kgm^-2]
 				params.inertia(1, 1) = 10.0f; // Iyy [Kgm^-2]
@@ -91,6 +93,11 @@ namespace msr
 				params.inertia(0, 2) = params.inertia(2,0) = 2.0f; // Ixz [Kgm^-2]
 				params.inertia(0, 1) = params.inertia(1, 0) = 0; // Ixy [Kgm^-2], symmetric
 				params.inertia(2, 1) = params.inertia(1, 2) = 0; // Iyz [Kgm^-2], symmetric
+
+				// Reference Areas //
+				params.dimensions.main_plane_area = 10; // S [m^2]
+				params.dimensions.horizontal_tail_plane_area = 2; // St [m^2]
+				params.dimensions.vertical_tail_plane_area = 3.5; // Svt [m^2]
 
 				// Body Terms //
 				params.derivatives.zero_lift_coefficient = 0.5f;
@@ -122,6 +129,7 @@ namespace msr
 				
 				params.derivatives.rudder_yaw_coefficient = 0.1f;
 				params.derivatives.rudder_sideforce_coefficient = 0.01f;
+				
 			}
 
 			void setupFrameCherokee(Params& params)
@@ -133,6 +141,11 @@ namespace msr
 				params.inertia(0, 2) = params.inertia(2, 0) = 2.0f; // Ixz [Kgm^-2]
 				params.inertia(0, 1) = params.inertia(1, 0) = 0; // Ixy [Kgm^-2], symmetric
 				params.inertia(2, 1) = params.inertia(1, 2) = 0; // Iyz [Kgm^-2], symmetric
+
+				// Reference Areas //
+				params.dimensions.main_plane_area = 10; // S [m^2]
+				params.dimensions.horizontal_tail_plane_area = 2; // St [m^2]
+				params.dimensions.vertical_tail_plane_area = 3.5; // Svt [m^2]
 
 				// Body Terms //
 				params.derivatives.zero_lift_coefficient = 0.5f;
@@ -176,6 +189,11 @@ namespace msr
 				params.inertia(0, 1) = params.inertia(1, 0) = 0; // Ixy [Kgm^-2], symmetric
 				params.inertia(2, 1) = params.inertia(1, 2) = 0; // Iyz [Kgm^-2], symmetric
 
+				// Reference Areas //
+				params.dimensions.main_plane_area = 10; // S [m^2]
+				params.dimensions.horizontal_tail_plane_area = 2; // St [m^2]
+				params.dimensions.vertical_tail_plane_area = 3.5; // Svt [m^2]
+
 				// Body Terms //
 				params.derivatives.zero_lift_coefficient = 0.5f;
 				params.derivatives.alpha_lift_coefficient = 0.05f;
@@ -217,6 +235,11 @@ namespace msr
 				params.inertia(0, 2) = params.inertia(2, 0) = 2.0f; // Ixz [Kgm^-2]
 				params.inertia(0, 1) = params.inertia(1, 0) = 0; // Ixy [Kgm^-2], symmetric
 				params.inertia(2, 1) = params.inertia(1, 2) = 0; // Iyz [Kgm^-2], symmetric
+
+				// Reference Areas //
+				params.dimensions.main_plane_area = 10; // S [m^2]
+				params.dimensions.horizontal_tail_plane_area = 2; // St [m^2]
+				params.dimensions.vertical_tail_plane_area = 3.5; // Svt [m^2]
 
 				// Body Terms //
 				params.derivatives.zero_lift_coefficient = 0.5f;

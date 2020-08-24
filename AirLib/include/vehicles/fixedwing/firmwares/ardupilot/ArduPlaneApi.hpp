@@ -62,7 +62,7 @@ public:
         ArduPlaneApi::update();
 
         sendSensors();
-        //recvRotorControl();
+        recvControlDeflection();
     }
 
     // TODO:VehicleApiBase implementation
@@ -213,7 +213,7 @@ protected:
         Utils::log("Not Implemented: commandControls", Utils::kLogLevelInfo);
     }
 
-    virtual void commandAttitudeHold(float roll, float pitch, float yaw, float tla) override
+    virtual void commandRollPitchYawHold(float roll, float pitch, float yaw, float tla) override
     {
         unused(roll);
         unused(pitch);

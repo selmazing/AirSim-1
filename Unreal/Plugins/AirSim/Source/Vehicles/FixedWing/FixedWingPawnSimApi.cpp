@@ -29,10 +29,8 @@ void FixedWingPawnSimApi::initialize()
     //setup physics vehicle
     fixedwing_physics_body_ = std::unique_ptr<FixedWing>(new FixedWingPhysicsBody(vehicle_params_.get(), vehicle_api_.get(),
         getKinematics(), getEnvironment()));
-    control_count = fixedwing_physics_body_->wrenchVertexCount();
-    elevator_info_.assign(0, FixedWingElevatorInfo()); // This is the vector size definition don't think it really makes sense!
-    aileron_info_.assign(0, FixedWingAileronInfo()); // This is the vector size definition don't think it really makes sense!
-    rudder_info_.assign(0, FixedWingRudderInfo()); // This is the vector size definition don't think it really makes sense!
+    control_count_ = fixedwing_physics_body_->wrenchVertexCount();
+    control_info_.assign(control_count_, FixedWingControlInfo());
 
     vehicle_api_->setSimulatedGroundTruth(getGroundTruthKinematics(), getGroundTruthEnvironment());
 
@@ -74,17 +72,14 @@ void FixedWingPawnSimApi::updateRenderedState(float dt)
     collision_response = fixedwing_physics_body_->getCollisionResponseInfo();
 
     //update control poses
-        const auto& aircraft_output = fixedwing_physics_body_->getDynamicForcesOutput();
-        FixedWingElevatorInfo* einfo = &elevator_info_[0];
-        einfo->elevator_speed = aircraft_output.elevator_speed;
-        einfo->elevator_command = aircraft_output.elevator_signal_filtered;
-		//do we also need a variable that indicates the deflection from UE4 or is this defined elsewhere its undefined atm.
-        FixedWingAileronInfo* ainfo = &aileron_info_[0];
-        ainfo->aileron_speed = aircraft_output.aileron_speed;
-        ainfo->aileron_command = aircraft_output.aileron_signal_filtered;
-        FixedWingRudderInfo* rinfo = &rudder_info_[0];
-        rinfo->rudder_speed = aircraft_output.rudder_speed;
-        rinfo->rudder_command = aircraft_output.rudder_signal_filtered;
+    for (unsigned int i = 0; i < control_count_; i++)
+    {
+        const auto& control_output = fixedwing_physics_body_->getControlSurfaceOutput(i);
+        FixedWingControlInfo* info = &control_info_[i];
+        info->control_speed = control_output.control_speed;
+        info->control_command = control_output.control_signal_filtered;
+        info->control_deflection = control_output.control_signal_input;
+    }
 		
     vehicle_api_->getStatusMessages(vehicle_api_messages_);
 
@@ -131,9 +126,7 @@ void FixedWingPawnSimApi::updateRendering(float dt)
         UAirBlueprintLib::LogMessage(FString(e.what()), TEXT(""), LogDebugLevel::Failure, 30);
     }
 
-    pawn_events_->getElevatorSignal().emit(elevator_info_);
-    pawn_events_->getAileronSignal().emit(aileron_info_);
-    pawn_events_->getRudderSignal().emit(rudder_info_);
+    pawn_events_->getControlSignal().emit(control_info_);
 }
 
 void FixedWingPawnSimApi::setPose(const Pose& pose, bool ignore_collision)

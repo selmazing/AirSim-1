@@ -1,17 +1,6 @@
 #include "FixedWingPawnEvents.h"
 
-FixedWingPawnEvents::ElevatorSignal& FixedWingPawnEvents::getElevatorSignal()
+FixedWingPawnEvents::ControlSignal& FixedWingPawnEvents::getControlSignal()
 {
-    return elevator_signal_;
+    return control_signal_;
 }
-
-FixedWingPawnEvents::AileronSignal& FixedWingPawnEvents::getAileronSignal()
-{
-	return aileron_signal_;
-}
-
-FixedWingPawnEvents::RudderSignal& FixedWingPawnEvents::getRudderSignal()
-{
-	return rudder_signal_;
-}
-

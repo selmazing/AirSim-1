@@ -243,48 +243,19 @@ public: //methods
         updateState();
         return current_state_.controls.landed ? LandedState::Landed : LandedState::Flying;
     }
-
-	// get the actuation from the control_surface
-	virtual real_T getElevatorSignal() const override
-	{
-        if (!is_simulation_mode_)
-            throw std::logic_error("Attempt to read elevator signal while not in simulation mode");
-
-        std::lock_guard<std::mutex> guard(hil_controls_mutex_);
-        return control_surfaces_[1];
-	}
 	
-    virtual real_T getAileronSignal() const override
+    virtual real_T getActuation(unsigned int control_index) const override
     {
         if (!is_simulation_mode_)
-            throw std::logic_error("Attempt to read aileron signal while not in simulation mode");
+            throw std::logic_error("Attempt to read actuator controls while not in simulation mode");
 
         std::lock_guard<std::mutex> guard(hil_controls_mutex_);
-        return control_surfaces_[0];
-    }
-	
-    virtual real_T getRudderSignal() const override
-    {
-        if (!is_simulation_mode_)
-            throw std::logic_error("Attempt to read rudder signal while not in simulation mode");
-
-        std::lock_guard<std::mutex> guard(hil_controls_mutex_);
-        return control_surfaces_[2];
-    }
-
-	
-    /*virtual real_T getActuation(unsigned int rotor_index) const override
-    {
-        if (!is_simulation_mode_)
-            throw std::logic_error("Attempt to read motor controls while not in simulation mode");
-
-        std::lock_guard<std::mutex> guard(hil_controls_mutex_);
-        return control_surfaces_[rotor_index];
+        return control_surfaces_[control_index];
     }
     virtual size_t getActuatorCount() const override
     {
         return ControlSurfacesCount;
-    }*/
+    }
 
     virtual bool armDisarm(bool arm) override
     {
