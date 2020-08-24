@@ -24,6 +24,7 @@ class FixedWingApiBase : public VehicleApiBase {
 protected: //must be implemented
 
     /************************* low level move APIs *********************************/
+	
     virtual void commandControls(float elevator, float aileron, float rudder, float tla) = 0;
     virtual void commandRollPitchYawHold(float roll, float pitch, float yaw, float tla) = 0; // maintain a selected attitude & TLA
     virtual void commandAltitudeHold(float roll, float pitch, float yaw, float z) = 0; // hold a set alt -z in NED earth co-ord, TLA defined in MavLinkFixedWingApi.hpp
@@ -31,7 +32,7 @@ protected: //must be implemented
     virtual void commandVelocityHold(float vx, float vy, float vz) = 0; // maintain linear velocity along different axis
     virtual void commandVelocityAltitudeHold(float vx, float vy, float z) = 0; // maintain velocity at a fixed altitude
     virtual void commandPositionHold(float x, float y, float z) = 0; // maintain a fixed position, only makes sense on ground, or if error is large as can't hover
-
+	
     /************************* set Controller Gains APIs *********************************/
     virtual void setControllerGains(uint8_t controllerType, const vector<float>& kp, const vector<float>& ki, const vector<float>& kd) = 0; // setsup a simple PID controller
 
