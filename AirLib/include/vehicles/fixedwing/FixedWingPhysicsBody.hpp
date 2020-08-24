@@ -10,6 +10,7 @@
 #include "FixedWingParams.hpp"
 #include "ControlSurface.hpp"
 #include "FixedWingParams.hpp"
+#include "Airplane.hpp"
 
 
 namespace msr
@@ -91,6 +92,11 @@ namespace msr
 				return controls_.at(control_index).getOutput();
 			}
 
+			Airplane::Output getAircraftOutput() const
+			{
+				return airplane_.getOutput();
+			}
+			
 			virtual real_T getRestitution() const override
 			{
 				return params_->getParams().restitution;
@@ -103,56 +109,13 @@ namespace msr
 			
 			virtual ~FixedWingPhysicsBody() = default;
 
-		protected:
-
-			virtual void setAoA(const Kinematics::State& kinematics)
-			{
-				aoa_->aero_axis = VectorMath::rotateVector(kinematics.twist.angular, kinematics.pose.orientation, true);
-				aoa_->alpha = aoa_->aero_axis(0);
-				aoa_->beta = aoa_->aero_axis(2);
-			}
-
-			void updateEnvironmentalFactors(const Kinematics::State& kinematics)
-			{
-				air_density_ratio_ = environment_->getState().air_density / air_density_sea_level_; // Sigma ratio
-				forward_velocity_ = kinematics.twist.linear(0); // Indicated Airspeed
-				dyn_pressure_ = 0.5 * environment_->getState().air_density * forward_velocity_ * forward_velocity_;
-			}
-
-			virtual void setWrench(Wrench& wrench)
-			{
-				wrench.force(0) = -1 * aero_force_->drag;
-				wrench.force(1) = aero_force_->side_force;
-				wrench.force(2) = -1 * aero_force_->lift;
-				wrench.torque(0) = aero_force_->roll_mom;
-				wrench.torque(1) = aero_force_->pitch_mom;
-				wrench.torque(2) = aero_force_->yaw_mom;
-			}
-
 		private: //methods
 			void initialize(Kinematics* kinematics, Environment* environment)
 			{
 				PhysicsBody::initialize(params_->getParams().mass, params_->getParams().inertia, kinematics, environment);
+
 				
-
 				initSensors(*params_, getKinematics(), getEnvironment());
-			}
-
-			virtual void createControls()
-			{
-				aileron_deflection_ = controls_.at(0).getOutput().control_deflection;
-				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
-				rudder_deflection_ = controls_.at(2).getOutput().control_deflection;
-			}
-
-			virtual void createAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics::State& kinematics, ControlSurface& output)
-			{	
-				aero_force_->lift = dyn_pressure_ * dimensions.main_plane_area * (derivatives.zero_lift_coefficient + derivatives.alpha_lift_coefficient * aoa_->alpha + derivatives.pitch_lift_coefficient * kinematics.twist.angular(0) + derivatives.elev_lift_coefficient * elevator_deflection_);
-				aero_force_->drag = dyn_pressure_ * dimensions.main_plane_area * (derivatives.zero_drag_coefficient + derivatives.alpha_drag_coefficient * aoa_->alpha + derivatives.pitch_drag_coefficient * kinematics.twist.linear(0) + derivatives.elev_drag_coefficient * elevator_deflection_);
-				aero_force_->side_force = dyn_pressure_ * dimensions.vertical_tail_plane_area * (derivatives.sidevelocity_sideforce_coefficient * kinematics.twist.linear(1) + derivatives.rudder_sideforce_coefficient * rudder_deflection_);
-				aero_force_->pitch_mom = dyn_pressure_ * dimensions.main_plane_area * (derivatives.zero_pitch_coefficient + derivatives.alpha_pitch_coefficient * aoa_->alpha + derivatives.pitchrate_pitch_coefficient * kinematics.twist.angular(1) + derivatives.elevator_pitch_coefficient * elevator_deflection_);
-				aero_force_->roll_mom = dyn_pressure_ * dimensions.main_plane_area * (derivatives.zero_roll_coefficient + derivatives.rollrate_roll_coefficient * kinematics.twist.angular(0) + derivatives.aileron_roll_coefficient * aileron_deflection_);
-				aero_force_->yaw_mom = dyn_pressure_ * dimensions.vertical_tail_plane_area * (derivatives.zero_yaw_coefficient + kinematics.twist.angular(2) + derivatives.rudder_yaw_coefficient * rudder_deflection_);
 			}
 			
 			void reportSensors(FixedWingParams& params, StateReporter& reporter)
@@ -180,6 +143,7 @@ namespace msr
 			private: //fields
 			FixedWingParams* params_;
 			vector<ControlSurface> controls_;
+			Airplane airplane_;
 			real_T aileron_deflection_, elevator_deflection_, rudder_deflection_;
 			std::unique_ptr<Environment> environment_;
 			VehicleApiBase* vehicle_api_;

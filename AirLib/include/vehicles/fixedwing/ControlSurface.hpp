@@ -63,14 +63,12 @@ namespace msr
 			virtual void resetImplementation() override
 			{
 				PhysicsBodyVertex::resetImplementation();
-				updateEnvironmentalFactors();
 				control_signal_filter_.reset();
 				setOutput(output_, control_signal_filter_);
 			}
 
 			virtual void update() override
 			{
-				updateEnvironmentalFactors();
 				PhysicsBodyVertex::update();
 				setOutput(output_, control_signal_filter_);
 				control_signal_filter_.update();
@@ -92,13 +90,6 @@ namespace msr
 			{
 				output.control_signal_input = control_signal_filter_.getInput();
 				output.control_signal_filtered = control_signal_filter_.getOutput();
-			}
-
-			void updateEnvironmentalFactors()
-			{
-				air_density_ratio_ = environment_->getState().air_density / air_density_sea_level_; // Sigma ratio
-				forward_velocity_ = kinematics_->getState().twist.linear(0); // Indicated Airspeed
-				dyn_pressure_ = 0.5 * environment_->getState().air_density * forward_velocity_ * forward_velocity_;
 			}
 
 		private: //fields
