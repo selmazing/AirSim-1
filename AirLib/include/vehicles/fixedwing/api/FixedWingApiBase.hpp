@@ -93,8 +93,8 @@ public: //these APIs uses above low level APIs
     virtual bool moveByVelocity(float vx, float vy, float vz, float duration); // move based on the aircraft's velocity eg V/S mode
     virtual bool moveOnPath(const vector<Vector3r>& path, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // move along a path [vector<Vector3r>& path]
     virtual bool moveToPosition(float x, float y, float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // move to a fixed position [x, y, z]
-    virtual bool moveToAlt(float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // Flight Level Change (FLC) mode, velocity should be from pitot though
-    virtual bool moveByManual(float vx_max, float vy_max, float z_min, float duration); // manually moves adjusted from MultiRotor not sure quite how this works?
+    // virtual bool moveToAlt(float z, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead); // Flight Level Change (FLC) mode, velocity should be from pitot though
+    // virtual bool moveByManual(float vx_max, float vy_max, float z_min, float duration); // manually moves adjusted from MultiRotor not sure quite how this works?
 	
     virtual RCData estimateRCTrims(float trimduration = 1, float minCountForTrim = 10, float maxTrim = 100); // estimate how to trim the remote control
     
@@ -141,10 +141,10 @@ protected: //utility methods
 
     /************* safety checks & emergency maneuvers ************/
 	//TODO: Consider adding in a min velocity 5% stall for the glide performance
-    virtual bool emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& result); // a go-around of some form for a fixed wing aircraft
-    virtual bool safetyCheckVelocity(const Vector3r& velocity);
-    virtual bool safetyCheckVelocityZ(float vx, float vy, float z);
-    virtual bool safetyCheckDestination(const Vector3r& dest_loc);
+    // virtual bool emergencyManeuverIfUnsafe(const SafetyEval::EvalResult& result); // a go-around of some form for a fixed wing aircraft
+    // virtual void safetyCheckVelocity(const Vector3r& velocity);
+    // virtual void safetyCheckVelocityZ(float vx, float vy, float z);
+    // virtual void safetyCheckDestination(const Vector3r& dest_loc);
 
     /************* wait helpers ************/
     // helper function can wait for anything (as defined by the given function) up to the max_wait duration (in seconds).
