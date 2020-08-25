@@ -101,7 +101,9 @@ FixedWingRpcLibClient* FixedWingRpcLibClient::moveByVelocityAsync(float vx, floa
 
 FixedWingRpcLibClient* FixedWingRpcLibClient::moveOnPathAsync(const vector<Vector3r>& path, float velocity, float timeout_sec, float lookahead, float adaptive_lookahead, const std::string& vehicle_name)
 {
-    pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveOnPathAsync", path, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name);
+    vector<FixedWingRpcLibAdapators::Vector3r> conv_path;
+    FixedWingRpcLibAdapators::from(path, conv_path);
+    pimpl_->last_future = static_cast<rpc::client*>(getClient())->async_call("moveOnPathAsync", conv_path, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name);
     return this;
 }
 

@@ -404,9 +404,9 @@ bool FixedWingApiBase::moveToPosition(float x, float y, float z, float velocity,
             Vector3r vel_body = VectorMath::transformToBodyFrame(vel_word, starting_quaternion, true);
 
             //find yaw as per terrain and remote setting
-            /*YawMode adj_yaw_mode(yaw_mode.is_rate, yaw_mode.yaw_or_rate);
-            adj_yaw_mode.yaw_or_rate += rc_data.yaw * 100.0f / kMaxRCValue;
-            adjustYaw(vel_body, drivetrain, adj_yaw_mode);*/ /*
+            // YawMode adj_yaw_mode(yaw_mode.is_rate, yaw_mode.yaw_or_rate);
+            // adj_yaw_mode.yaw_or_rate += rc_data.yaw * 100.0f / kMaxRCValue;
+            // adjustYaw(vel_body, drivetrain, adj_yaw_mode);
 
             //execute command
             try {
@@ -671,7 +671,7 @@ void FixedWingApiBase::moveToPathPosition(const Vector3r& dest, float velocity, 
     /*if (std::abs(cur.z() - dest.z()) <= getDistanceAccuracy()) //for paths in XY plan current code leaves z untouched, so we can compare with strict equality
         moveByVelocityZInternal(velocity_vect.x(), velocity_vect.y(), dest.z(), yaw_mode);
     else*/
-	
+
     moveByVelocityInternal(velocity_vect.x(), velocity_vect.y(), velocity_vect.z());
 }
 
