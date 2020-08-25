@@ -237,13 +237,13 @@ public: //methods
         updateState();
         return VectorMath::toQuaternion(current_state_.attitude.pitch, current_state_.attitude.roll, current_state_.attitude.yaw);
     }
- 
+
     virtual LandedState getLandedState() const override
     {
         updateState();
         return current_state_.controls.landed ? LandedState::Landed : LandedState::Flying;
     }
-	
+
     virtual real_T getActuation(unsigned int control_index) const override
     {
         if (!is_simulation_mode_)
@@ -326,7 +326,7 @@ public: //methods
         return waitForZ(timeout_sec, z, getDistanceAccuracy());
     }
 
-	//TODO: Update for a fixedwing landing, maintain RoD to touchdown point then autoflare etc. 
+	//TODO: Update for a fixedwing landing, maintain RoD to touchdown point then autoflare etc.
     virtual bool land(float timeout_sec) override
     {
         SingleCall lock(this);
@@ -493,7 +493,7 @@ protected: //methods
     virtual void commandRollPitchYawHold(float roll, float pitch, float yaw, float tla) override
     {
         checkValidVehicle();
-        mav_vehicle_->moveByAttitude(roll, pitch, 0, 0, 0, 0, tla); 
+        mav_vehicle_->moveByAttitude(roll, pitch, 0, 0, 0, 0, tla);
     }
 
 	// Not sure if this makes sense should I define a climb speed Vy and then set the aircraft to that if it does not match? setting thrust alone will not work!
@@ -510,8 +510,8 @@ protected: //methods
         float TLA = 0.10f + tla_controller_.control(-state.local_est.pos.z);
         mav_vehicle_->moveByAttitude(roll, pitch, yaw, 0, 0, 0, TLA);
     }
-	
-	
+
+
     virtual void commandAngleRates(float roll_rate, float pitch_rate, float yaw_rate, float tla) override
     {
         checkValidVehicle();
@@ -1226,10 +1226,10 @@ private: //methods
                 control_surfaces_[1] = HilControlsMessage.pitch_elevator;
                 control_surfaces_[2] = HilControlsMessage.yaw_rudder;
                 control_surfaces_[3] = HilControlsMessage.throttle;
-                control_surfaces_[4] = HilControlsMessage.aux1;
-                control_surfaces_[5] = HilControlsMessage.aux2;
-                control_surfaces_[6] = HilControlsMessage.aux3;
-                control_surfaces_[7] = HilControlsMessage.aux4;
+                // control_surfaces_[4] = HilControlsMessage.aux1;
+                // control_surfaces_[5] = HilControlsMessage.aux2;
+                // control_surfaces_[6] = HilControlsMessage.aux3;
+                // control_surfaces_[7] = HilControlsMessage.aux4;
 
                 normalizeControls();
                 received_actuator_controls_ = true;
@@ -1330,7 +1330,7 @@ private: //methods
         hil_sensor.ygyro = gyro.y();
         hil_sensor.zgyro = gyro.z();
 
-        hil_sensor.fields_updated |= 0b111000; // Set gyro bit fields 
+        hil_sensor.fields_updated |= 0b111000; // Set gyro bit fields
 
         hil_sensor.xmag = mag.x();
         hil_sensor.ymag = mag.y();
