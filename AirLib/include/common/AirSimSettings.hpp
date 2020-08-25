@@ -32,6 +32,7 @@ public: //types
     static constexpr char const * kVehicleTypeArduRover = "ardurover";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
     static constexpr char const * kVehicleTypeArduPlane = "arduplane";
+    static constexpr char const*  kVehicleTypePX4Plane = "px4plane";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";

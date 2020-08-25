@@ -16,7 +16,7 @@ namespace msr
 			{
 				std::unique_ptr<FixedWingParams> config;
 
-				if (vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypePX4)
+				if (vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypePX4Plane)
 				{
 					config.reset(new Px4FixedWingParams(*static_cast<const AirSimSettings::MavLinkVehicleSetting*>(vehicle_setting), sensor_factory));
 				}
