@@ -111,10 +111,10 @@ FixedWingRpcLibServer::FixedWingRpcLibServer(ApiProvider* api_provider, string s
     //         float lookahead, float adaptive_lookahead, const std::string& vehicle_name) -> bool {
     //     return getVehicleApi(vehicle_name)->moveToZ(z, velocity, timeout_sec, yaw_mode.to(), lookahead, adaptive_lookahead);
     // });
-    (static_cast<rpc::server*>(getServer()))->
+    /*(static_cast<rpc::server*>(getServer()))->
         bind("moveByManual", [&](float vx_max, float vy_max, float z_min, float duration, const std::string& vehicle_name) -> bool {
         return getVehicleApi(vehicle_name)->moveByManual(vx_max, vy_max, z_min, duration);
-    });
+    });*/
 
     // (static_cast<rpc::server*>(getServer()))->
     //     bind("rotateToYaw", [&](float yaw, float timeout_sec, float margin, const std::string& vehicle_name) -> bool {
