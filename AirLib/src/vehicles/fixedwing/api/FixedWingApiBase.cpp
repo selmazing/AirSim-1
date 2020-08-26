@@ -511,7 +511,7 @@ void FixedWingApiBase::moveByRC(const RCData& rc_data)
 
 void FixedWingApiBase::moveByVelocityInternal(float vx, float vy, float vz)
 {
-    if (safetyCheckVelocity(Vector3r(vx, vy, vz)))
+    // if (safetyCheckVelocity(Vector3r(vx, vy, vz)))
         commandVelocityHold(vx, vy, vz);
 }
 
@@ -523,7 +523,7 @@ void FixedWingApiBase::moveByVelocityInternal(float vx, float vy, float vz)
 
 void FixedWingApiBase::moveToPositionInternal(const Vector3r& dest)
 {
-    if (safetyCheckDestination(dest))
+    // if (safetyCheckDestination(dest))
         commandPositionHold(dest.x(), dest.y(), dest.z());
 }
 
@@ -535,7 +535,7 @@ void FixedWingApiBase::moveToPositionInternal(const Vector3r& dest)
 
 void FixedWingApiBase::moveByRollPitchYawInternal(float roll, float pitch, float yaw, float tla)
 {
-    if (safetyCheckVelocity(getVelocity()))
+    // if (safetyCheckVelocity(getVelocity()))
         commandRollPitchYawHold(roll, pitch, yaw, tla);
 }
 
@@ -559,7 +559,7 @@ void FixedWingApiBase::moveByRollPitchYawInternal(float roll, float pitch, float
 
 void FixedWingApiBase::moveByAngleRatesInternal(float roll_rate, float pitch_rate, float yaw_rate, float tla)
 {
-    if (safetyCheckVelocity(getVelocity()))
+    // if (safetyCheckVelocity(getVelocity()))
         commandAngleRates(roll_rate, pitch_rate, yaw_rate, tla);
 }
 
