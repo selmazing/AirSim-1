@@ -7,7 +7,7 @@
 #include "common/Common.hpp"
 #include "common/common_utils/Signal.hpp"
 
-/* This started of as a generic control constructor, but given they are all quite diffrent in axis and implementation it became easier
+/* This started of as a generic control constructor, but given they are all quite different in axis and implementation it became easier
 to define a control class for each control*/
 class FixedWingPawnEvents : public PawnEvents {
 public: //types
