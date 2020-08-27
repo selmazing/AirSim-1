@@ -32,7 +32,7 @@ public: //types
     static constexpr char const * kVehicleTypeArduRover = "ardurover";
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
     static constexpr char const * kVehicleTypeArduPlane = "arduplane";
-    static constexpr char const*  kVehicleTypePX4Plane = "px4plane";
+    static constexpr char const * kVehicleTypePX4Plane = "px4plane";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -723,7 +723,8 @@ private:
 
         std::unique_ptr<VehicleSetting> vehicle_setting;
         if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo
-            || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover)
+            || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover
+            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane)
             vehicle_setting = createMavLinkVehicleSetting(settings_json);
         //for everything else we don't need derived class yet
         else {
@@ -793,6 +794,12 @@ private:
         cv_setting->vehicle_name = "ComputerVision";
         cv_setting->vehicle_type = kVehicleTypeComputerVision;
         vehicles[cv_setting->vehicle_name] = std::move(cv_setting);
+
+    	//create default fixedwing vehicle
+        auto arduplane_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+        arduplane_setting->vehicle_name = "arduplane";
+        arduplane_setting->vehicle_type = kVehicleTypeArduPlane;
+        vehicles[arduplane_setting->vehicle_name] = std::move(simple_flight_setting);
     }
 
     static void loadVehicleSettings(const std::string& simmode_name, const Settings& settings_json,
@@ -828,7 +835,8 @@ private:
             PawnPath("Class'/AirSim/Blueprints/BP_FlyingPawn.BP_FlyingPawn_C'"));
         pawn_paths.emplace("DefaultComputerVision",
             PawnPath("Class'/AirSim/Blueprints/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"));
-
+        pawn_paths.emplace("DefaultFixedWing",
+            PawnPath("Class'/AirSim/Blueprints/BP_FixedWingPawn.BP_FixedWingPawn_C'"));
     }
 
     static void loadPawnPaths(const Settings& settings_json, std::map<std::string, PawnPath>& pawn_paths)

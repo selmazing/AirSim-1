@@ -95,7 +95,7 @@ void ASimModeWorldFixedWing::getExistingVehiclePawns(TArray<AActor*>& pawns) con
 // only allow for arduplane and PX4 vehicle, AirSimSettings specifies px4multirotor, think this is overspecified. 
 bool ASimModeWorldFixedWing::isVehicleTypeSupported(const std::string& vehicle_type) const
 {
-    return ((vehicle_type == AirSimSettings::kVehicleTypePX4) ||
+    return ((vehicle_type == AirSimSettings::kVehicleTypePX4Plane) ||
             (vehicle_type == AirSimSettings::kVehicleTypeArduPlane));
 }
 
