@@ -104,7 +104,7 @@ std::string ASimModeWorldFixedWing::getVehiclePawnPathName(const AirSimSettings:
     //decide which derived BP to use
     std::string pawn_path = vehicle_setting.pawn_path;
     if (pawn_path == "")
-        pawn_path = "DefaultFixedWing";
+        pawn_path = "DefaultAircraft";
 
     return pawn_path;
 }
