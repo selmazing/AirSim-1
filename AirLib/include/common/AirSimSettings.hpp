@@ -1125,7 +1125,7 @@ private:
             clock_type = "ScalableClock";
 
             //override if multirotor simmode with simple_flight
-            if (simmode_name == "Multirotor") {
+            if (simmode_name == "Multirotor" || simmode_name == "FixedWing") {
                 //TODO: this won't work if simple_flight and PX4 is combined together!
 
                 //for multirotors we select steppable fixed interval clock unless we have
@@ -1133,8 +1133,10 @@ private:
                 clock_type = "SteppableClock";
                 for (auto const& vehicle : vehicles)
                 {
-                    if (vehicle.second->auto_create &&
-                        vehicle.second->vehicle_type == kVehicleTypePX4) {
+                    if ((vehicle.second->auto_create &&
+                        vehicle.second->vehicle_type == kVehicleTypePX4) || 
+                        (vehicle.second->auto_create && 
+                        vehicle.second->vehicle_type == kVehicleTypePX4Plane)) {
                         clock_type = "ScalableClock";
                         break;
                     }
