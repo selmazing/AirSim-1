@@ -518,7 +518,7 @@ private:
 
         physics_engine_name = settings_json.getString("PhysicsEngineName", "");
         if (physics_engine_name == "") {
-            if (simmode_name == "Multirotor")
+            if (simmode_name == "Multirotor" || simmode_name == "FixedWing")
                 physics_engine_name = "FastPhysicsEngine";
             else
                 physics_engine_name = "PhysX"; //this value is only informational for now
@@ -535,7 +535,7 @@ private:
         std::string view_mode_string = settings_json.getString("ViewMode", "");
 
         if (view_mode_string == "") {
-            if (simmode_name == "Multirotor")
+            if (simmode_name == "Multirotor" || simmode_name == "FixedWing")
                 view_mode_string = "FlyWithMe";
             else if (simmode_name == "ComputerVision")
                 view_mode_string = "Fpv";
@@ -795,11 +795,13 @@ private:
         cv_setting->vehicle_type = kVehicleTypeComputerVision;
         vehicles[cv_setting->vehicle_name] = std::move(cv_setting);
 
-    	//create default fixedwing vehicle
+
+    	/* This Broke the call as there was a null pointer call
+    	create default fixedwing vehicle -> variable arduplane set as default*/
         auto arduplane_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
         arduplane_setting->vehicle_name = "arduplane";
         arduplane_setting->vehicle_type = kVehicleTypeArduPlane;
-        vehicles[arduplane_setting->vehicle_name] = std::move(simple_flight_setting);
+        vehicles[arduplane_setting->vehicle_name] = std::move(arduplane_setting);
     }
 
     static void loadVehicleSettings(const std::string& simmode_name, const Settings& settings_json,
@@ -1293,7 +1295,7 @@ private:
     static void createDefaultSensorSettings(const std::string& simmode_name,
         std::map<std::string, std::unique_ptr<SensorSetting>>& sensors)
     {
-        if (simmode_name == "Multirotor") {
+        if (simmode_name == "Multirotor" || simmode_name == "FixedWing") {
             sensors["imu"] = createSensorSetting(SensorBase::SensorType::Imu, "imu", true);
             sensors["magnetometer"] = createSensorSetting(SensorBase::SensorType::Magnetometer, "magnetometer", true);
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);

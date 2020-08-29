@@ -3,6 +3,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Misc/FileHelper.h"
 
+#include "vehicles/FixedWing/SimModeWorldFixedWing.h"
 #include "Vehicles/Multirotor/SimModeWorldMultiRotor.h"
 #include "Vehicles/Car/SimModeCar.h"
 #include "Vehicles/ComputerVision/SimModeComputerVision.h"
@@ -300,7 +301,10 @@ void ASimHUD::createSimMode()
 
     //spawn at origin. We will use this to do global NED transforms, for ex, non-vehicle objects in environment
     if (simmode_name == "Multirotor")
-        simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldMultiRotor>(FVector::ZeroVector, 
+        simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldMultiRotor>(FVector::ZeroVector,
+            FRotator::ZeroRotator, simmode_spawn_params);
+    else if (simmode_name == "FixedWing")
+        simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldFixedWing>(FVector::ZeroVector,
             FRotator::ZeroRotator, simmode_spawn_params);
     else if (simmode_name == "Car")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeCar>(FVector::ZeroVector,
