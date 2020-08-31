@@ -37,6 +37,10 @@ namespace msr
 				{
 					setupFrameCherokee(params);
 				}
+				else if (connection_info_.model == "SkywalkerX8")
+				{
+					setupFrameSkywalkerX8(params);
+				}
 				else if (connection_info_.model == "DA62")
 				{
 					setupFrameDA62(params);
