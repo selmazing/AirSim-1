@@ -1149,3 +1149,233 @@ class CarClient(VehicleClient, object):
         """
         controls_raw = self.client.call('getCarControls', vehicle_name)
         return CarControls.from_msgpack(controls_raw)
+
+# -----------------------------------  FixedWing APIs ---------------------------------------------
+class FixedWingClient(VehicleClient, object):
+    def __init__(self, ip = "", port = 41451, timeout_value = 3600):
+        super(FixedWingClient, self).__init__(ip, port, timeout_value)
+
+    def takeoffAsync(self, timeout_sec = 20, vehicle_name = ''):
+        """
+        Takeoff vehicle to 3m above ground, requires a takeoff run, along the ground ideally on undercarriage, which is not yet implemented
+
+        Args:
+            timeout_sec (int, optional): Timeout for the vehicle to reach desired altitude
+            vehicle_name (str, optional): Name of the vehicle to send this command to
+
+        Returns:
+            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+        """
+        return self.client.call_async('takeoff', timeout_sec, vehicle_name)
+
+    def landAsync(self, timeout_sec = 60, vehicle_name = ''):
+        """
+        Land the vehicle, should approach a landing site and proceed to touch down at the location
+
+        Args:
+            timeout_sec (int, optional): Timeout for the vehicle to land
+            vehicle_name (str, optional): Name of the vehicle to send this command to
+
+        Returns:
+            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+        """
+        return self.client.call_async('land', timeout_sec, vehicle_name)
+
+    def goHomeAsync(self, timeout_sec = 3e+38, vehicle_name = ''):
+        """
+        Return vehicle to Home i.e. Launch location, for fixedwing this should then proceed to call the landAsync Method as hover is not an option
+
+        Args:
+            timeout_sec (int, optional): Timeout for the vehicle to reach desired altitude
+            vehicle_name (str, optional): Name of the vehicle to send this command to
+
+        Returns:
+            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+        """
+        return self.client.call_async('goHome', timeout_sec, vehicle_name)
+
+    def moveByControlsAsync(self, elevator, aileron, rudder, tla, duration, vehicle_name = ''):
+        """
+        - Directly control the aircraft using control surfaces and powerplant
+
+        Args:
+            elevator (float): control surface deflection for elevator (between -1.0 to 1.0)
+            aileron (float): control surface deflection for aileron (between -1.0 to 1.0)
+            rudder (float): control surface deflection for rudder (between -1.0 to 1.0)
+            tla (float): angle of aircraft's power lever (between 0.0 to 1.0) <-- not implemnted yet
+            duration (float): Desired amount of time (seconds), to send this command for
+            vehicle_name (str, optional): Name of the fixedwing vehicle to send this command to
+        Returns:
+            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+        """
+        return self.client.call_async('moveByControlsAsync', elevator, aileron, rudder, tla, duration, vehicle_name)
+
+    def moveByAttitudeAsync(self, roll, pitch, yaw, tla, duration, vehicle_name = ''):
+        """
+        - Desired throttle is between 0.0 to 1.0
+        - Roll angle, pitch angle, and yaw angle are given in **radians**, in the body frame.
+        - The body frame follows the Front Left Up (FLU) convention, and right-handedness.
+
+        - Frame Convention:
+            - X axis is along the **Front** direction of the fixedwing.
+
+            | Clockwise rotation about this axis defines a positive **roll** angle.
+            | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+
+            - Y axis is along the **Left** direction of the quadrotor.
+
+            | Clockwise rotation about this axis defines a positive **pitch** angle.
+            | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+
+            - Z axis is along the **Up** direction.
+
+            | Clockwise rotation about this axis defines a positive **yaw** angle.
+            | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+
+        Args:
+            roll (float): Desired roll angle, in radians.
+            pitch (float): Desired pitch angle, in radians.
+            yaw (float): Desired yaw angle, in radians.
+            throttle (float): Desired throttle (between 0.0 to 1.0)
+            duration (float): Desired amount of time (seconds), to send this command for
+            vehicle_name (str, optional): Name of the fixedwing to send this command to
+
+        Returns:
+            msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+        """
+        return self.client.call_async('moveByAttitudeAsync', roll, -pitch, -yaw, tla, duration, vehicle_name)
+
+        def moveByAngleRatesAsync(self, roll_rate, pitch_rate, yaw_rate, tla, duration, vehicle_name = ''):
+            """
+            - Desired throttle is between 0.0 to 1.0
+            - Roll rate, pitch rate, and yaw rate set points are given in **radians**, in the body frame.
+            - The body frame follows the Front Left Up (FLU) convention, and right-handedness.
+
+            - Frame Convention:
+                - X axis is along the **Front** direction of the quadrotor.
+
+                | Clockwise rotation about this axis defines a positive **roll** angle.
+                | Hence, rolling with a positive angle is equivalent to translating in the **right** direction, w.r.t. our FLU body frame.
+
+                - Y axis is along the **Left** direction of the quadrotor.
+
+                | Clockwise rotation about this axis defines a positive **pitch** angle.
+                | Hence, pitching with a positive angle is equivalent to translating in the **front** direction, w.r.t. our FLU body frame.
+
+                - Z axis is along the **Up** direction.
+
+                | Clockwise rotation about this axis defines a positive **yaw** angle.
+                | Hence, yawing with a positive angle is equivalent to rotated towards the **left** direction wrt our FLU body frame. Or in an anticlockwise fashion in the body XY / FL plane.
+
+            Args:
+                roll_rate (float): Desired roll rate, in radians / second
+                pitch_rate (float): Desired pitch rate, in radians / second
+                yaw_rate (float): Desired yaw rate, in radians / second
+                throttle (float): Desired throttle (between 0.0 to 1.0)
+                duration (float): Desired amount of time (seconds), to send this command for
+                vehicle_name (str, optional): Name of the fixedwing to send this command to
+
+            Returns:
+                msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            """
+            return self.client.call_async('moveByAngleRatesAsync', roll_rate, -pitch_rate, -yaw_rate, throttle, duration, vehicle_name)
+
+        def moveByVelocityAsync(self, vx, vy, vz, duration, vehicle_name):
+            """
+            Args:
+                vx (float): desired velocity in world (NED) X axis
+                vy (float): desired velocity in world (NED) Y axis
+                vz (float): desired velocity in world (NED) Z axis
+                duration (float): Desired amount of time (seconds), to send this command for
+                vehicle_name (str, optional): Name of the fixedwing to send this command to
+
+            Returns:
+                msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            """
+            return self.client.call_async('moveByVelocityAsync', vx, vy, vz, duration, vehicle_name)
+
+        def moveOnPathAsync(self, path, velocity, timeout_sec = 3e+38, lookahead = 1, adaptive_lookahead = 1, vehicle_name = ''):
+            return self.client.call_async('moveOnPathAsync', path, velocity, timeout_sec, yaw_mode, lookahead, adaptive_lookahead, vehicle_name)
+
+        def moveToPositionAsync(self, x, y, z, velocity, timeout_sec = 3e+38, lookahead = -1, adaptive_lookahead = 1, vehicle_name = ''):
+            return self.client.call_async('moveToPositionAsync', x, y, z, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name)
+
+        def moveToAltAsync(self, z, velocity, timeout_sec = 3e+38, lookahead = -1, adaptive_lookahead = 1, vehicle_name = ''):
+
+            return self.client.call_async('moveToAltAsync', z, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name)
+
+        def moveByManualAsync(self, vx_max, vy_max, z_min, duration, vehicle_name = ''):
+            """
+            - Read current RC state and use it to control the vehicles.
+
+            Parameters sets up the constraints on velocity and minimum altitude while flying. If RC state is detected to violate these constraints
+            then that RC state would be ignored.
+
+            Args:
+                vx_max (float): max velocity allowed in x direction
+                vy_max (float): max velocity allowed in y direction
+                vz_max (float): max velocity allowed in z direction
+                z_min (float): min z allowed for vehicle position
+                duration (float): after this duration vehicle would switch back to non-manual mode
+                vehicle_name (str, optional): Name of the fixedwing to send this command to
+            Returns:
+                msgpackrpc.future.Future: future. call .join() to wait for method to finish. Example: client.METHOD().join()
+            """
+            return self.client.call_async('moveByManual', vx_max, vy_max, z_min, duration, drivetrain, yaw_mode, vehicle_name)
+
+        def setAngleLevelControllerGains(self, angle_level_gains=AngleLevelControllerGains(), vehicle_name = ''):
+            """
+            - Sets angle level controller gains (used by any API setting angle references - for ex: moveByRollPitchYawZAsync(), moveByRollPitchYawThrottleAsync(), etc)
+            - Modifying these gains will also affect the behaviour of moveByVelocityAsync() API.
+                This is because the AirSim flight controller will track velocity setpoints by converting them to angle set points.
+            - This function should only be called if the default angle level control PID gains need to be modified.
+            - Passing AngleLevelControllerGains() sets gains to default airsim values.
+
+            Args:
+                angle_level_gains (AngleLevelControllerGains):
+                    - Correspond to the roll, pitch, yaw axes, defined in the body frame.
+                    - Pass AngleLevelControllerGains() to reset gains to default recommended values.
+                vehicle_name (str, optional): Name of the fixedwing to send this command to
+            """
+            self.client.call('setAngleLevelControllerGains', *(angle_level_gains.to_lists()+(vehicle_name,)))
+
+        def setVelocityControllerGains(self, velocity_gains=VelocityControllerGains(), vehicle_name = ''):
+            """
+            - Sets velocity controller gains for moveByVelocityAsync().
+            - This function should only be called if the default velocity control PID gains need to be modified.
+            - Passing VelocityControllerGains() sets gains to default airsim values.
+
+            Args:
+                velocity_gains (VelocityControllerGains):
+                    - Correspond to the world X, Y, Z axes.
+                    - Pass VelocityControllerGains() to reset gains to default recommended values.
+                    - Modifying velocity controller gains will have an affect on the behaviour of moveOnSplineAsync() and moveOnSplineVelConstraintsAsync(), as they both use velocity control to track the trajectory.
+                vehicle_name (str, optional): Name of the fixedwing to send this command to
+            """
+            self.client.call('setVelocityControllerGains', *(velocity_gains.to_lists()+(vehicle_name,)))
+
+
+        def setPositionControllerGains(self, position_gains=PositionControllerGains(), vehicle_name = ''):
+            """
+            Sets position controller gains for moveByPositionAsync.
+            This function should only be called if the default position control PID gains need to be modified.
+
+            Args:
+                position_gains (PositionControllerGains):
+                    - Correspond to the X, Y, Z axes.
+                    - Pass PositionControllerGains() to reset gains to default recommended values.
+                vehicle_name (str, optional): Name of the fixedwing to send this command to
+            """
+            self.client.call('setPositionControllerGains', *(position_gains.to_lists()+(vehicle_name,)))
+
+        # query vehicle state
+        def getFixedWingState(self, vehicle_name = ''):
+            """
+            Args:
+                vehicle_name (str, optional): Vehicle to get the state of
+
+            Returns:
+                FixedWingState:
+            """
+            return FixedWingState.from_msgpack(self.client.call('getFixedWingState', vehicle_name))
+        getFixedWingState.__annotations__ = {'return': FixedWingState}
