@@ -112,6 +112,12 @@ public:
     {
         return rudder_deflection_;
     }
+
+	virtual real_T getTLASignal() const
+    {
+        return tla_deflection_;
+    }
+	
 	
     virtual void moveByRC(const RCData& rc_data) override
     {
@@ -431,6 +437,7 @@ private:
         elevator_deflection_ = pkt.elevator_deflection;
         aileron_deflection_ = pkt.aileron_deflection;
         rudder_deflection_ = pkt.rudder_deflection;
+        tla_deflection_ = pkt.tla_deflection;
     	
     }
 
@@ -440,9 +447,10 @@ private:
 	
     struct PlaneControlMessage
     {
-        float elevator_deflection;
-        float aileron_deflection;
-        float rudder_deflection;
+        real_T elevator_deflection;
+        real_T aileron_deflection;
+        real_T rudder_deflection;
+        real_T tla_deflection;
     };
 
     std::shared_ptr<mavlinkcom::UdpSocket> udpSocket_;
@@ -458,9 +466,10 @@ private:
     RCData last_rcData_;
     bool is_rc_connected_;
 
-    float elevator_deflection_;
-    float aileron_deflection_;
-    float rudder_deflection_;
+    real_T elevator_deflection_;
+    real_T aileron_deflection_;
+    real_T rudder_deflection_;
+    real_T tla_deflection_;
 };
 
 }} //namespace

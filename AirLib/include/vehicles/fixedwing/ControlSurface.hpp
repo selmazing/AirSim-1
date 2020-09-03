@@ -76,10 +76,10 @@ namespace msr
 
 			virtual void reportState(StateReporter& reporter) override
 			{
-				reporter.writeValue("Elevator-Ctrl-in", output_.control_signal_input);
-				reporter.writeValue("Elevator-Ctrl-fl", output_.control_signal_filtered);
-				reporter.writeValue("Elevator-Control-Deflection", output_.control_deflection);
-				reporter.writeValue("Elevator-Control-Speed", output_.control_speed);
+				reporter.writeValue("Ctrl-in", output_.control_signal_input);
+				reporter.writeValue("Ctrl-fl", output_.control_signal_filtered);
+				reporter.writeValue("Control-Deflection", output_.control_deflection);
+				reporter.writeValue("Control-Speed", output_.control_speed);
 			}
 			/* End: update state implementation*/
 			
