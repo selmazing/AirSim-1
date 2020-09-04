@@ -24,6 +24,7 @@ namespace msr
 				: params_(params), vehicle_api_(vehicle_api)
 			{
 				initialize(kinematics, environment);
+				printf("Hello Physics!");
 			}
 			
 			//*** Start: UpdatableState implementation ***//
@@ -114,8 +115,15 @@ namespace msr
 			{
 				PhysicsBody::initialize(params_->getParams().mass, params_->getParams().inertia, kinematics, environment);
 
+				createAirplane(*params_, airplane_, environment);
 				
 				initSensors(*params_, getKinematics(), getEnvironment());
+			}
+
+			static void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment)
+			{
+				const FixedWingParams::AirplanePose& airplane_pose = params.getParams().airplane_pose;
+				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives);
 			}
 			
 			void reportSensors(FixedWingParams& params, StateReporter& reporter)

@@ -60,7 +60,6 @@ public:
     virtual void update() override
     {
         FixedWingApiBase::update();
-
         sendSensors();
         recvControlDeflection();
     }

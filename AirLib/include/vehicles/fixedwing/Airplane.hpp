@@ -20,6 +20,7 @@ namespace msr
 			struct Output
 			{
 				AeroFM aero_force_;
+				real_T thrust;
 			};
 			// types, declare variables in struct? --> currently no output struct
 
@@ -90,12 +91,13 @@ namespace msr
 
 			virtual void setWrench(Wrench& wrench) override
 			{
-				wrench.force(0) = -1 * output_.aero_force_.drag;
+				wrench.force(0) = (-1 * output_.aero_force_.drag) + output_.thrust;
 				wrench.force(1) = output_.aero_force_.side_force;
 				wrench.force(2) = -1 * output_.aero_force_.lift;
 				wrench.torque(0) = output_.aero_force_.roll_mom;
 				wrench.torque(1) = output_.aero_force_.pitch_mom;
 				wrench.torque(2) = output_.aero_force_.yaw_mom;
+				printf("It ran!");
 			}
 
 			virtual void createControls()
@@ -104,6 +106,11 @@ namespace msr
 				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
 				rudder_deflection_ = controls_.at(2).getOutput().control_deflection;
 				tla_deflection_ = controls_.at(3).getOutput().control_deflection;
+			}
+
+			virtual void createPropulsionForces(const ControlSurface& output, const PropulsionDerivatives& derivatives)
+			{
+				output_.thrust = derivatives.thrust_tla_coefficient;
 			}
 
 			virtual void createAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics::State& kinematics, ControlSurface& output)

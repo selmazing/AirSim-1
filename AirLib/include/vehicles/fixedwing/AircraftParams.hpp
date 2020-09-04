@@ -55,6 +55,11 @@ namespace msr
 			real_T aileron_yaw_coefficient = 0; // yaw due to aileron deflection
 		};
 
+		struct PropulsionDerivatives
+		{
+			real_T thrust_tla_coefficient = 0; // CTtla, thrust produced with tla deflection
+		};
+
 		struct Dimensions
 		{
 			real_T main_plane_area = 0; // S, area of main wing [m^2]

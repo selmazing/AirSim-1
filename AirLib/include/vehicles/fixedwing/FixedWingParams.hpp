@@ -16,13 +16,27 @@ namespace msr
 			// SI units used throughout
 		{
 		public:
+			struct AirplanePose
+			{
+				Vector3r position;
+				Vector3r normal;
+
+				AirplanePose()
+				{}
+				AirplanePose(const Vector3r& position_val, const Vector3r& normal_val)
+					: position(position_val), normal(normal_val)
+				{}
+			};
+			
 			struct Params
 			{
 				/*required parameters*/
 				real_T mass; // operational aircraft mass [kg]
 				Matrix3x3r inertia; // operational inertia matrix
 				LinearAeroDerivatives derivatives; // initialize aerodynamic derivatives
+				PropulsionDerivatives prop_derivatives; // propulsion derivatives
 				Dimensions dimensions; // aircraft reference dimensions
+				AirplanePose airplane_pose; // full aircraft pose
 
 				/*parameters set with defaults*/
 				real_T restitution = 0.55f; // needed for FixedWingPawnSimApi.cpp API creation
@@ -144,6 +158,9 @@ namespace msr
 				params.derivatives.rudder_yaw_coefficient = 0.222f;
 				params.derivatives.rudder_sideforce_coefficient = 0.445f;
 				params.derivatives.rudder_roll_coefficient = 0.082f;
+
+				// Propulsion Terms //
+				params.prop_derivatives.thrust_tla_coefficient = 0.1; // set arbitrarily
 				
 			}
 
