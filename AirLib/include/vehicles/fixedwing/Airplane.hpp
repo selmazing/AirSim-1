@@ -10,6 +10,8 @@
 #include "AircraftParams.hpp"
 #include "ControlSurface.hpp"
 
+#include "Engine/Engine.h"
+
 namespace msr
 {
 	namespace airlib
@@ -34,6 +36,9 @@ namespace msr
 			{
 				initialize(position, normal, derivative);
 				air_density_sea_level_ = EarthUtils::getAirDensity(0.0f);
+
+				FString DEBUG_MSG = FString::Printf(TEXT("Its Running!"));
+				GEngine->AddOnScreenDebugMessage(1, 3000.0f, FColor::Green, DEBUG_MSG);
 				
 			}
 			void initialize(const Vector3r& position, const Vector3r& normal, const LinearAeroDerivatives& derivative)
@@ -97,7 +102,8 @@ namespace msr
 				wrench.torque(0) = output_.aero_force_.roll_mom;
 				wrench.torque(1) = output_.aero_force_.pitch_mom;
 				wrench.torque(2) = output_.aero_force_.yaw_mom;
-				printf("It ran!");
+				FString DEBUG_MSG = FString::Printf(TEXT("Forces are being Called!"));
+				GEngine->AddOnScreenDebugMessage(2, 3000.0f, FColor::Blue, DEBUG_MSG);
 			}
 
 			virtual void createControls()

@@ -31,7 +31,7 @@ namespace msr
 
 				config->initialize(vehicle_setting);
 
-					return config;
+				return config;
 			}
 		};
 	}
