@@ -87,13 +87,18 @@ namespace msr
 			}
 
 			//physics body interface
-			virtual PhysicsBodyVertex& getWrenchVertex()  override
+			virtual uint wrenchVertexCount() const override
+			{
+				uint const instances = 1;
+				return instances;
+			}
+			virtual PhysicsBodyVertex& getWrenchVertex(uint index)  override
 			{
 				return airplane_;
 			}
 			virtual const PhysicsBodyVertex& getWrenchVertex(uint index) const override
 			{
-				return rotors_.at(index);
+				return airplane_;
 			}
 
 

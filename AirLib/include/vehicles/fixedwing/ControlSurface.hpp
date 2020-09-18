@@ -58,19 +58,19 @@ namespace msr
 			}
 
 			/* Start: update state implementation*/
-			virtual void resetImplementation()
+			void resetImplementation()
 			{
 				control_signal_filter_.reset();
 				setOutput(output_, control_signal_filter_);
 			}
 
-			virtual void update()
+			void update()
 			{
 				setOutput(output_, control_signal_filter_);
 				control_signal_filter_.update();
 			}
 
-			virtual void reportState(StateReporter& reporter)
+			void reportState(StateReporter& reporter)
 			{
 				reporter.writeValue("Ctrl-in", output_.control_signal_input);
 				reporter.writeValue("Ctrl-fl", output_.control_signal_filtered);
