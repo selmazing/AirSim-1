@@ -30,7 +30,7 @@ namespace msr
 			//*** Start: UpdatableState implementation ***//
 			virtual void resetImplementation() override
 			{
-				//reset rotors, kinematics and environment
+				//reset controls, kinematics and environment
 				PhysicsBody::resetImplementation();
 
 				//reset sensors last after their ground truth has been reset
@@ -87,16 +87,31 @@ namespace msr
 			}
 
 			//physics body interface
+			virtual PhysicsBodyVertex& getWrenchVertex()  override
+			{
+				return airplane_;
+			}
+			virtual const PhysicsBodyVertex& getWrenchVertex(uint index) const override
+			{
+				return rotors_.at(index);
+			}
 
+
+
+
+
+
+
+
+			
 			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
 			{
 				return controls_.at(control_index).getOutput();
 			}
 
-			Airplane::Output getAircraftOutput() const
-			{
-				return airplane_.getOutput();
-			}
+			
+		
+
 			
 			virtual real_T getRestitution() const override
 			{
@@ -107,7 +122,12 @@ namespace msr
 			{
 				return params_ ->getParams().friction;
 			}
-			
+
+			Airplane::Output getAircraftOutput() const
+			{
+				return airplane_.getOutput();
+			}
+
 			virtual ~FixedWingPhysicsBody() = default;
 
 		private: //methods
@@ -115,15 +135,15 @@ namespace msr
 			{
 				PhysicsBody::initialize(params_->getParams().mass, params_->getParams().inertia, kinematics, environment);
 
-				createAirplane(*params_, airplane_, environment);
+				createAirplane(*params_, airplane_, environment, kinematics);
 				
 				initSensors(*params_, getKinematics(), getEnvironment());
 			}
 
-			static void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment)
+			static void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment, const Kinematics* kinematics)
 			{
 				const FixedWingParams::AirplanePose& airplane_pose = params.getParams().airplane_pose;
-				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives);
+				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives, params.getParams().prop_derivatives, params.getParams().dimensions, environment, kinematics);
 			}
 			
 			void reportSensors(FixedWingParams& params, StateReporter& reporter)
