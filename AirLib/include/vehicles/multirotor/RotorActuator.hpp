@@ -13,6 +13,8 @@
 #include "physics/PhysicsBodyVertex.hpp"
 #include "RotorParams.hpp"
 
+#include "Engine/Engine.h"
+
 namespace msr { namespace airlib {
 
 //Rotor gets control signal as input (PWM or voltage represented from 0 to 1) which causes 
@@ -112,6 +114,8 @@ protected:
         //forces and torques are proportional to air density: http://physics.stackexchange.com/a/32013/14061
         wrench.force = normal * output_.thrust * air_density_ratio_;
         wrench.torque = normal * output_.torque_scaler * air_density_ratio_; //TODO: try using filtered control here
+        FString DEBUG_MSG = FString::Printf(TEXT("Forces are being Called!"));
+        GEngine->AddOnScreenDebugMessage(2, 3000.0f, FColor::Blue, DEBUG_MSG);
     }
 
 private: //methods

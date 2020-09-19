@@ -81,12 +81,15 @@ namespace msr
 
 			virtual void setWrench(Wrench& wrench) override
 			{
-				wrench.force(0) = (-1 * output_.aero_force_.drag) + output_.thrust;
-				wrench.force(1) = output_.aero_force_.side_force;
-				wrench.force(2) = -1 * output_.aero_force_.lift;
-				wrench.torque(0) = output_.aero_force_.roll_mom;
-				wrench.torque(1) = output_.aero_force_.pitch_mom;
-				wrench.torque(2) = output_.aero_force_.yaw_mom;
+				const Vector3r aero_x = Vector3r(1, 0, 0);
+				const Vector3r aero_y = Vector3r(0, 1, 0);
+				const Vector3r aero_z = Vector3r(0, 0, 1);
+				wrench.force = (aero_x * (-1 * output_.aero_force_.drag)) + (aero_x * output_.thrust);
+				wrench.force += aero_y * output_.aero_force_.side_force;
+				wrench.force += aero_z * (-1 * output_.aero_force_.lift);
+				wrench.torque += aero_x * output_.aero_force_.roll_mom;
+				wrench.torque += aero_y * output_.aero_force_.pitch_mom;
+				wrench.torque = aero_z * output_.aero_force_.yaw_mom;
 				FString DEBUG_MSG = FString::Printf(TEXT("Forces are being Called!"));
 				GEngine->AddOnScreenDebugMessage(2, 3000.0f, FColor::Blue, DEBUG_MSG);
 			}
