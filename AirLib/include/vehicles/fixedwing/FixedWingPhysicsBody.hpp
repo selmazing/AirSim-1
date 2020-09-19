@@ -87,6 +87,12 @@ namespace msr
 			}
 
 			//physics body interface
+			uint controlCount() const
+			{
+				return params_->getParams().control_count;
+			}
+
+			
 			virtual uint wrenchVertexCount() const override
 			{
 				return params_->getParams().airplane_count;
