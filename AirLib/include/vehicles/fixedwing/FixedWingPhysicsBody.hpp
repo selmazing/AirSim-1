@@ -24,7 +24,7 @@ namespace msr
 				: params_(params), vehicle_api_(vehicle_api)
 			{
 				initialize(kinematics, environment);
-				printf("Hello Physics!");
+				Utils::log("Hello Physics!");
 			}
 			
 			//*** Start: UpdatableState implementation ***//
@@ -99,6 +99,7 @@ namespace msr
 			}
 			virtual PhysicsBodyVertex& getWrenchVertex(uint index)  override
 			{
+				Utils::log("getWrenchVertex called");
 				return airplane_;
 			}
 			virtual const PhysicsBodyVertex& getWrenchVertex(uint index) const override
