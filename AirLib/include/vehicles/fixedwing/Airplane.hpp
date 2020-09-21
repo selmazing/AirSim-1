@@ -96,7 +96,7 @@ namespace msr
 
 		private: // methods
 
-			virtual void setAoA()
+			void setAoA()
 			{
 				aoa_->aero_axis = VectorMath::rotateVector(kinematics_->getState().twist.angular, kinematics_->getState().pose.orientation, true);
 				aoa_->alpha = aoa_->aero_axis(0);
@@ -114,7 +114,7 @@ namespace msr
 				air_density_ratio_ = environment_->getState().air_density / air_density_sea_level_; // Sigma ratio
 			}
 
-			virtual void createControls()
+			void createControls()
 			{
 				aileron_deflection_ = controls_.at(0).getOutput().control_deflection;
 				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
@@ -122,12 +122,12 @@ namespace msr
 				tla_deflection_ = controls_.at(3).getOutput().control_deflection;
 			}
 
-			virtual void createPropulsionForces(const PropulsionDerivatives& derivatives, Output& output)
+			void createPropulsionForces(const PropulsionDerivatives& derivatives, Output& output)
 			{
 				output.thrust = derivatives.thrust_tla_coefficient;
 			}
 
-			virtual void createAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics* kinematics, Output& output)
+			void createAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics* kinematics, Output& output)
 			{
 				createControls();
 				const real_T airspeed = setAirspeed();

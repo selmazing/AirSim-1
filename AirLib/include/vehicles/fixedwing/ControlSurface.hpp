@@ -82,7 +82,7 @@ namespace msr
 		private: // methods
 
 			//calculates all the forces
-			virtual void setOutput(Output& output, const FirstOrderFilter<real_T>& control_signal_filter)
+			void setOutput(Output& output, const FirstOrderFilter<real_T>& control_signal_filter)
 			{
 				output.control_signal_input = control_signal_filter_.getInput();
 				output.control_signal_filtered = control_signal_filter_.getOutput();
