@@ -26,20 +26,13 @@ namespace msr
 				real_T control_deflection;
 			};
 		public: //methods
-			
+
 			ControlSurface()
 			{
-				// Default constructor
+				initialize();
 			}
-
-			ControlSurface(const Vector3r& position, const Vector3r& normal, const Environment* environment, uint id = -1 )
+			void initialize()
 			{
-				initialize(position, normal, environment, id);
-			}
-			void initialize(const Vector3r& position, const Vector3r& normal, const Environment* environment, uint id = -1)
-			{
-				id_ = id;
-				environment_ = environment;
 				air_density_sea_level_ = EarthUtils::getAirDensity(0.0f);
 
 				// hardcoded time-constant for now, should probably have another hpp class with the control surface properties
@@ -89,9 +82,7 @@ namespace msr
 			}
 
 		private: //fields
-			uint id_; // for debug messages
 			FirstOrderFilter<real_T> control_signal_filter_;
-			const Environment* environment_ = nullptr;
 			const Kinematics* kinematics_ = nullptr;
 			real_T air_density_sea_level_, air_density_ratio_, dyn_pressure_, forward_velocity_;
 			Output output_;

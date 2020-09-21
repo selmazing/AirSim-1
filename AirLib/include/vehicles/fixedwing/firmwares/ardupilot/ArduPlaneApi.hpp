@@ -97,6 +97,23 @@ public:
     }
 
 public:
+
+    virtual real_T getActuation(unsigned actuator_index) const override
+    {
+	    switch (actuator_index)
+	    {
+        case 0: return aileron_deflection_;
+
+        case 1: return elevator_deflection_;
+
+        case 2: return rudder_deflection_;
+
+        case 3: return tla_deflection_;
+
+        default: return 0.0f;
+	    }
+    }
+	
     virtual real_T getElevatorSignal() const 
     {
         return elevator_deflection_;
@@ -385,7 +402,7 @@ private:
                            "}"
                            "%s"
                            "}\n",
-                           static_cast<uint64_t>(msr::airlib::ClockFactory::get()->nowNanos() / 1.0E3),
+                           static_cast<uint64_t>(msr::airlib::ClockFactory::get()->nowNanos() / 1.0E3),	
                            imu_output.angular_velocity[0],
                            imu_output.angular_velocity[1],
                            imu_output.angular_velocity[2],

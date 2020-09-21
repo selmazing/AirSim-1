@@ -53,12 +53,12 @@ namespace msr
 				PhysicsBody::reportState(reporter);
 
 				reportSensors(*params_, reporter);
-				for (uint control_index = 0; control_index < controls_.size(); ++control_index)
+				for (uint control_index = 0; control_index < airplane_.controls_.size(); ++control_index)
 				{
 					reporter.startHeading("", 1);
 					reporter.writeValue("Control", control_index);
 					reporter.endHeading(false, 1);
-					controls_.at(control_index).reportState(reporter);
+					airplane_.controls_.at(control_index).reportState(reporter);
 				}
 			}
 			//*** End: UpdatableState implementation ***//
@@ -74,9 +74,9 @@ namespace msr
 				vehicle_api_->update();
 
 				//transfer new input values from controller to control_surface
-				for(uint control_index = 0; control_index < controls_.size(); ++control_index)
+				for(uint control_index = 0; control_index < airplane_.controls_.size(); ++control_index)
 				{
-					controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
+					airplane_.controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
 				}
 			}
 
@@ -117,7 +117,7 @@ namespace msr
 			
 			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
 			{
-				return controls_.at(control_index).getOutput();
+				return airplane_.controls_.at(control_index).getOutput();
 			}
 
 			
@@ -151,7 +151,7 @@ namespace msr
 				initSensors(*params_, getKinematics(), getEnvironment());
 			}
 
-			static void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment, const Kinematics* kinematics)
+			void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment, const Kinematics* kinematics)
 			{
 				const FixedWingParams::AirplanePose& airplane_pose = params.getParams().airplane_pose;
 				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives, params.getParams().prop_derivatives, params.getParams().dimensions, environment, kinematics);
@@ -181,7 +181,6 @@ namespace msr
 
 			private: //fields
 			FixedWingParams* params_;
-			vector<ControlSurface> controls_;
 			Airplane airplane_;
 			real_T aileron_deflection_, elevator_deflection_, rudder_deflection_;
 			std::unique_ptr<Environment> environment_;

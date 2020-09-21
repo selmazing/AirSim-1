@@ -44,6 +44,7 @@ namespace msr
 				aero_derivatives_ = aero_derivatives;
 				prop_derivatives_ = prop_derivatives;
 				dimensions_ = dimensions;
+				createControls(4);
 				FString DEBUG_MSG = FString::Printf(TEXT("Its Running!"));
 				GEngine->AddOnScreenDebugMessage(1, 3000.0f, FColor::Green, DEBUG_MSG);
 				PhysicsBodyVertex::initialize(position, normal); // call base initializer
@@ -61,10 +62,10 @@ namespace msr
 			virtual void update() override
 			{
 				updateEnvironmentalFactors();
-				// should call getWrench
-				PhysicsBodyVertex::update();
 				createPropulsionForces(prop_derivatives_, output_);
 				createAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
+				// should call getWrench
+				PhysicsBodyVertex::update();
 			}
 
 			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
@@ -114,69 +115,75 @@ namespace msr
 				air_density_ratio_ = environment_->getState().air_density / air_density_sea_level_; // Sigma ratio
 			}
 
-			void createControls()
-			{
-				aileron_deflection_ = controls_.at(0).getOutput().control_deflection;
-				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
-				rudder_deflection_ = controls_.at(2).getOutput().control_deflection;
-				tla_deflection_ = controls_.at(3).getOutput().control_deflection;
-			}
-
 			void createPropulsionForces(const PropulsionDerivatives& derivatives, Output& output)
 			{
 				output.thrust = derivatives.thrust_tla_coefficient;
 			}
 
+			void createControls(const uint control_count)
+			{
+				for (uint i = 0; i < control_count; ++i)
+				{
+					controls_.push_back(ControlSurface());
+				}
+			}
+
 			void createAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics* kinematics, Output& output)
 			{
-				createControls();
+				aileron_deflection_ = controls_.at(0).getOutput().control_deflection;
+				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
+				rudder_deflection_ = controls_.at(2).getOutput().control_deflection;
+				tla_deflection_ = controls_.at(3).getOutput().control_deflection;
+				
 				const real_T airspeed = setAirspeed();
 				dyn_pressure_ = 0.5 * environment_->getState().air_density * pow(airspeed, 2);
+				const real_T angular_pressure = 0.25 * environment_->getState().air_density * airspeed * dimensions.main_plane_area * dimensions.main_plane_chord; // expanded out 1/2*rho*V^2 * S * (c / 2 * V) to prevent division by zero
 
 				
 				output.aero_force_.lift = dyn_pressure_ * dimensions.main_plane_area * (
-					derivatives.zero_lift_coefficient + 
-					(derivatives.alpha_lift_coefficient * aoa_->alpha) + 
-					(derivatives.pitch_lift_coefficient * (dimensions.main_plane_chord / (2 * airspeed)) * kinematics_->getState().twist.angular(1)) +
-					(derivatives.elev_lift_coefficient * elevator_deflection_));
+					derivatives.zero_lift_coefficient +
+					(derivatives.alpha_lift_coefficient * aoa_->alpha) +
+					(derivatives.elev_lift_coefficient * elevator_deflection_)) +
+					(derivatives.pitch_lift_coefficient * angular_pressure * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.drag = dyn_pressure_ * dimensions.main_plane_area * (
-					derivatives.zero_drag_coefficient + 
-					(derivatives.alpha_drag_coefficient * aoa_->alpha) + 
-					(derivatives.alpha_drag_coefficient_2 * (aoa_->alpha * aoa_->alpha)) + 
-					(derivatives.beta_drag_coefficient * aoa_->beta) + 
-					(derivatives.beta_drag_coefficient_2 * (aoa_->beta * aoa_->beta)) + 
-					(derivatives.pitch_drag_coefficient * (dimensions.main_plane_chord / (2 * airspeed)) * kinematics_->getState().twist.angular(1)) +
-					(derivatives.elev_drag_coefficient * elevator_deflection_));
+					derivatives.zero_drag_coefficient +
+					(derivatives.alpha_drag_coefficient * aoa_->alpha) +
+					(derivatives.alpha_drag_coefficient_2 * (aoa_->alpha * aoa_->alpha)) +
+					(derivatives.beta_drag_coefficient * aoa_->beta) +
+					(derivatives.beta_drag_coefficient_2 * (aoa_->beta * aoa_->beta)) +
+					(derivatives.elev_drag_coefficient * elevator_deflection_)) +
+					(derivatives.pitch_drag_coefficient * angular_pressure * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.side_force = dyn_pressure_ * dimensions.main_plane_area * (
 					derivatives.zero_sideforce_coefficient +
 					(derivatives.beta_sideforce_coefficient * aoa_->beta) +
-					(derivatives.rollrate_sideforce_coefficient * (dimensions.main_plane_span / (2 * airspeed)) * kinematics_->getState().twist.angular(0)) +
-					(derivatives.yawrate_sideforce_coefficient * (dimensions.main_plane_span / (2 * airspeed)) * kinematics_->getState().twist.angular(2)) +
 					(derivatives.sidevelocity_sideforce_coefficient * kinematics_->getState().twist.linear(1)) +
-					(derivatives.rudder_sideforce_coefficient * rudder_deflection_));
+					(derivatives.rudder_sideforce_coefficient * rudder_deflection_)) +
+					(derivatives.rollrate_sideforce_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
+					(derivatives.yawrate_sideforce_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
 				
 				output.aero_force_.pitch_mom = dyn_pressure_ * dimensions.main_plane_area * dimensions.main_plane_chord * (
-					derivatives.zero_pitch_coefficient + 
-					(derivatives.alpha_pitch_coefficient * aoa_->alpha) + 
-					(derivatives.pitchrate_pitch_coefficient * (dimensions.main_plane_chord / (2 * airspeed)) * kinematics_->getState().twist.angular(1)) +
-					(derivatives.elevator_pitch_coefficient * elevator_deflection_));
+					derivatives.zero_pitch_coefficient +
+					(derivatives.alpha_pitch_coefficient * aoa_->alpha) +
+					(derivatives.elevator_pitch_coefficient * elevator_deflection_)) +
+					(derivatives.pitchrate_pitch_coefficient * angular_pressure * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.roll_mom = dyn_pressure_ * dimensions.main_plane_area * dimensions.main_plane_span * (
 					derivatives.zero_roll_coefficient +
 					(derivatives.beta_roll_coefficient * aoa_->beta) +
-					(derivatives.rollrate_roll_coefficient * (dimensions.main_plane_span / (2 * airspeed)) * kinematics_->getState().twist.angular(0)) +
-					(derivatives.yawrate_roll_coefficient * (dimensions.main_plane_span / (2 * airspeed)) * kinematics_->getState().twist.angular(2)) +
-					derivatives.aileron_roll_coefficient * aileron_deflection_);
+					(derivatives.aileron_roll_coefficient * aileron_deflection_)) +
+					(derivatives.rollrate_roll_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
+					(derivatives.yawrate_roll_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
+
 				
 				output.aero_force_.yaw_mom = dyn_pressure_ * dimensions.main_plane_area * dimensions.main_plane_span * (
 					derivatives.zero_yaw_coefficient +
 					(derivatives.beta_yaw_coefficient * aoa_->beta) +
-					(derivatives.rollrate_yaw_coefficient * (dimensions.main_plane_span / (2 * airspeed)) * kinematics_->getState().twist.angular(0)) +
-					(derivatives.yawrate_yaw_coefficient * (dimensions.main_plane_span / (2 * airspeed)) * kinematics_->getState().twist.angular(2)) +
 					(derivatives.aileron_yaw_coefficient * aileron_deflection_) +
-					(derivatives.rudder_yaw_coefficient * rudder_deflection_));
+					(derivatives.rudder_yaw_coefficient * rudder_deflection_)) +
+					(derivatives.rollrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
+					(derivatives.yawrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
 			}
 
 
@@ -191,6 +198,7 @@ namespace msr
 			Output output_;
 			// AeroFM* aero_force_;
 			real_T aileron_deflection_, elevator_deflection_, rudder_deflection_, tla_deflection_;
+		public:
 			vector<ControlSurface> controls_;
 		};
 		

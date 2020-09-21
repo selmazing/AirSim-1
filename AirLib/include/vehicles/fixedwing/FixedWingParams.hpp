@@ -41,8 +41,8 @@ namespace msr
 				/*parameters set with defaults*/
 				real_T restitution = 0.55f; // needed for FixedWingPawnSimApi.cpp API creation
 				real_T friction = 0.5f; // needed for FixedWingPawnSimApi.cpp API creation
-				uint control_count = 3; // number of control variables (elevator, aileron, rudder, TLA)
-				uint airplane_count = 0; // number of aircraft (Should not normally be more than 1)
+				uint control_count = 4; // number of control variables (elevator, aileron, rudder, TLA)
+				uint airplane_count = 1; // number of aircraft (Should not normally be more than 1)
 			};
 
 		protected:
