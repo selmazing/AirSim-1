@@ -44,7 +44,7 @@ namespace msr
 				aero_derivatives_ = aero_derivatives;
 				prop_derivatives_ = prop_derivatives;
 				dimensions_ = dimensions;
-				createControls(4);
+				createControls(4); // currently hardcoded should really get params when initialized in FixedWingPhysicsBody
 				FString DEBUG_MSG = FString::Printf(TEXT("Its Running!"));
 				GEngine->AddOnScreenDebugMessage(1, 3000.0f, FColor::Green, DEBUG_MSG);
 				PhysicsBodyVertex::initialize(position, normal); // call base initializer
@@ -54,22 +54,31 @@ namespace msr
 			virtual void resetImplementation() override
 			{
 				PhysicsBodyVertex::resetImplementation();
+				for (auto& control : controls_)
+				{
+					control.resetImplementation();
+				}
 				updateEnvironmentalFactors();
 				createPropulsionForces(prop_derivatives_, output_);
-				createAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
+				updateAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
 			}
 
 			virtual void update() override
 			{
 				updateEnvironmentalFactors();
+				for(auto& control: controls_)
+				{
+					control.update();
+				}
 				createPropulsionForces(prop_derivatives_, output_);
-				createAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
+				updateAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
 				// should call getWrench
 				PhysicsBodyVertex::update();
+	
 			}
 
-			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
-			{
+			ControlSurface::Output getControlSurfaceOutput(uint control_index) const{
+	
 				return controls_.at(control_index).getOutput();
 			}
 
@@ -117,7 +126,9 @@ namespace msr
 
 			void createPropulsionForces(const PropulsionDerivatives& derivatives, Output& output)
 			{
-				output.thrust = derivatives.thrust_tla_coefficient;
+
+				tla_deflection_ = controls_.at(2).getOutput().control_deflection + 1.0f;
+				output.thrust = derivatives.thrust_tla_coefficient * tla_deflection_;
 			}
 
 			void createControls(const uint control_count)
@@ -128,12 +139,11 @@ namespace msr
 				}
 			}
 
-			void createAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics* kinematics, Output& output)
+			void updateAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics* kinematics, Output& output)
 			{
 				aileron_deflection_ = controls_.at(0).getOutput().control_deflection;
 				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
-				rudder_deflection_ = controls_.at(2).getOutput().control_deflection;
-				tla_deflection_ = controls_.at(3).getOutput().control_deflection;
+				rudder_deflection_ = controls_.at(3).getOutput().control_deflection;
 				
 				const real_T airspeed = setAirspeed();
 				dyn_pressure_ = 0.5 * environment_->getState().air_density * pow(airspeed, 2);
@@ -184,6 +194,12 @@ namespace msr
 					(derivatives.rudder_yaw_coefficient * rudder_deflection_)) +
 					(derivatives.rollrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
 					(derivatives.yawrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
+
+				if(isnan(output.aero_force_.lift))
+				{
+					FString DEBUG_MSG = FString::Printf(TEXT("Forces are being Called!"));
+					GEngine->AddOnScreenDebugMessage(2, 3000.0f, FColor::Blue, DEBUG_MSG);
+				}
 			}
 
 

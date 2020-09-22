@@ -105,10 +105,10 @@ public:
         case 0: return aileron_deflection_;
 
         case 1: return elevator_deflection_;
+   
+        case 2: return tla_deflection_;
 
-        case 2: return rudder_deflection_;
-
-        case 3: return tla_deflection_;
+        case 3: return rudder_deflection_;
 
         default: return 0.0f;
 	    }
@@ -450,11 +450,15 @@ private:
             recv_ret = udpSocket_->recv(&pkt, sizeof(pkt), 100);
 	    }
 
+
         elevator_deflection_ = pkt.elevator_deflection;
         aileron_deflection_ = pkt.aileron_deflection;
-        rudder_deflection_ = pkt.rudder_deflection;
         tla_deflection_ = pkt.tla_deflection;
-    	
+        rudder_deflection_ = pkt.rudder_deflection;
+        Utils::log(Utils::stringf("Received TLA: %f", tla_deflection_), Utils::kLogLevelInfo);
+        Utils::log(Utils::stringf("Received elevator: %f", elevator_deflection_), Utils::kLogLevelInfo);
+        Utils::log(Utils::stringf("Received aileron: %f", aileron_deflection_), Utils::kLogLevelInfo);
+        Utils::log(Utils::stringf("Received rudder: %f", rudder_deflection_), Utils::kLogLevelInfo);
     }
 
 private:
@@ -463,10 +467,10 @@ private:
 	
     struct PlaneControlMessage
     {
-        real_T elevator_deflection;
-        real_T aileron_deflection;
-        real_T rudder_deflection;
-        real_T tla_deflection;
+        uint16 aileron_deflection;
+        uint16 elevator_deflection;
+        uint16 tla_deflection;
+        uint16 rudder_deflection;
     };
 
     std::shared_ptr<mavlinkcom::UdpSocket> udpSocket_;

@@ -42,7 +42,8 @@ namespace msr
 			// set elevator signal from -1 to 1 for full deflection at limit
 			void setControlSignal(real_T control_signal)
 			{
-				control_signal_filter_.setInput(Utils::clip(control_signal, -1.0f, 1.0f));
+				// control_signal_filter_.setInput(Utils::clip(control_signal, -1.0f, 1.0f));
+				output_.control_deflection = (control_signal - 1500.0f) / 500.0f;
 			}
 
 			Output getOutput() const
@@ -59,8 +60,8 @@ namespace msr
 
 			void update()
 			{
-				setOutput(output_, control_signal_filter_);
-				control_signal_filter_.update();
+				// control_signal_filter_.update();
+				// setOutput(output_, control_signal_filter_);
 			}
 
 			void reportState(StateReporter& reporter)

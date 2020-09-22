@@ -77,6 +77,8 @@ namespace msr
 				for(uint control_index = 0; control_index < airplane_.controls_.size(); ++control_index)
 				{
 					airplane_.controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
+
+					Utils::log(Utils::stringf("Received TLA [%i]: %f", control_index, airplane_.controls_.at(control_index).getOutput().control_deflection, Utils::kLogLevelInfo));
 				}
 			}
 
