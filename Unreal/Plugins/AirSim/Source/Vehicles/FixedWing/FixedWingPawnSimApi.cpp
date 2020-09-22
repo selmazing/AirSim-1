@@ -29,7 +29,7 @@ void FixedWingPawnSimApi::initialize()
     //setup physics vehicle
     fixedwing_physics_body_ = std::unique_ptr<FixedWing>(new FixedWingPhysicsBody(vehicle_params_.get(), vehicle_api_.get(),
         getKinematics(), getEnvironment()));
-    control_count_ = fixedwing_physics_body_->wrenchVertexCount();
+    control_count_ = fixedwing_physics_body_->controlCount();
     control_info_.assign(control_count_, FixedWingControlInfo());
 
     vehicle_api_->setSimulatedGroundTruth(getGroundTruthKinematics(), getGroundTruthEnvironment());

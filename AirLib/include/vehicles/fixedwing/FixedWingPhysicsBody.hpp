@@ -24,13 +24,13 @@ namespace msr
 				: params_(params), vehicle_api_(vehicle_api)
 			{
 				initialize(kinematics, environment);
-				printf("Hello Physics!");
+				Utils::log("Hello Physics!");
 			}
 			
 			//*** Start: UpdatableState implementation ***//
 			virtual void resetImplementation() override
 			{
-				//reset rotors, kinematics and environment
+				//reset controls, kinematics and environment
 				PhysicsBody::resetImplementation();
 
 				//reset sensors last after their ground truth has been reset
@@ -53,12 +53,12 @@ namespace msr
 				PhysicsBody::reportState(reporter);
 
 				reportSensors(*params_, reporter);
-				for (uint control_index = 0; control_index < controls_.size(); ++control_index)
+				for (uint control_index = 0; control_index < airplane_.controls_.size(); ++control_index)
 				{
 					reporter.startHeading("", 1);
 					reporter.writeValue("Control", control_index);
 					reporter.endHeading(false, 1);
-					controls_.at(control_index).reportState(reporter);
+					airplane_.controls_.at(control_index).reportState(reporter);
 				}
 			}
 			//*** End: UpdatableState implementation ***//
@@ -74,9 +74,11 @@ namespace msr
 				vehicle_api_->update();
 
 				//transfer new input values from controller to control_surface
-				for(uint control_index = 0; control_index < controls_.size(); ++control_index)
+				for(uint control_index = 0; control_index < airplane_.controls_.size(); ++control_index)
 				{
-					controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
+					airplane_.controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
+
+					Utils::log(Utils::stringf("Received TLA [%i]: %f", control_index, airplane_.controls_.at(control_index).getOutput().control_deflection, Utils::kLogLevelInfo));
 				}
 			}
 
@@ -87,16 +89,42 @@ namespace msr
 			}
 
 			//physics body interface
+			uint controlCount() const
+			{
+				return params_->getParams().control_count;
+			}
 
+			
+			virtual uint wrenchVertexCount() const override
+			{
+				return params_->getParams().airplane_count;
+			}
+			virtual PhysicsBodyVertex& getWrenchVertex(uint index)  override
+			{
+				Utils::log("getWrenchVertex called");
+				return airplane_;
+			}
+			virtual const PhysicsBodyVertex& getWrenchVertex(uint index) const override
+			{
+				return airplane_;
+			}
+
+
+
+
+
+
+
+
+			
 			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
 			{
-				return controls_.at(control_index).getOutput();
+				return airplane_.controls_.at(control_index).getOutput();
 			}
 
-			Airplane::Output getAircraftOutput() const
-			{
-				return airplane_.getOutput();
-			}
+			
+		
+
 			
 			virtual real_T getRestitution() const override
 			{
@@ -107,7 +135,12 @@ namespace msr
 			{
 				return params_ ->getParams().friction;
 			}
-			
+
+			Airplane::Output getAircraftOutput() const
+			{
+				return airplane_.getOutput();
+			}
+
 			virtual ~FixedWingPhysicsBody() = default;
 
 		private: //methods
@@ -115,15 +148,15 @@ namespace msr
 			{
 				PhysicsBody::initialize(params_->getParams().mass, params_->getParams().inertia, kinematics, environment);
 
-				createAirplane(*params_, airplane_, environment);
+				createAirplane(*params_, airplane_, environment, kinematics);
 				
 				initSensors(*params_, getKinematics(), getEnvironment());
 			}
 
-			static void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment)
+			void createAirplane(const FixedWingParams& params, Airplane& airplane, const Environment* environment, const Kinematics* kinematics)
 			{
 				const FixedWingParams::AirplanePose& airplane_pose = params.getParams().airplane_pose;
-				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives);
+				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives, params.getParams().prop_derivatives, params.getParams().dimensions, environment, kinematics);
 			}
 			
 			void reportSensors(FixedWingParams& params, StateReporter& reporter)
@@ -150,7 +183,6 @@ namespace msr
 
 			private: //fields
 			FixedWingParams* params_;
-			vector<ControlSurface> controls_;
 			Airplane airplane_;
 			real_T aileron_deflection_, elevator_deflection_, rudder_deflection_;
 			std::unique_ptr<Environment> environment_;

@@ -41,7 +41,8 @@ namespace msr
 				/*parameters set with defaults*/
 				real_T restitution = 0.55f; // needed for FixedWingPawnSimApi.cpp API creation
 				real_T friction = 0.5f; // needed for FixedWingPawnSimApi.cpp API creation
-				unsigned int control_count = 3; // number of control variables (elevator, aileron, rudder)
+				uint control_count = 4; // number of control variables (elevator, aileron, rudder, TLA)
+				uint airplane_count = 1; // number of aircraft (Should not normally be more than 1)
 			};
 
 		protected:
@@ -102,12 +103,12 @@ namespace msr
 			{
 				// Basic Parameters //
 				params.mass = 2.0f; //mass in [kg]
-				params.inertia(0, 0) = 0.0f; // Ixx [Kgm^-2]
-				params.inertia(1, 1) = 0.0f; // Iyy [Kgm^-2]
-				params.inertia(2, 2) = 0.0f; //Izz [Kgm^-2]
-				params.inertia(0, 2) = params.inertia(2,0) = 0.0f; // Ixz [Kgm^-2]
-				params.inertia(0, 1) = params.inertia(1, 0) = 0.0f; // Ixy [Kgm^-2], symmetric
-				params.inertia(2, 1) = params.inertia(1, 2) = 0.0f; // Iyz [Kgm^-2], symmetric
+				params.inertia(0, 0) = 1.0f; // Ixx [Kgm^-2]
+				params.inertia(1, 1) = 1.0f; // Iyy [Kgm^-2]
+				params.inertia(2, 2) = 1.0f; //Izz [Kgm^-2]
+				params.inertia(0, 2) = params.inertia(2,0) = 0.05f; // Ixz [Kgm^-2]
+				params.inertia(0, 1) = params.inertia(1, 0) = 0.05f; // Ixy [Kgm^-2], symmetric
+				params.inertia(2, 1) = params.inertia(1, 2) = 0.05f; // Iyz [Kgm^-2], symmetric
 
 				// Reference Areas //
 				params.dimensions.main_plane_area = 0.45f; // S [m^2]
@@ -160,7 +161,7 @@ namespace msr
 				params.derivatives.rudder_roll_coefficient = 0.082f;
 
 				// Propulsion Terms //
-				params.prop_derivatives.thrust_tla_coefficient = 0.1; // set arbitrarily
+				params.prop_derivatives.thrust_tla_coefficient = 100.0; // set arbitrarily
 				
 			}
 
