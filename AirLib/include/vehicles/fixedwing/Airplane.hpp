@@ -108,11 +108,11 @@ namespace msr
 				/* aoa_->aero_axis = VectorMath::rotateVector(kinematics_->getState().twist.angular, kinematics_->getState().pose.orientation, true);
 				aoa_->alpha = aoa_->aero_axis(0);
 				aoa_->beta = aoa_->aero_axis(2); */
-				aoa_->alpha = 0.0f;
-				aoa_->beta = 0.0f;
+				aoa_.alpha = 0.0f;
+				aoa_.beta = 0.0f;
 
 				Utils::log(Utils::stringf("Angular variables: p: %f, q: %f, r: %f, alpha: %f, beta: %f, roll_aero: %f",
-				kinematics_->getState().twist.angular(0), kinematics_->getState().twist.angular(1), kinematics_->getState().twist.angular(2), aoa_->alpha, aoa_->beta, Utils::kLogLevelInfo));
+				kinematics_->getState().twist.angular(0), kinematics_->getState().twist.angular(1), kinematics_->getState().twist.angular(2), aoa_.alpha, aoa_.beta, Utils::kLogLevelInfo));
 
 			}
 
@@ -155,22 +155,22 @@ namespace msr
 				
 				output.aero_force_.lift = dyn_pressure_ * dimensions.main_plane_area * (
 					derivatives.zero_lift_coefficient +
-					(derivatives.alpha_lift_coefficient * aoa_->alpha) +
+					(derivatives.alpha_lift_coefficient * aoa_.alpha) +
 					(derivatives.elev_lift_coefficient * elevator_deflection_)) +
 					(derivatives.pitch_lift_coefficient * angular_pressure * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.drag = dyn_pressure_ * dimensions.main_plane_area * (
 					derivatives.zero_drag_coefficient +
-					(derivatives.alpha_drag_coefficient * aoa_->alpha) +
-					(derivatives.alpha_drag_coefficient_2 * (aoa_->alpha * aoa_->alpha)) +
-					(derivatives.beta_drag_coefficient * aoa_->beta) +
-					(derivatives.beta_drag_coefficient_2 * (aoa_->beta * aoa_->beta)) +
+					(derivatives.alpha_drag_coefficient * aoa_.alpha) +
+					(derivatives.alpha_drag_coefficient_2 * (aoa_.alpha * aoa_.alpha)) +
+					(derivatives.beta_drag_coefficient * aoa_.beta) +
+					(derivatives.beta_drag_coefficient_2 * (aoa_.beta * aoa_.beta)) +
 					(derivatives.elev_drag_coefficient * elevator_deflection_)) +
 					(derivatives.pitch_drag_coefficient * angular_pressure * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.side_force = dyn_pressure_ * dimensions.main_plane_area * (
 					derivatives.zero_sideforce_coefficient +
-					(derivatives.beta_sideforce_coefficient * aoa_->beta) +
+					(derivatives.beta_sideforce_coefficient * aoa_.beta) +
 					(derivatives.sidevelocity_sideforce_coefficient * kinematics_->getState().twist.linear(1)) +
 					(derivatives.rudder_sideforce_coefficient * rudder_deflection_)) +
 					(derivatives.rollrate_sideforce_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
@@ -178,13 +178,13 @@ namespace msr
 				
 				output.aero_force_.pitch_mom = dyn_pressure_ * dimensions.main_plane_area * dimensions.main_plane_chord * (
 					derivatives.zero_pitch_coefficient +
-					(derivatives.alpha_pitch_coefficient * aoa_->alpha) +
+					(derivatives.alpha_pitch_coefficient * aoa_.alpha) +
 					(derivatives.elevator_pitch_coefficient * elevator_deflection_)) +
 					(derivatives.pitchrate_pitch_coefficient * angular_pressure * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.roll_mom = dyn_pressure_ * dimensions.main_plane_area * dimensions.main_plane_span * (
 					derivatives.zero_roll_coefficient +
-					(derivatives.beta_roll_coefficient * aoa_->beta) +
+					(derivatives.beta_roll_coefficient * aoa_.beta) +
 					(derivatives.aileron_roll_coefficient * aileron_deflection_)) +
 					(derivatives.rollrate_roll_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
 					(derivatives.yawrate_roll_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
@@ -192,38 +192,38 @@ namespace msr
 				
 				output.aero_force_.yaw_mom = dyn_pressure_ * dimensions.main_plane_area * dimensions.main_plane_span * (
 					derivatives.zero_yaw_coefficient +
-					(derivatives.beta_yaw_coefficient * aoa_->beta) +
+					(derivatives.beta_yaw_coefficient * aoa_.beta) +
 					(derivatives.aileron_yaw_coefficient * aileron_deflection_) +
 					(derivatives.rudder_yaw_coefficient * rudder_deflection_)) +
 					(derivatives.rollrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
 					(derivatives.yawrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
 
 				Utils::log(Utils::stringf("Lift: %f = q: %f * S: %f * (Cl0: %f + Clalpha: %f * alpha: %f + Clelev: %f * elev: %f) + (Clq: %f * Q_ang: %f * q: %f) ", output.aero_force_.lift, dyn_pressure_, dimensions.main_plane_area, 
-					derivatives.zero_lift_coefficient, derivatives.alpha_lift_coefficient, aoa_->alpha, derivatives.elev_lift_coefficient, elevator_deflection_,
+					derivatives.zero_lift_coefficient, derivatives.alpha_lift_coefficient, aoa_.alpha, derivatives.elev_lift_coefficient, elevator_deflection_,
 					derivatives.pitch_lift_coefficient, angular_pressure, kinematics_->getState().twist.angular(1), Utils::kLogLevelInfo));
 
 				Utils::log(Utils::stringf("Drag: %f = q: %f * S: %f * (Cd0: %f + Cdalpha: %f * alpha: %f + Cdalpha2: %f * alpha^2: %f + cdbeta: %f * beta: %f + cdbeta2: %f * beta2: %f + Cdelev: %f * elev: %f) + (Cdq: %f * Q_ang: %f * q: %f) ", output.aero_force_.drag, dyn_pressure_, dimensions.main_plane_area,
-					derivatives.zero_drag_coefficient, derivatives.alpha_drag_coefficient, aoa_->alpha, derivatives.alpha_drag_coefficient_2, aoa_->alpha * aoa_->alpha,
-					derivatives.beta_drag_coefficient, aoa_->beta, derivatives.beta_drag_coefficient_2, (aoa_->beta * aoa_->beta),
+					derivatives.zero_drag_coefficient, derivatives.alpha_drag_coefficient, aoa_.alpha, derivatives.alpha_drag_coefficient_2, aoa_.alpha * aoa_.alpha,
+					derivatives.beta_drag_coefficient, aoa_.beta, derivatives.beta_drag_coefficient_2, (aoa_.beta * aoa_.beta),
 					derivatives.elev_drag_coefficient, elevator_deflection_,
 					derivatives.pitch_drag_coefficient, angular_pressure, kinematics_->getState().twist.angular(1), Utils::kLogLevelInfo));
 
 				Utils::log(Utils::stringf("SideForce: %f = q: %f * S: %f * (Cy0: %f + Cybeta: %f * beta %f + Cyv: %f * v: %f + Cyrudd: %f * rudd: %f) + (CYp: %f * Q_ang: %f * p: %f) + (CYr: %f * Q_ang: %f * r: %f) ", output.aero_force_.side_force, dyn_pressure_, dimensions.main_plane_area,
-					derivatives.zero_sideforce_coefficient, derivatives.beta_sideforce_coefficient, aoa_->beta, derivatives.sidevelocity_sideforce_coefficient, kinematics->getState().twist.linear(1), derivatives.rudder_sideforce_coefficient, rudder_deflection_,
+					derivatives.zero_sideforce_coefficient, derivatives.beta_sideforce_coefficient, aoa_.beta, derivatives.sidevelocity_sideforce_coefficient, kinematics->getState().twist.linear(1), derivatives.rudder_sideforce_coefficient, rudder_deflection_,
 					derivatives.rollrate_sideforce_coefficient, angular_pressure, kinematics_->getState().twist.angular(0),
 					derivatives.yawrate_sideforce_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
 
 				Utils::log(Utils::stringf("Pitching Moment: %f = q: %f * S: %f * b: %f (Cm0: %f + Cmalpha: %f * alpha: %f + Cmelev: %f * elev: %f) + (Cmq: %f * Q_ang: %f * q: %f) ", output.aero_force_.pitch_mom, dyn_pressure_, dimensions.main_plane_area, dimensions.main_plane_span,
-					derivatives.zero_pitch_coefficient, derivatives.alpha_pitch_coefficient, aoa_->alpha, derivatives.elevator_pitch_coefficient, elevator_deflection_,
+					derivatives.zero_pitch_coefficient, derivatives.alpha_pitch_coefficient, aoa_.alpha, derivatives.elevator_pitch_coefficient, elevator_deflection_,
 					derivatives.pitchrate_pitch_coefficient, angular_pressure, kinematics_->getState().twist.angular(1), Utils::kLogLevelInfo));
 
 				Utils::log(Utils::stringf("Rolling Moment: %f = q: %f * S: %f * c: %f (Cl0: %f + Clalpha: %f * beta: %f + Clail: %f * ail: %f) + (Clp: %f * Q_ang: %f * p: %f) + (Clr: %f * Q_ang: %f * r: %f) ", output.aero_force_.roll_mom, dyn_pressure_, dimensions.main_plane_area, dimensions.main_plane_chord,
-					derivatives.zero_roll_coefficient, derivatives.beta_roll_coefficient, aoa_->beta, derivatives.aileron_roll_coefficient, aileron_deflection_,
+					derivatives.zero_roll_coefficient, derivatives.beta_roll_coefficient, aoa_.beta, derivatives.aileron_roll_coefficient, aileron_deflection_,
 					derivatives.rollrate_roll_coefficient, angular_pressure, kinematics_->getState().twist.angular(0),
 					derivatives.yawrate_roll_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
 
 				Utils::log(Utils::stringf("Yawing Moment: %f = q: %f * S: %f * c: %f (Cn0: %f + Cnbeta: %f * beta: %f + Clail: %f * ail: %f) + (Cnp: %f * Q_ang: %f * p: %f) + (Cnr: %f * Q_ang: %f * r: %f) ", output.aero_force_.yaw_mom, dyn_pressure_, dimensions.main_plane_area, dimensions.main_plane_chord,
-					derivatives.zero_yaw_coefficient, derivatives.beta_yaw_coefficient, aoa_->beta, derivatives.aileron_yaw_coefficient, aileron_deflection_,
+					derivatives.zero_yaw_coefficient, derivatives.beta_yaw_coefficient, aoa_.beta, derivatives.aileron_yaw_coefficient, aileron_deflection_,
 					derivatives.rollrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(0),
 					derivatives.yawrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
 
@@ -241,7 +241,7 @@ namespace msr
 			PropulsionDerivatives prop_derivatives_;
 			Dimensions dimensions_;
 			real_T air_density_sea_level_, air_density_ratio_, dyn_pressure_;
-			AoA* aoa_;
+			AoA aoa_;
 			Output output_;
 			// AeroFM* aero_force_;
 			real_T aileron_deflection_, elevator_deflection_, rudder_deflection_, tla_deflection_;
