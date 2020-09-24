@@ -103,12 +103,12 @@ namespace msr
 			{
 				// Basic Parameters //
 				params.mass = 2.0f; //mass in [kg]
-				params.inertia(0, 0) = 1.0f; // Ixx [Kgm^-2]
-				params.inertia(1, 1) = 1.0f; // Iyy [Kgm^-2]
-				params.inertia(2, 2) = 1.0f; //Izz [Kgm^-2]
-				params.inertia(0, 2) = params.inertia(2,0) = 0.05f; // Ixz [Kgm^-2]
-				params.inertia(0, 1) = params.inertia(1, 0) = 0.05f; // Ixy [Kgm^-2], symmetric
-				params.inertia(2, 1) = params.inertia(1, 2) = 0.05f; // Iyz [Kgm^-2], symmetric
+				params.inertia(0, 0) = 0.045f; // Ixx [Kgm^-2]
+				params.inertia(1, 1) = 0.0005f; // Iyy [Kgm^-2]
+				params.inertia(2, 2) = 0.005f; //Izz [Kgm^-2]
+				params.inertia(0, 2) = params.inertia(2, 0) = 0.00001f; // Ixz [Kgm^-2]
+				params.inertia(0, 1) = params.inertia(1, 0) = 0.00001f; // Ixy [Kgm^-2], symmetric
+				params.inertia(2, 1) = params.inertia(1, 2) = 0.00001f; // Iyz [Kgm^-2], symmetric
 
 				// Reference Areas //
 				params.dimensions.main_plane_area = 0.45f; // S [m^2]
@@ -161,7 +161,7 @@ namespace msr
 				params.derivatives.rudder_roll_coefficient = 0.082f;
 
 				// Propulsion Terms //
-				params.prop_derivatives.thrust_tla_coefficient = 100.0; // set arbitrarily
+				params.prop_derivatives.thrust_tla_coefficient = 10.0f; // set arbitrarily
 				
 			}
 

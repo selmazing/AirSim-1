@@ -161,7 +161,7 @@ private:
             // crank up friction with the ground so it doesn't try and slide across the ground
             // again, this should depend on the type of surface we are landing on.
             friction = 1; 
-
+            Utils::log(Utils::stringf("Landed state active", Utils::kLogLevelInfo));
             //we have collided with ground straight on, we will fix orientation later
             ground_collision = is_ground_normal;
         }

@@ -78,7 +78,7 @@ namespace msr
 				{
 					airplane_.controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
 
-					Utils::log(Utils::stringf("Received TLA [%i]: %f", control_index, airplane_.controls_.at(control_index).getOutput().control_deflection, Utils::kLogLevelInfo));
+					Utils::log(Utils::stringf("Received Control [%i]: %f", control_index, airplane_.controls_.at(control_index).getOutput().control_deflection, Utils::kLogLevelInfo));
 				}
 			}
 
@@ -94,7 +94,6 @@ namespace msr
 				return params_->getParams().control_count;
 			}
 
-			
 			virtual uint wrenchVertexCount() const override
 			{
 				return params_->getParams().airplane_count;
@@ -109,23 +108,11 @@ namespace msr
 				return airplane_;
 			}
 
-
-
-
-
-
-
-
-			
 			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
 			{
 				return airplane_.controls_.at(control_index).getOutput();
 			}
 
-			
-		
-
-			
 			virtual real_T getRestitution() const override
 			{
 				return params_->getParams().restitution;
