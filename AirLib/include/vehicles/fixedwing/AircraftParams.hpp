@@ -75,6 +75,7 @@ namespace msr
 			real_T alpha;
 			real_T psi; // aero roll?
 			real_T beta;
+			Vector3r aero_axis;
 		};
 
 		// Aero Forces and Moments

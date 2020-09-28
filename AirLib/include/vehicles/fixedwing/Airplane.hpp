@@ -58,7 +58,7 @@ namespace msr
 				}
 				updateEnvironmentalFactors();
 				updatePropulsionForces(prop_derivatives_, output_);
-				updateAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
+				updateAeroForces(aero_derivatives_, dimensions_, output_);
 			}
 
 			virtual void update() override
@@ -70,7 +70,7 @@ namespace msr
 				}
 				updateAoA();
 				updatePropulsionForces(prop_derivatives_, output_);
-				updateAeroForces(aero_derivatives_, dimensions_, kinematics_, output_);
+				updateAeroForces(aero_derivatives_, dimensions_, output_);
 				// should call getWrench
 				PhysicsBodyVertex::update();
 	
@@ -105,13 +105,15 @@ namespace msr
 
 			void updateAoA()
 			{
-				/* aoa_->aero_axis = VectorMath::rotateVector(kinematics_->getState().twist.angular, kinematics_->getState().pose.orientation, true);
-				aoa_->alpha = aoa_->aero_axis(0);
-				aoa_->beta = aoa_->aero_axis(2); */
-				aoa_.alpha = 0.0f;
-				aoa_.beta = 0.0f;
+				Quaternionr quaternion = kinematics_->getState().pose.orientation;
+				aoa_.aero_axis = toEuler(quaternion);
+				// aoa_.aero_axis = VectorMath::rotateVector(kinematics_->getState().twist.angular, kinematics_->getState().pose.orientation, true);
+				aoa_.alpha = aoa_.aero_axis(0);
+				aoa_.beta = aoa_.aero_axis(1);
+				/* aoa_.alpha = 0.0f;
+				aoa_.beta = 0.0f; */
 
-				Utils::log(Utils::stringf("Angular variables: p: %f, q: %f, r: %f, alpha: %f, beta: %f, roll_aero: %f",
+				Utils::log(Utils::stringf("Angular variables: p: %f, q: %f, r: %f, alpha: %f, beta: %f, psi (aero_roll?): %f",
 				kinematics_->getState().twist.angular(0), kinematics_->getState().twist.angular(1), kinematics_->getState().twist.angular(2), aoa_.alpha, aoa_.beta, Utils::kLogLevelInfo));
 
 			}
@@ -142,7 +144,7 @@ namespace msr
 				}
 			}
 
-			void updateAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, const Kinematics* kinematics, Output& output)
+			void updateAeroForces(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, Output& output)
 			{
 				aileron_deflection_ = controls_.at(0).getOutput().control_deflection;
 				elevator_deflection_ = controls_.at(1).getOutput().control_deflection;
@@ -198,18 +200,31 @@ namespace msr
 					(derivatives.rollrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(0)) +
 					(derivatives.yawrate_yaw_coefficient * angular_pressure * kinematics_->getState().twist.angular(2));
 
-				Utils::log(Utils::stringf("Lift: %f = q: %f * S: %f * (Cl0: %f + Clalpha: %f * alpha: %f + Clelev: %f * elev: %f) + (Clq: %f * Q_ang: %f * q: %f) ", output.aero_force_.lift, dyn_pressure_, dimensions.main_plane_area, 
+				aeroDebugMessages(derivatives, dimensions, output, angular_pressure);
+				kinematicsDebugMessages();
+
+				
+				if(isnan(output.aero_force_.lift))
+				{
+					Utils::log(Utils::stringf("Lift is not a number, something has gone wrong!"));
+				}
+			}
+
+
+			void aeroDebugMessages(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, Output& output, real_T angular_pressure) const
+			{
+				Utils::log(Utils::stringf("Lift: %f = q: %f * S: %f * (Cl0: %f + Clalpha: %f * alpha: %f + Clelev: %f * elev: %f) + (Clq: %f * Q_ang: %f * q: %f) ", output.aero_force_.lift, dyn_pressure_, dimensions.main_plane_area,
 					derivatives.zero_lift_coefficient, derivatives.alpha_lift_coefficient, aoa_.alpha, derivatives.elev_lift_coefficient, elevator_deflection_,
 					derivatives.pitch_lift_coefficient, angular_pressure, kinematics_->getState().twist.angular(1), Utils::kLogLevelInfo));
 
-				Utils::log(Utils::stringf("Drag: %f = q: %f * S: %f * (Cd0: %f + Cdalpha: %f * alpha: %f + Cdalpha2: %f * alpha^2: %f + cdbeta: %f * beta: %f + cdbeta2: %f * beta2: %f + Cdelev: %f * elev: %f) + (Cdq: %f * Q_ang: %f * q: %f) ", output.aero_force_.drag, dyn_pressure_, dimensions.main_plane_area,
+				Utils::log(Utils::stringf("Drag: %f = q: %f * S: %f * (Cd0: %f + Cdalpha: %f * alpha: %f + Cdalpha2: %f * alpha^2: %f + Cdbeta: %f * beta: %f + Cdbeta2: %f * beta2: %f + Cdelev: %f * elev: %f) + (Cdq: %f * Q_ang: %f * q: %f) ", output.aero_force_.drag, dyn_pressure_, dimensions.main_plane_area,
 					derivatives.zero_drag_coefficient, derivatives.alpha_drag_coefficient, aoa_.alpha, derivatives.alpha_drag_coefficient_2, aoa_.alpha * aoa_.alpha,
 					derivatives.beta_drag_coefficient, aoa_.beta, derivatives.beta_drag_coefficient_2, (aoa_.beta * aoa_.beta),
 					derivatives.elev_drag_coefficient, elevator_deflection_,
 					derivatives.pitch_drag_coefficient, angular_pressure, kinematics_->getState().twist.angular(1), Utils::kLogLevelInfo));
 
 				Utils::log(Utils::stringf("SideForce: %f = q: %f * S: %f * (Cy0: %f + Cybeta: %f * beta %f + Cyv: %f * v: %f + Cyrudd: %f * rudd: %f) + (CYp: %f * Q_ang: %f * p: %f) + (CYr: %f * Q_ang: %f * r: %f) ", output.aero_force_.side_force, dyn_pressure_, dimensions.main_plane_area,
-					derivatives.zero_sideforce_coefficient, derivatives.beta_sideforce_coefficient, aoa_.beta, derivatives.sidevelocity_sideforce_coefficient, kinematics->getState().twist.linear(1), derivatives.rudder_sideforce_coefficient, rudder_deflection_,
+					derivatives.zero_sideforce_coefficient, derivatives.beta_sideforce_coefficient, aoa_.beta, derivatives.sidevelocity_sideforce_coefficient, kinematics_->getState().twist.linear(1), derivatives.rudder_sideforce_coefficient, rudder_deflection_,
 					derivatives.rollrate_sideforce_coefficient, angular_pressure, kinematics_->getState().twist.angular(0),
 					derivatives.yawrate_sideforce_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
 
@@ -226,13 +241,72 @@ namespace msr
 					derivatives.zero_yaw_coefficient, derivatives.beta_yaw_coefficient, aoa_.beta, derivatives.aileron_yaw_coefficient, aileron_deflection_,
 					derivatives.rollrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(0),
 					derivatives.yawrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
-
-				if(isnan(output.aero_force_.lift))
-				{
-					Utils::log(Utils::stringf("Lift is not a number, something has gone wrong!"));
-				}
 			}
 
+			void kinematicsDebugMessages() const
+			{
+				Quaternionr quaternion = kinematics_->getState().pose.orientation;
+				Vector3r aircraft_euler = toEuler(quaternion);
+				Vector3r position = kinematics_->getState().pose.position;
+				Vector3r linear_velocity = kinematics_->getState().twist.linear;
+				Vector3r angular_velocity = kinematics_->getState().twist.angular;
+				Vector3r linear_acceleration = kinematics_->getState().accelerations.linear;
+				Vector3r angular_acceleration = kinematics_->getState().accelerations.angular;
+				Vector3r wind_axis = VectorMath::rotateVector(linear_velocity, quaternion, true);
+				Vector3r manual_wind_axis = angleBetweenVectors(aircraft_euler, linear_velocity);
+				Utils::log(Utils::stringf("Pose Values as quaternion: q = %f + %f i + %f j + %f k", quaternion.coeffs().w(), quaternion.coeffs().x(), quaternion.coeffs().y(), quaternion.coeffs().z(), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Position: Xe = %f, Ye = %f, Ze = %f", position(0), position(1), position(2), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Wind axis: Xwang = %f, Ywang = %f, Zwang = %f", wind_axis(0), wind_axis(1), wind_axis(2), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Manual Wind axis: Xmwang = %f, Ymwang = %f, Zmwang = %f", manual_wind_axis(0), manual_wind_axis(1), manual_wind_axis(2), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Linear velocity: Ub = %f, Vb = %f, Wb = %f", linear_velocity(0), linear_velocity(1), linear_velocity(2), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Angular velocity: pb = %f, qb = %f, qr = %f", angular_velocity(0), angular_velocity(1), angular_velocity(2), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Linear acceleration: axb = %f, ayb = %f, azb = %f", linear_acceleration(0), linear_acceleration(1), linear_acceleration(2), Utils::kLogLevelInfo));
+				Utils::log(Utils::stringf("Angular acceleration: pdotb = %f, qdotb = %f, rdotb = %f", angular_acceleration(0), angular_acceleration(1), angular_acceleration(2), Utils::kLogLevelInfo));
+				
+			}
+
+			Vector3r angleBetweenVectors(Vector3r aVector, Vector3r bVector) const
+			{
+				Vector3r direction_vector;
+				Vector3r dot;
+				// dot product a.b
+				dot(0) = aVector(0) * bVector(1);
+				dot(1) = aVector(1) * bVector(1);
+				dot(2) = aVector(2) * bVector(2);
+
+				// normalize result
+				const real_T size = pow(pow(aVector(0), 2) + pow(aVector(1), 2) + pow(aVector(2), 2), 0.5) + pow(pow(bVector(0), 2) + pow(bVector(1), 2) + pow(bVector(2), 2), 0.5);
+				dot = dot / size;
+
+				direction_vector(0) = std::acos(dot(0));
+				direction_vector(1) = std::acos(dot(1));
+				direction_vector(2) = std::acos(dot(2));
+				return direction_vector;
+			}
+			
+			Vector3r toEuler(Quaternionr quaternion) const
+			{
+				Vector3r euler;
+				// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+				// roll (x-axis rotation)
+				double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
+				double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
+				euler(0) = std::atan2(sinr_cosp, cosr_cosp);
+
+				// pitch (y-axis rotation)
+				double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+				if (std::abs(sinp) >= 1)
+					euler(1) = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+				else
+					euler(1) = std::asin(sinp);
+
+				// yaw (z-axis rotation)
+				double siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
+				double cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
+				euler(2) = std::atan2(siny_cosp, cosy_cosp);
+
+				return euler;
+			}
 
 		private: // fields
 			const Environment* environment_ = nullptr;

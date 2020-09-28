@@ -34,8 +34,11 @@ protected:
 
         // Use connection_info_.model for the model name, see Px4MultiRotorParams for example
 
-        // Only Generic for now
-        setupFrameGenericAircraft(params);
+        /* Only Generic for now
+        setupFrameGenericAircraft(params); */
+
+    	// Using Skywalker X8 instead
+        setupFrameSkywalkerX8(params);
     }
 
     virtual const SensorFactory* getSensorFactory() const override

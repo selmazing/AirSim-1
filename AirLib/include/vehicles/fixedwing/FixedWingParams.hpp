@@ -226,6 +226,10 @@ namespace msr
 				params.derivatives.rudder_yaw_coefficient = 0.0f;
 				params.derivatives.rudder_sideforce_coefficient = 0.0f;
 				params.derivatives.rudder_roll_coefficient = 0.0f;
+
+				// Propulsion Terms //
+				params.prop_derivatives.thrust_tla_coefficient = 10.0f; // set arbitrarily
+				
 			}
 
 			void setupFrameCherokee(Params& params)
