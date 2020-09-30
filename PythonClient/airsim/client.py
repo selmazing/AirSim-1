@@ -1246,7 +1246,7 @@ class FixedWingClient(VehicleClient, object):
         return self.client.call_async('moveByAttitudeAsync', roll, -pitch, -yaw, tla, duration, vehicle_name)
 
     def moveByAngleRatesAsync(self, roll_rate, pitch_rate, yaw_rate, tla, duration, vehicle_name = ''):
-            """
+        """
             - Desired throttle is between 0.0 to 1.0
             - Roll rate, pitch rate, and yaw rate set points are given in **radians**, in the body frame.
             - The body frame follows the Front Left Up (FLU) convention, and right-handedness.
@@ -1281,7 +1281,7 @@ class FixedWingClient(VehicleClient, object):
         return self.client.call_async('moveByAngleRatesAsync', roll_rate, -pitch_rate, -yaw_rate, throttle, duration, vehicle_name)
 
     def moveByVelocityAsync(self, vx, vy, vz, duration, vehicle_name):
-            """
+        """
             Args:
                 vx (float): desired velocity in world (NED) X axis
                 vy (float): desired velocity in world (NED) Y axis
@@ -1305,7 +1305,7 @@ class FixedWingClient(VehicleClient, object):
         return self.client.call_async('moveToAltAsync', z, velocity, timeout_sec, lookahead, adaptive_lookahead, vehicle_name)
 
     def moveByManualAsync(self, vx_max, vy_max, z_min, duration, vehicle_name = ''):
-            """
+        """
             - Read current RC state and use it to control the vehicles.
 
             Parameters sets up the constraints on velocity and minimum altitude while flying. If RC state is detected to violate these constraints
@@ -1324,7 +1324,7 @@ class FixedWingClient(VehicleClient, object):
         return self.client.call_async('moveByManual', vx_max, vy_max, z_min, duration, drivetrain, yaw_mode, vehicle_name)
 
     def setAngleLevelControllerGains(self, angle_level_gains=AngleLevelControllerGains(), vehicle_name = ''):
-            """
+        """
             - Sets angle level controller gains (used by any API setting angle references - for ex: moveByRollPitchYawZAsync(), moveByRollPitchYawThrottleAsync(), etc)
             - Modifying these gains will also affect the behaviour of moveByVelocityAsync() API.
                 This is because the AirSim flight controller will track velocity setpoints by converting them to angle set points.
@@ -1340,7 +1340,7 @@ class FixedWingClient(VehicleClient, object):
         return self.client.call('setAngleLevelControllerGains', *(angle_level_gains.to_lists()+(vehicle_name,)))
 
     def setVelocityControllerGains(self, velocity_gains=VelocityControllerGains(), vehicle_name = ''):
-            """
+        """
             - Sets velocity controller gains for moveByVelocityAsync().
             - This function should only be called if the default velocity control PID gains need to be modified.
             - Passing VelocityControllerGains() sets gains to default airsim values.
@@ -1356,7 +1356,7 @@ class FixedWingClient(VehicleClient, object):
 
 
     def setPositionControllerGains(self, position_gains=PositionControllerGains(), vehicle_name = ''):
-            """
+        """
             Sets position controller gains for moveByPositionAsync.
             This function should only be called if the default position control PID gains need to be modified.
 
@@ -1370,7 +1370,7 @@ class FixedWingClient(VehicleClient, object):
 
         # query vehicle state
     def getFixedWingState(self, vehicle_name):
-            """
+        """
             Args:
                 vehicle_name (str, optional): Vehicle to get the state of
 
