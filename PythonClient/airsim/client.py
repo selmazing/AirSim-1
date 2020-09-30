@@ -1369,7 +1369,7 @@ class FixedWingClient(VehicleClient, object):
         return self.client.call('setPositionControllerGains', *(position_gains.to_lists()+(vehicle_name,)))
 
         # query vehicle state
-    def getFixedWingState(self, vehicle_name):
+    def getFixedWingState(self, vehicle_name = ''):
         """
             Args:
                 vehicle_name (str, optional): Vehicle to get the state of
