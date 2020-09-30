@@ -15,6 +15,7 @@
     <InterpreterId>Global|ContinuumAnalytics|Anaconda36-64</InterpreterId>
     <InterpreterVersion>
     </InterpreterVersion>
+    <TestFramework>Pytest</TestFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
