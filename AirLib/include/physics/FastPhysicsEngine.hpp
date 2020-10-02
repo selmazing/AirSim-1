@@ -176,10 +176,10 @@ private:
             // so we reduce the coefficient of restitution.  0 means no bounce.
             // TODO: it would be better if we did this based on the material we are landing on.
             // e.g. grass should be inelastic, but a hard surface like the road should be more bouncy.
-            restitution = 0;
+            restitution = 0.0f;
             // crank up friction with the ground so it doesn't try and slide across the ground
             // again, this should depend on the type of surface we are landing on.
-            friction = 0.05; // set low so it can slide
+            friction = 0.05f; // set low so it can slide
             Utils::log(Utils::stringf("Landed state active", Utils::kLogLevelInfo));
             //we have collided with ground straight on, we will fix orientation later
             ground_collision = is_ground_normal;
