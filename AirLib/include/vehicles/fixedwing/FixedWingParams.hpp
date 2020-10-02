@@ -39,8 +39,8 @@ namespace msr
 				AirplanePose airplane_pose; // full aircraft pose
 
 				/*parameters set with defaults*/
-				real_T restitution = 0.55f; // needed for FixedWingPawnSimApi.cpp API creation
-				real_T friction = 0.5f; // needed for FixedWingPawnSimApi.cpp API creation
+				real_T restitution = 0.1f; // needed for FixedWingPawnSimApi.cpp API creation
+				real_T friction = 0.05f; // needed for FixedWingPawnSimApi.cpp API creation
 				uint control_count = 4; // number of control variables (elevator, aileron, rudder, TLA)
 				uint airplane_count = 1; // number of aircraft (Should not normally be more than 1)
 			};
@@ -161,7 +161,7 @@ namespace msr
 				params.derivatives.rudder_roll_coefficient = 0.082f;
 
 				// Propulsion Terms //
-				params.prop_derivatives.thrust_tla_coefficient = 10.0f; // set arbitrarily
+				params.prop_derivatives.thrust_tla_coefficient = 1.0f; // set arbitrarily
 				
 			}
 
@@ -201,7 +201,7 @@ namespace msr
 				params.derivatives.sidevelocity_sideforce_coefficient = 0.0f;
 
 				params.derivatives.zero_roll_coefficient = 0.0f;
-				params.derivatives.beta_roll_coefficient = 0.0f;
+				params.derivatives.beta_roll_coefficient = -0.0849f;
 				params.derivatives.rollrate_roll_coefficient = -0.4042f;
 				params.derivatives.yawrate_roll_coefficient = 0.0555f;
 
@@ -228,7 +228,7 @@ namespace msr
 				params.derivatives.rudder_roll_coefficient = 0.0f;
 
 				// Propulsion Terms //
-				params.prop_derivatives.thrust_tla_coefficient = 10.0f; // set arbitrarily
+				params.prop_derivatives.thrust_tla_coefficient = 40.0f; // set arbitrarily
 				
 			}
 

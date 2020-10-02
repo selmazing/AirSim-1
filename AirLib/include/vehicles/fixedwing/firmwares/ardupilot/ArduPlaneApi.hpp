@@ -455,10 +455,10 @@ private:
         aileron_deflection_ = pkt.aileron_deflection;
         tla_deflection_ = pkt.tla_deflection;
         rudder_deflection_ = pkt.rudder_deflection;
-        Utils::log(Utils::stringf("Received TLA: %f", tla_deflection_), Utils::kLogLevelInfo);
+        /* Utils::log(Utils::stringf("Received TLA: %f", tla_deflection_), Utils::kLogLevelInfo);
         Utils::log(Utils::stringf("Received elevator: %f", elevator_deflection_), Utils::kLogLevelInfo);
         Utils::log(Utils::stringf("Received aileron: %f", aileron_deflection_), Utils::kLogLevelInfo);
-        Utils::log(Utils::stringf("Received rudder: %f", rudder_deflection_), Utils::kLogLevelInfo);
+        Utils::log(Utils::stringf("Received rudder: %f", rudder_deflection_), Utils::kLogLevelInfo); */
     }
 
 private:

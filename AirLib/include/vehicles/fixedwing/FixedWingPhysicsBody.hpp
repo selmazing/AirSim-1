@@ -78,7 +78,7 @@ namespace msr
 				{
 					airplane_.controls_.at(control_index).setControlSignal(vehicle_api_->getActuation(control_index));
 
-					Utils::log(Utils::stringf("Received Control [%i]: %f", control_index, airplane_.controls_.at(control_index).getOutput().control_deflection, Utils::kLogLevelInfo));
+					// Utils::log(Utils::stringf("Received Control [%i]: %f", control_index, airplane_.controls_.at(control_index).getOutput().control_deflection, Utils::kLogLevelInfo));
 				}
 			}
 
@@ -100,7 +100,7 @@ namespace msr
 			}
 			virtual PhysicsBodyVertex& getWrenchVertex(uint index)  override
 			{
-				Utils::log("getWrenchVertex called");
+				// Utils::log("getWrenchVertex called");
 				return airplane_;
 			}
 			virtual const PhysicsBodyVertex& getWrenchVertex(uint index) const override

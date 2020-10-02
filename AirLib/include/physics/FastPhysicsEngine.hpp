@@ -45,7 +45,23 @@ public:
         for (PhysicsBody* body_ptr : *this) {
             updatePhysics(*body_ptr);
         }
+        printForce();
     }
+
+    void printForce()
+    {
+	    for(PhysicsBody* body_ptr : *this)
+	    {
+            real_T force_body_x = body_ptr->getWrench().force(0);
+            real_T force_body_y = body_ptr->getWrench().force(1);
+            real_T force_body_z = body_ptr->getWrench().force(2);
+            real_T torque_body_x = body_ptr->getWrench().torque(0);
+            real_T torque_body_y = body_ptr->getWrench().torque(1);
+            real_T torque_body_z = body_ptr->getWrench().torque(2);
+            Utils::log(Utils::stringf("PForce [%f, %f, %f], PTorque [%f, %f, %f]", force_body_x, force_body_y, force_body_z, torque_body_x, torque_body_y, torque_body_z, Utils::kLogLevelInfo));
+	    }
+    }
+	
     virtual void reportState(StateReporter& reporter) override
     {
         for (PhysicsBody* body_ptr : *this) {
@@ -68,7 +84,7 @@ private:
     void updatePhysics(PhysicsBody& body)
     {
         TTimeDelta dt = clock()->updateSince(body.last_kinematics_time);
-
+    	
         //get current kinematics state of the body - this state existed since last dt seconds
         const Kinematics::State& current = body.getKinematics();
         Kinematics::State next;
@@ -121,6 +137,9 @@ private:
         const Kinematics::State& current, Kinematics::State& next, Wrench& next_wrench, bool enable_ground_lock)
     {
         /************************* Collision response ************************/
+
+        Utils::log(Utils::stringf("getNextKinematicsOnCollision has been called!", Utils::kLogLevelInfo));
+    	
         const real_T dt_real = static_cast<real_T>(dt);
 
         //are we going away from collision? if so then keep using computed next state
@@ -160,7 +179,7 @@ private:
             restitution = 0;
             // crank up friction with the ground so it doesn't try and slide across the ground
             // again, this should depend on the type of surface we are landing on.
-            friction = 1; 
+            friction = 0.05; // set low so it can slide
             Utils::log(Utils::stringf("Landed state active", Utils::kLogLevelInfo));
             //we have collided with ground straight on, we will fix orientation later
             ground_collision = is_ground_normal;
@@ -202,6 +221,10 @@ private:
         next.twist.linear += contact_tang_unit * friction_mag;
         next.twist.angular += r.cross(contact_tang_unit_body) * (friction_mag / body.getMass());
 
+        Utils::log(Utils::stringf("next.twist.linear = [%f, %f, %f]", next.twist.linear(0), next.twist.linear(1), next.twist.linear(2), Utils::kLogLevelInfo));
+        Utils::log(Utils::stringf("next.twist.angular = [%f, %f, %f]", next.twist.angular(0), next.twist.angular(1), next.twist.angular(2), Utils::kLogLevelInfo));
+
+
         //TODO: implement better rolling friction
         next.twist.angular *= 0.9f;
 
@@ -228,7 +251,7 @@ private:
             // but we do want to "feel" the ground when we hit it (we should see a small z-acc bump)
             // equal and opposite our downward velocity.
             next.accelerations.linear = -0.5f * body.getMass() * vcur_avg;
-
+            Utils::log(Utils::stringf("next.accelerations.linear = [%f, %f, %f]", next.accelerations.linear(0), next.accelerations.linear(1), next.accelerations.linear(2), Utils::kLogLevelInfo));
             //throttledLogOutput("*** Triggering ground lock", 0.1);
         }
         else
@@ -306,7 +329,10 @@ private:
         }
 
         //convert force to world frame, leave torque to local frame
+        Utils::log(Utils::stringf("BForce [%f, %f, %f], BTorque [%f, %f, %f]", wrench.force(0), wrench.force(1), wrench.force(2), wrench.torque(0), wrench.torque(1), wrench.torque(2), Utils::kLogLevelInfo));
         wrench.force = VectorMath::transformToWorldFrame(wrench.force, orientation);
+        Utils::log(Utils::stringf("Orientation [%f, %f, %f, %f]", orientation.coeffs().w(), orientation.coeffs().x(), orientation.coeffs().y(), orientation.coeffs().z(), Utils::kLogLevelInfo));
+        Utils::log(Utils::stringf("WForce [%f, %f, %f], WTorque [%f, %f, %f]", wrench.force(0), wrench.force(1), wrench.force(2), wrench.torque(0), wrench.torque(1), wrench.torque(2), Utils::kLogLevelInfo));
 
         return wrench;
     }
@@ -314,6 +340,9 @@ private:
     static void getNextKinematicsNoCollision(TTimeDelta dt, PhysicsBody& body, const Kinematics::State& current, 
         Kinematics::State& next, Wrench& next_wrench)
     {
+
+        Utils::log(Utils::stringf("getNextKinematicsNoCollision has been called!", Utils::kLogLevelInfo));
+    	
         const real_T dt_real = static_cast<real_T>(dt);
 
         Vector3r avg_linear = Vector3r::Zero();
@@ -325,6 +354,8 @@ private:
 
         if (body.isGrounded()) {
             // make it stick to the ground until the magnitude of net external force on body exceeds its weight.
+            Utils::log(Utils::stringf("Body is grounded!", Utils::kLogLevelInfo));
+        	
             float external_force_magnitude = body_wrench.force.squaredNorm();
             Vector3r weight = body.getMass() * body.getEnvironment().getState().gravity;
             float weight_magnitude = weight.squaredNorm();
@@ -384,18 +415,26 @@ private:
             if (next.twist.linear.squaredNorm() > EarthUtils::SpeedOfLight * EarthUtils::SpeedOfLight) { //speed of light
                 next.twist.linear /= (next.twist.linear.norm() / EarthUtils::SpeedOfLight);
                 next.accelerations.linear = Vector3r::Zero();
+                Utils::log(Utils::stringf("Linear Velocity is big!", Utils::kLogLevelInfo));
             }
             //
             //for disc of 1m radius which angular velocity translates to speed of light on tangent?
             if (next.twist.angular.squaredNorm() > EarthUtils::SpeedOfLight * EarthUtils::SpeedOfLight) { //speed of light
                 next.twist.angular /= (next.twist.angular.norm() / EarthUtils::SpeedOfLight);
                 next.accelerations.angular = Vector3r::Zero();
+                Utils::log(Utils::stringf("Angular Velocity is big!", Utils::kLogLevelInfo));
+
             }
         }
 
         computeNextPose(dt, current.pose, avg_linear, avg_angular, next);
 
-        //Utils::log(Utils::stringf("N-VEL %s %f: ", VectorMath::toString(next.twist.linear).c_str(), dt));
+        Utils::log(Utils::stringf("vel_current [%f %f %f %f %f %f]", current.twist.linear(0), current.twist.linear(1), current.twist.linear(2), current.twist.angular(0), current.twist.angular(1), current.twist.angular(2)));
+        Utils::log(Utils::stringf("vel_next [%f %f %f %f %f %f]", next.twist.linear(0), next.twist.linear(1), next.twist.linear(2), next.twist.angular(0), next.twist.angular(1), next.twist.angular(2)));
+
+
+
+        Utils::log(Utils::stringf("N-VEL %s %f: ", VectorMath::toString(next.twist.linear).c_str(), dt));
         //Utils::log(Utils::stringf("N-POS %s %f: ", VectorMath::toString(next.pose.position).c_str(), dt));
 
     }
