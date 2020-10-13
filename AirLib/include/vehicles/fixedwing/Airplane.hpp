@@ -23,6 +23,7 @@ namespace msr
 			{
 				AeroFM aero_force_;
 				real_T thrust;
+				real_T torque;
 			};
 			// types, declare variables in struct? --> currently no output struct
 
@@ -97,10 +98,14 @@ namespace msr
 				const Vector3r aero_body_force = WindToBodyForce(aoa_.alpha, aoa_.beta, output_.aero_force_.drag, output_.aero_force_.side_force, output_.aero_force_.lift);
 
 				wrench.force = (aero_x * aero_body_force(0)) + (aero_x * output_.thrust) + (aero_y * aero_body_force(1)) + (aero_z * aero_body_force(2));
-				wrench.torque = (aero_x * output_.aero_force_.roll_mom) + (aero_y * output_.aero_force_.pitch_mom) + (aero_z * output_.aero_force_.yaw_mom);
+				wrench.torque = (aero_x * output_.aero_force_.roll_mom) + (aero_x * output_.torque) + (aero_y * output_.aero_force_.pitch_mom) + (aero_z * output_.aero_force_.yaw_mom);
 
 				Utils::log(Utils::stringf("AForce [%f, %f, %f] ATorque [%f, %f, %f]", output_.thrust-output_.aero_force_.drag,  output_.aero_force_.side_force, -output_.aero_force_.lift, output_.aero_force_.roll_mom,
 					output_.aero_force_.pitch_mom, output_.aero_force_.yaw_mom, Utils::kLogLevelInfo));
+
+				debugWrenchFile(wrench);
+
+				
 			}
 
 		private: // methods
@@ -153,10 +158,15 @@ namespace msr
 
 			void updatePropulsionForces(const PropulsionDerivatives& derivatives, Output& output)
 			{
-
 				tla_deflection_ = controls_.at(2).getOutput().control_deflection + 1.0f;
-				output.thrust = derivatives.thrust_tla_coefficient * tla_deflection_;
-				Utils::log(Utils::stringf("Thrust: %f = TLA: %f * Cttla: %f", output.thrust, tla_deflection_, derivatives.thrust_tla_coefficient, Utils::kLogLevelInfo));
+				const real_T airspeed = updateAirspeed();
+				const real_T discharge_velocity = airspeed + tla_deflection_ * (derivatives.k_motor_coefficient - airspeed);
+				output.thrust = 0.5 * environment_->getState().air_density * derivatives.propeller_area * discharge_velocity * (discharge_velocity - airspeed);
+				output.torque = -derivatives.motor_torque_coefficient * (derivatives.propeller_torque_coefficient * tla_deflection_);
+				Utils::log(Utils::stringf("Va = %f, Vd = %f, thrust = %f, torque = %f", airspeed, discharge_velocity, output.thrust, output.torque, Utils::kLogLevelInfo));
+				
+				// output.thrust = derivatives.thrust_tla_coefficient * tla_deflection_; old linear thrust method
+				// Utils::log(Utils::stringf("Thrust: %f = TLA: %f * Cttla: %f", output.thrust, tla_deflection_, derivatives.thrust_tla_coefficient, Utils::kLogLevelInfo));
 			}
 
 			void createControls(const uint control_count)
@@ -196,12 +206,12 @@ namespace msr
 				
 				output.aero_force_.drag = dyn_pressure_ * dimensions.main_plane_area * (
 					derivatives.zero_drag_coefficient +
-					(derivatives.alpha_drag_coefficient * std::fabsf(aoa_.alpha)) +
+					(derivatives.alpha_drag_coefficient * aoa_.alpha) +
 					(derivatives.alpha_drag_coefficient_2 * (aoa_.alpha * aoa_.alpha)) +
-					(derivatives.beta_drag_coefficient * std::fabsf(aoa_.beta)) +
+					(derivatives.beta_drag_coefficient * aoa_.beta) +
 					(derivatives.beta_drag_coefficient_2 * (aoa_.beta * aoa_.beta)) +
-					(derivatives.elev_drag_coefficient * std::fabsf(elevator_deflection_))) +
-					(derivatives.pitch_drag_coefficient * angular_pressure * dimensions.main_plane_chord * std::fabsf(kinematics_->getState().twist.angular(1)));
+					(derivatives.elev_drag_coefficient * (elevator_deflection_ * elevator_deflection_))) +
+					(derivatives.pitch_drag_coefficient * angular_pressure * dimensions.main_plane_chord * kinematics_->getState().twist.angular(1));
 				
 				output.aero_force_.side_force = dyn_pressure_ * dimensions.main_plane_area * (
 					derivatives.zero_sideforce_coefficient +
@@ -234,8 +244,8 @@ namespace msr
 					(derivatives.rollrate_yaw_coefficient * angular_pressure * dimensions.main_plane_span * dimensions.main_plane_span * kinematics_->getState().twist.angular(0)) +
 					(derivatives.yawrate_yaw_coefficient * angular_pressure * dimensions.main_plane_span * dimensions.main_plane_span * kinematics_->getState().twist.angular(2));
 				
-				kinematicsDebugMessages();
-				aeroDebugMessages(derivatives, dimensions, output, angular_pressure);
+				debugKinematicsMessages();
+				debugAeroMessages(derivatives, dimensions, output, angular_pressure);
 
 				
 				if(isnan(output.aero_force_.lift))
@@ -245,7 +255,7 @@ namespace msr
 			}
 
 
-			void aeroDebugMessages(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, Output& output, real_T angular_pressure) const
+			void debugAeroMessages(const LinearAeroDerivatives& derivatives, const Dimensions& dimensions, Output& output, real_T angular_pressure) const
 			{
 				Utils::log(Utils::stringf("Lift: %f = q: %f * S: %f * (Cl0: %f + Clalpha: %f * alpha: %f + Clelev: %f * elev: %f) + (Clq: %f * Q_ang: %f * q: %f) ", output.aero_force_.lift, dyn_pressure_, dimensions.main_plane_area,
 					derivatives.zero_lift_coefficient, derivatives.alpha_lift_coefficient, aoa_.alpha, derivatives.elev_lift_coefficient, elevator_deflection_,
@@ -277,7 +287,7 @@ namespace msr
 					derivatives.yawrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
 			}
 
-			void kinematicsDebugMessages() const
+			void debugKinematicsMessages() const
 			{
 				Quaternionr quaternion = kinematics_->getState().pose.orientation;
 				Vector3r aircraft_euler = toEuler(quaternion);
@@ -289,12 +299,12 @@ namespace msr
 				Vector3r wind_axis = VectorMath::rotateVector(linear_velocity, quaternion, true);
 				Vector3r manual_wind_axis = angleBetweenVectors(aircraft_euler, linear_velocity);
 
-				Utils::log(Utils::stringf("y [%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f]",
+				Utils::log(Utils::stringf("y = [%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f]",
 					position(0), position(1), position(2),
 					aircraft_euler(0), aircraft_euler(1), aircraft_euler(2),
 					linear_velocity(0), linear_velocity(1), linear_velocity(2),
 					angular_velocity(0), angular_velocity(1), angular_velocity(2)));
-				Utils::log(Utils::stringf("u [%f, %f, %f, %f]", elevator_deflection_, aileron_deflection_, rudder_deflection_, tla_deflection_));
+				Utils::log(Utils::stringf("u = [%f, %f, %f, %f]", elevator_deflection_, aileron_deflection_, rudder_deflection_, tla_deflection_));
 				
 				/* Utils::log(Utils::stringf("Pose Values as quaternion: q = %f + %f i + %f j + %f k", quaternion.coeffs().w(), quaternion.coeffs().x(), quaternion.coeffs().y(), quaternion.coeffs().z(), Utils::kLogLevelInfo));
 				Utils::log(Utils::stringf("Position: Xe = %f, Ye = %f, Ze = %f", position(0), position(1), position(2), Utils::kLogLevelInfo));
@@ -305,6 +315,18 @@ namespace msr
 				Utils::log(Utils::stringf("Linear acceleration: axb = %f, ayb = %f, azb = %f", linear_acceleration(0), linear_acceleration(1), linear_acceleration(2), Utils::kLogLevelInfo));
 				Utils::log(Utils::stringf("Angular acceleration: pdotb = %f, qdotb = %f, rdotb = %f", angular_acceleration(0), angular_acceleration(1), angular_acceleration(2), Utils::kLogLevelInfo)); */
 				
+			}
+
+			void debugWrenchFile(Wrench& wrench) const
+			{
+				std::ofstream wrenchFile("C:/Users/quessy/Documents/AirSim/force-file.txt", std::ios_base::app | std::ios_base::out);
+				wrenchFile << wrench.force(0)
+					<< "," << wrench.force(1)
+					<< "," << wrench.force(2)
+					<< "," << wrench.torque(0)
+					<< "," << wrench.torque(1)
+					<< "," << wrench.torque(2)
+					<< "\n";
 			}
 
 			Vector3r WindToBodyForce(real_T alpha, real_T beta, real_T drag, real_T side_force, real_T lift) const

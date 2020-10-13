@@ -26,12 +26,14 @@ public:
 	typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign> Vector2d;
 	typedef Eigen::Vector3f Vector3f;
 	typedef Eigen::Vector3d Vector3d;
+	typedef Eigen::Matrix<float, 6, 1> Vector6f;
 	typedef Eigen::Array3f Array3f;
 	typedef Eigen::Array3d Array3d;
 	typedef Eigen::Quaternion<float, Eigen::DontAlign> Quaternionf;
 	typedef Eigen::Quaternion<double, Eigen::DontAlign> Quaterniond;
 	typedef Eigen::Matrix<double, 3, 3> Matrix3x3d;
 	typedef Eigen::Matrix<float, 3, 3> Matrix3x3f;
+	typedef Eigen::Matrix<float, 6, 6> Matrix6x6f;
 	typedef Eigen::AngleAxisd AngleAxisd;
 	typedef Eigen::AngleAxisf AngleAxisf;
 
@@ -310,7 +312,7 @@ public:
 		RealT t4 = +1.0f - 2.0f * (ysqr + q.z() * q.z());
 		yaw = std::atan2(t3, t4);
 	}
-
+	
     static RealT angleBetween(const Vector3T& v1, const Vector3T& v2, bool assume_normalized = false)
     {
         Vector3T v1n = v1;
@@ -676,6 +678,85 @@ public:
 		static Vector3T v(0, -1, 0);
 		return v;
 	}
+
+
+	//skew-symmetric cross - product operator
+	static Matrix3x3f sMatrixTransform(Vector3T v)
+	{
+		Matrix3x3f S;
+		S <<    0, -v(2),  v(1),
+			 v(2),     0, -v(0),
+			-v(1),  v(0),    0;
+		return S;
+	}
+
+	//full euler angle transformation matrix
+	static Matrix3x3f eulerTransformMatrix(RealT phi, RealT theta, RealT psi)
+	{
+		Matrix3x3f R;
+		R << (cos(psi) * cos(theta)), (-sin(psi) * cos(phi) + cos(psi) * sin(theta) * sin(phi)), (sin(psi) * sin(phi) + cos(psi) * cos(phi) * sin(theta)),
+			(sin(psi) * cos(theta)),  (cos(psi) * cos(phi) + sin(phi) * sin(theta) * sin(psi)),  (-cos(psi) * sin(phi) + sin(theta) * sin(psi) * cos(phi)),
+			(-sin(theta)),            (cos(theta) * sin(phi)),									 (cos(theta) * cos(phi));
+		return R;
+	}
+
+	// not quite sure how the transformation matrix is derived initially
+	static Matrix3x3f phiThetaTransformationMatrix(RealT phi, RealT theta)
+	{
+		Matrix3x3f R;
+		R << 1, (sin(phi) * (sin(theta) / cos(theta))), (cos(phi) * (sin(theta) / cos(theta))),
+			 0, (cos(phi)),                             (-sin(phi)),
+			 0, (sin(phi) / cos(theta)),                (cos(phi) / cos(theta));
+		return R;
+	}
+
+	static Vector3T toEuler(QuaternionT quaternion)
+	{
+		Vector3T euler;
+		// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+		// roll (x-axis rotation)
+		double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
+		double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
+		euler(0) = std::atan2(sinr_cosp, cosr_cosp);
+
+		// pitch (y-axis rotation)
+		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+		if (std::abs(sinp) >= 1)
+			euler(1) = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+		else
+			euler(1) = std::asin(sinp);
+
+		// yaw (z-axis rotation)
+		double siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
+		double cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
+		euler(2) = std::atan2(siny_cosp, cosy_cosp);
+
+		return euler;
+	}
+
+	// Tait-Bryan angle
+	static QuaternionT eulerToQuaternion(Vector3T euler)
+	{
+		RealT yaw = euler(0);
+		RealT pitch = euler(1);
+		RealT roll = euler(2);
+		// Abbreviations for the various angular functions, taken from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+		RealT cy = cos(yaw * 0.5);
+		RealT sy = sin(yaw * 0.5);
+		RealT cp = cos(pitch * 0.5);
+		RealT sp = sin(pitch * 0.5);
+		RealT cr = cos(roll * 0.5);
+		RealT sr = sin(roll * 0.5);
+
+		QuaternionT q;
+		q.w() = cr * cp * cy + sr * sp * sy;
+		q.x() = sr * cp * cy - cr * sp * sy;
+		q.y() = cr * sp * cy + sr * cp * sy;
+		q.z() = cr * cp * sy - sr * sp * cy;
+
+		return q;
+	}
+	
 };
 typedef VectorMathT<Eigen::Vector3d, Eigen::Quaternion<double, Eigen::DontAlign>, double> VectorMathd;
 typedef VectorMathT<Eigen::Vector3f, Eigen::Quaternion<float, Eigen::DontAlign>, float> VectorMathf;

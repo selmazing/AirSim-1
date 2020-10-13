@@ -171,7 +171,7 @@ namespace msr
 				params.inertia(0, 0) = 1.2290f; // Ixx [Kgm^-2]
 				params.inertia(1, 1) = 0.1702f; // Iyy [Kgm^-2]
 				params.inertia(2, 2) = 0.8808f; //Izz [Kgm^-2]
-				params.inertia(0, 2) = params.inertia(2, 0) = 0.9343f; // Ixz [Kgm^-2]
+				params.inertia(0, 2) = params.inertia(2, 0) = -0.9343f; // Ixz [Kgm^-2]
 				params.inertia(0, 1) = params.inertia(1, 0) = 0; // Ixy [Kgm^-2], symmetric
 				params.inertia(2, 1) = params.inertia(1, 2) = 0; // Iyz [Kgm^-2], symmetric
 
@@ -229,7 +229,11 @@ namespace msr
 
 				// Propulsion Terms //
 				params.prop_derivatives.thrust_tla_coefficient = 40.0f; // set arbitrarily
-				
+				params.prop_derivatives.propeller_area = 0.1018f;
+				params.prop_derivatives.propeller_thrust_coefficient = 1.0f;
+				params.prop_derivatives.k_motor_coefficient = 40.0f;
+				params.prop_derivatives.propeller_torque_coefficient = 0.0f;
+				params.prop_derivatives.motor_torque_coefficient = 0.0f;
 			}
 
 			void setupFrameCherokee(Params& params)
