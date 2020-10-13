@@ -715,20 +715,20 @@ public:
 		Vector3T euler;
 		// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 		// roll (x-axis rotation)
-		double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
-		double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
+		RealT sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
+		RealT cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
 		euler(0) = std::atan2(sinr_cosp, cosr_cosp);
 
 		// pitch (y-axis rotation)
-		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+		RealT sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
 		if (std::abs(sinp) >= 1)
 			euler(1) = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
 		else
 			euler(1) = std::asin(sinp);
 
 		// yaw (z-axis rotation)
-		double siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
-		double cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
+		RealT siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
+		RealT cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
 		euler(2) = std::atan2(siny_cosp, cosy_cosp);
 
 		return euler;

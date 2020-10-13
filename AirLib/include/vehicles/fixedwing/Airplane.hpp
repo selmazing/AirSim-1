@@ -246,7 +246,7 @@ namespace msr
 				
 				debugKinematicsMessages();
 				debugAeroMessages(derivatives, dimensions, output, angular_pressure);
-
+				debugAeroFile(aoa_);
 				
 				if(isnan(output.aero_force_.lift))
 				{
@@ -326,6 +326,20 @@ namespace msr
 					<< "," << wrench.torque(0)
 					<< "," << wrench.torque(1)
 					<< "," << wrench.torque(2)
+					<< "\n";
+			}
+
+			void debugAeroFile(AoA& aoa) const
+			{
+				std::ofstream aeroFile("C:/Users/quessy/Documents/AirSim/aero-file.txt", std::ios_base::app | std::ios_base::out);
+				aeroFile << aoa.alpha
+					<< "," << aoa.beta
+					<< "," << kinematics_->getState().twist.linear(0)
+					<< "," << kinematics_->getState().twist.linear(1)
+					<< "," << kinematics_->getState().twist.linear(2)
+					<< "," << kinematics_->getState().twist.angular(0)
+					<< "," << kinematics_->getState().twist.angular(1)
+					<< "," << kinematics_->getState().twist.angular(2)
 					<< "\n";
 			}
 
