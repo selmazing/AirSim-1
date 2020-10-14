@@ -103,7 +103,7 @@ namespace msr
 				Utils::log(Utils::stringf("AForce [%f, %f, %f] ATorque [%f, %f, %f]", output_.thrust-output_.aero_force_.drag,  output_.aero_force_.side_force, -output_.aero_force_.lift, output_.aero_force_.roll_mom,
 					output_.aero_force_.pitch_mom, output_.aero_force_.yaw_mom, Utils::kLogLevelInfo));
 
-				debugWrenchFile(wrench);
+				// debugWrenchFile(wrench);
 
 				
 			}
@@ -246,7 +246,6 @@ namespace msr
 				
 				debugKinematicsMessages();
 				debugAeroMessages(derivatives, dimensions, output, angular_pressure);
-				// debugAeroFile(aoa_);
 				
 				if(isnan(output.aero_force_.lift))
 				{
@@ -285,6 +284,8 @@ namespace msr
 					derivatives.zero_yaw_coefficient, derivatives.beta_yaw_coefficient, aoa_.beta, derivatives.aileron_yaw_coefficient, aileron_deflection_,
 					derivatives.rollrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(0),
 					derivatives.yawrate_yaw_coefficient, angular_pressure, kinematics_->getState().twist.angular(2), Utils::kLogLevelInfo));
+
+				// debugAeroFile();
 			}
 
 			void debugKinematicsMessages() const
@@ -329,11 +330,11 @@ namespace msr
 					<< "\n";
 			}
 
-			void debugAeroFile(AoA& aoa) const
+			void debugAeroFile() const
 			{
 				std::ofstream aeroFile("C:/Users/quessy/Documents/AirSim/aero-file.txt", std::ios_base::app | std::ios_base::out);
-				aeroFile << aoa.alpha
-					<< "," << aoa.beta
+				aeroFile << aoa_.alpha
+					<< "," << aoa_.beta
 					<< "," << kinematics_->getState().twist.linear(0)
 					<< "," << kinematics_->getState().twist.linear(1)
 					<< "," << kinematics_->getState().twist.linear(2)
