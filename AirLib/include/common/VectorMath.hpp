@@ -715,20 +715,20 @@ public:
 		Vector3T euler;
 		// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 		// roll (x-axis rotation)
-		RealT sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
-		RealT cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
+		double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
+		double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
 		euler(0) = std::atan2(sinr_cosp, cosr_cosp);
 
 		// pitch (y-axis rotation)
-		RealT sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
 		if (std::abs(sinp) >= 1)
 			euler(1) = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
 		else
 			euler(1) = std::asin(sinp);
 
 		// yaw (z-axis rotation)
-		RealT siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
-		RealT cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
+		double siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
+		double cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
 		euler(2) = std::atan2(siny_cosp, cosy_cosp);
 
 		return euler;
@@ -737,16 +737,16 @@ public:
 	// Tait-Bryan angle
 	static QuaternionT eulerToQuaternion(Vector3T euler)
 	{
-		RealT yaw = euler(0);
-		RealT pitch = euler(1);
-		RealT roll = euler(2);
+		double yaw = euler(0);
+		double pitch = euler(1);
+		double roll = euler(2);
 		// Abbreviations for the various angular functions, taken from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-		RealT cy = std::cos(yaw * 0.5);
-		RealT sy = std::sin(yaw * 0.5);
-		RealT cp = std::cos(pitch * 0.5);
-		RealT sp = std::sin(pitch * 0.5);
-		RealT cr = std::cos(roll * 0.5);
-		RealT sr = std::sin(roll * 0.5);
+		double cy = std::cos(yaw * 0.5);
+		double sy = std::sin(yaw * 0.5);
+		double cp = std::cos(pitch * 0.5);
+		double sp = std::sin(pitch * 0.5);
+		double cr = std::cos(roll * 0.5);
+		double sr = std::sin(roll * 0.5);
 
 		QuaternionT q;
 		q.w() = cr * cp * cy + sr * sp * sy;

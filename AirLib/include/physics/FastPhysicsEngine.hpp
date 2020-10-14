@@ -507,7 +507,7 @@ namespace msr {
                     next.twist.angular(0), next.twist.angular(1), next.twist.angular(2),
                     Utils::kLogLevelInfo));
 
-                debugKinematicsFile(next);
+                debugKinematicsFile(dt, next);
 
 
             }
@@ -655,7 +655,7 @@ namespace msr {
                     next.pose.orientation = current_pose.orientation;
             }
 
-            void static debugKinematicsFile(Kinematics::State& next)
+            void static debugKinematicsFile(TTimeDelta dt, Kinematics::State& next)
             {
                 std::ofstream kinematicsFile("C:/Users/quessy/Documents/AirSim/kinematics-file.txt", std::ios_base::app | std::ios_base::out);
                 kinematicsFile << next.pose.position.x()
@@ -667,6 +667,7 @@ namespace msr {
                     << "," << next.accelerations.linear.x()
                     << "," << next.accelerations.linear.y()
                     << "," << next.accelerations.linear.z()
+            		<< "," << dt
                     << "\n";
             }
 

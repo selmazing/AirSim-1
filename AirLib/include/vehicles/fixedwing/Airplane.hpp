@@ -103,7 +103,7 @@ namespace msr
 				Utils::log(Utils::stringf("AForce [%f, %f, %f] ATorque [%f, %f, %f]", output_.thrust-output_.aero_force_.drag,  output_.aero_force_.side_force, -output_.aero_force_.lift, output_.aero_force_.roll_mom,
 					output_.aero_force_.pitch_mom, output_.aero_force_.yaw_mom, Utils::kLogLevelInfo));
 
-				debugWrenchFile(wrench);
+				// debugWrenchFile(wrench);
 
 				
 			}
@@ -246,7 +246,7 @@ namespace msr
 				
 				debugKinematicsMessages();
 				debugAeroMessages(derivatives, dimensions, output, angular_pressure);
-				debugAeroFile(aoa_);
+				// debugAeroFile(aoa_);
 				
 				if(isnan(output.aero_force_.lift))
 				{
