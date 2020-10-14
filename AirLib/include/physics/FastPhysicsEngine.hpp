@@ -507,7 +507,7 @@ namespace msr {
                     next.twist.angular(0), next.twist.angular(1), next.twist.angular(2),
                     Utils::kLogLevelInfo));
 
-                debugKinematicsFile(dt, next);
+                // debugKinematicsFile(dt, next);
 
 
             }

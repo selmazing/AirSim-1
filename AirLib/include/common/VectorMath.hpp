@@ -710,7 +710,7 @@ public:
 		return R;
 	}
 
-	static Vector3T toEuler(QuaternionT quaternion)
+	static Vector3T toEuler(const QuaternionT quaternion)
 	{
 		Vector3T euler;
 		// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
@@ -720,7 +720,7 @@ public:
 		euler(0) = std::atan2(sinr_cosp, cosr_cosp);
 
 		// pitch (y-axis rotation)
-		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+		float sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
 		if (std::abs(sinp) >= 1)
 			euler(1) = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
 		else
@@ -735,18 +735,18 @@ public:
 	}
 
 	// Tait-Bryan angle
-	static QuaternionT eulerToQuaternion(Vector3T euler)
+	static QuaternionT eulerToQuaternion(const Vector3T euler)
 	{
 		float yaw = euler(0);
 		float pitch = euler(1);
 		float roll = euler(2);
 		// Abbreviations for the various angular functions, taken from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-		float cy = std::cos(yaw * 0.5);
-		float sy = std::sin(yaw * 0.5);
-		float cp = std::cos(pitch * 0.5);
-		float sp = std::sin(pitch * 0.5);
-		float cr = std::cos(roll * 0.5);
-		float sr = std::sin(roll * 0.5);
+		double cy = std::cos(yaw * 0.5);
+		double sy = std::sin(yaw * 0.5);
+		double cp = std::cos(pitch * 0.5);
+		double sp = std::sin(pitch * 0.5);
+		double cr = std::cos(roll * 0.5);
+		double sr = std::sin(roll * 0.5);
 
 		QuaternionT q;
 		q.w() = cr * cp * cy + sr * sp * sy;
