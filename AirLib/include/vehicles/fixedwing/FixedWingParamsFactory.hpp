@@ -4,6 +4,7 @@
 #include "vehicles/fixedwing/firmwares/mavlink/MavLinkFixedWingApi.hpp"
 #include "vehicles/fixedwing/firmwares/ardupilot/ArduPlaneParams.hpp"
 #include "vehicles/fixedwing/firmwares/mavlink/Px4FixedWingParams.hpp"
+#include "vehicles/fixedwing/firmwares/plane_flight/PlaneFlightXParams.hpp"
 
 namespace msr
 {	
@@ -23,6 +24,10 @@ namespace msr
 				else if (vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypeArduPlane)
 				{
 					config.reset(new ArduPlaneParams(*static_cast<const AirSimSettings::MavLinkVehicleSetting*>(vehicle_setting), sensor_factory));
+				}
+				else if (vehicle_setting->vehicle_type == "" || vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypePlaneFlight)
+				{
+					config.reset(new PlaneFlightXParams(vehicle_setting, sensor_factory));
 				}
 				else
 					throw std::runtime_error(Utils::stringf(

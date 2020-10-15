@@ -33,6 +33,7 @@ public: //types
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
     static constexpr char const * kVehicleTypeArduPlane = "arduplane";
     static constexpr char const * kVehicleTypePX4Plane = "px4plane";
+    static constexpr char const * kVehicleTypePlaneFlight = "planeflight";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -729,7 +730,7 @@ private:
         //for everything else we don't need derived class yet
         else {
             vehicle_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-            if (vehicle_type == kVehicleTypeSimpleFlight) {
+            if (vehicle_type == kVehicleTypeSimpleFlight || vehicle_type == kVehicleTypePlaneFlight) {
                 //TODO: we should be selecting remote if available else keyboard
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;
@@ -799,7 +800,7 @@ private:
     	/* This Broke the call as there was a null pointer call
     	create default fixedwing vehicle -> variable arduplane set as default*/
         auto arduplane_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-        arduplane_setting->vehicle_name = "arduplane";
+        arduplane_setting->vehicle_name = "ArduPlane";
         arduplane_setting->vehicle_type = kVehicleTypeArduPlane;
         vehicles[arduplane_setting->vehicle_name] = std::move(arduplane_setting);
     }
