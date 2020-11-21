@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.22",
+	"EngineAssociation": "{00042A48-08D8-7752-AF10-F81AF6D24E18}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -19,12 +19,12 @@
 			"Enabled": true
 		},
 		{
-            		"Name": "SteamVR",
-		        "Enabled": false
-	        },
-        	{
-		        "Name": "OculusVR",
-		        "Enabled": false
-	        },
+			"Name": "SteamVR",
+			"Enabled": false
+		},
+		{
+			"Name": "OculusVR",
+			"Enabled": false
+		}
 	]
 }
