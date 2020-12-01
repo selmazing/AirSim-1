@@ -30,7 +30,7 @@ public:
 	//interface with UnrealEngine
 	void initializeForBeginPlay();
 	const common_utils::UniqueValueMap<std::string, APIPCamera*> getCameras() const;
-	JSBSimPawnEvents* getPawnEvents()
+	AJSBSimPawnEvents* getPawnEvents()
 	{
 		return &pawn_events_;
 	}

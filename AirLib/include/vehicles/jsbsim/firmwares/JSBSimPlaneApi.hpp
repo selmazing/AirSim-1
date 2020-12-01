@@ -2,8 +2,10 @@
 #define msr_airlib_JSBSimPlaneApi_hpp
 
 #include "vehicles/jsbsim/api/JSBSimApiBase.hpp"
+#include "vehicles/JSBSim/JSBSimPawnSimApi.h"
+#include "JSBSimPawnSimApi.h"
 
-namespace msr { namespace {
+namespace msr { namespace airlib {
 
 class JSBSimPlaneApi : public JSBSimApiBase
 {
@@ -11,21 +13,24 @@ public:
 	JSBSimPlaneApi(const AirSimSettings::VehicleSetting* vehicle_setting, std::shared_ptr<SensorFactory> sensor_factory,
 		const Kinematics::State& state, const Environment& environment) :
 	JSBSimApiBase(vehicle_setting, sensor_factory, state, environment)
-	{}
+	{/*insert constructor code*/}
 
 	~JSBSimPlaneApi()
-	{}
+	{/*insert destructor code*/}
 
 protected:
 	virtual void resetImplementation() override
 	{
 		JSBSimApiBase::resetImplementation();
+		// reset state
 	}
 
 public:
 	virtual void update() override
 	{
 		JSBSimApiBase::update();
+		last_jsbsim_state_ = getJSBSimState();
+		
 	}
 
 	virtual const SensorCollection& getSensors() const override
@@ -65,7 +70,7 @@ public:
 		last_jsbsim_state_ = jsbsim_state;
 	}
 
-	virtual const JSBSimState& getJSBSimState() const override
+	virtual JSBSimState getJSBSimState() const
 	{
 		return last_jsbsim_state_;
 	}

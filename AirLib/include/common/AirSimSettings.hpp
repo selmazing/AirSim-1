@@ -798,6 +798,11 @@ private:
         cv_setting->vehicle_type = kVehicleTypeComputerVision;
         vehicles[cv_setting->vehicle_name] = std::move(cv_setting);
 
+    	//create default JSBSim vehicle
+        auto jsbsim_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+        jsbsim_setting->vehicle_name = "JSBSimPlane";
+        jsbsim_setting->vehicle_type = kVehicleTypeJSBSimPlane;
+        vehicles[jsbsim_setting->vehicle_name] = std::move(jsbsim_setting);
 
     	/* This Broke the call as there was a null pointer call
     	create default fixedwing vehicle -> variable arduplane set as default*/

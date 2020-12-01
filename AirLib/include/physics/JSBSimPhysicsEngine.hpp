@@ -60,9 +60,27 @@ public: //methods
 		setProperty("fcs/rudder-cmd-norm", rudder); // range -1 ot +1 note x8 has no rudder
 	}
 
-	Kinematics::State& getKinematicState()
+	void setPaths(std::string aircraft_path, std::string engine_path, std::string system_path, std::string model_path)
+	{
+		aircraft_path_ = aircraft_path;
+		engine_path_ = engine_path;
+		system_path_ = system_path;
+		model_path_ = model_path;
+	}
+
+	void setCollisionInfo(CollisionInfo& collision_info) const
+	{
+		collision_info = collision_info_;
+	}
+
+	Kinematics::State getKinematicState() const
 	{
 		return current_state_;
+	}
+
+	Pose& getPose()
+	{
+		return current_state_.pose;
 	}
 
 	vector<double>& getControlState()
@@ -70,14 +88,24 @@ public: //methods
 		return jsbsim_control_state_;
 	}
 
-	void setDeltaT() const
+	void setDeltaT(double delta_t)
 	{
-		delta_t_;
+		delta_t_ = delta_t;
 	}
 
 	double getDeltaT() const
 	{
 		return delta_t_;
+	}
+
+	double getTime() const
+	{
+		return jsbsim_aircraft.GetSimTime();
+	}
+	
+	JSBSim::FGFDMExec getJSBSim()
+	{
+		return jsbsim_aircraft;
 	}
 
 protected:

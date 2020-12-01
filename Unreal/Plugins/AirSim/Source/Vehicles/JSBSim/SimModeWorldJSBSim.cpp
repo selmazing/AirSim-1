@@ -7,7 +7,6 @@
 #include "AirBlueprintLib.h"
 // JSBSimApiBase.hpp goes here
 #include "JSBSimPawnSimApi.h"
-#include "physics/PhysicsBody.hpp"
 #include "common/ClockFactory.hpp"
 #include <memory>
 // JSBSimRpcLibServer.hpp

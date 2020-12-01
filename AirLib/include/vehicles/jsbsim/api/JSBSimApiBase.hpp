@@ -2,11 +2,9 @@
 #define air_JSBSimControlServer_hpp
 
 #include "common/Common.hpp"
-#include "JSBSimCommon.hpp"
 #include "physics/Kinematics.hpp"
 #include "physics/Environment.hpp"
 #include "api/VehicleApiBase.hpp"
-#include "Physics/JSBSimPhysicsEngine.hpp"
 #include "sensors/SensorBase.hpp"
 #include "sensors/SensorCollection.hpp"
 #include "sensors/SensorFactory.hpp"
@@ -37,7 +35,7 @@ public:
 		{}
 		
 	};
-
+	
 	struct JSBSimState
 	{
 		CollisionInfo collision;
@@ -47,7 +45,7 @@ public:
 		JSBSimState()
 		{}
 
-		JSBSimState(const CollisionInfo& collision_val, const Kinematics::State& kinematics_estimate_val,
+		JSBSimState(CollisionInfo& collision_val, Kinematics::State& kinematics_estimate_val,
 			uint64_t timestamp_val) : collision(collision_val),
 			kinematics_estimated(kinematics_estimate_val), timestamp(timestamp_val)
 		{}
@@ -106,13 +104,23 @@ public:
 		getSensors().reportState(reporter);
 	}
 
-	/* JSBSimState getJSBSimState() const {
+	JSBSimState getJSBSimState() {
 		JSBSimState state;
-		state.collision = getCollisionState();
-		state.kinematics_estimated = getKinematicState();
+		state.collision = collision_info_;
+		state.kinematics_estimated = kinematics_;
 		state.timestamp = clock()->nowNanos();
 		return state;
-	} */
+	}
+
+	virtual void getCollisionState(CollisionInfo collision_info)
+	{
+		collision_info_ = collision_info;
+	}
+
+	virtual void getKinematicState(Kinematics::State kinematics)
+	{
+		kinematics_ = kinematics;
+	}
 
 	// sensor helpers
 	virtual const SensorCollection& getSensors() const override
@@ -127,7 +135,7 @@ public:
 	
 	virtual void setJSBSimControls(const JSBSimControls& controls) = 0;
 	virtual void updateJSBSimState(const JSBSimState& state) = 0;
-	virtual const JSBSimState& getJSBSimState() const = 0;
+	// virtual const JSBSimState& getJSBSimState() const = 0;
 	virtual const JSBSimControls& getJSBSimControls() const = 0;
 	
 	virtual ~JSBSimApiBase() = default;
@@ -136,6 +144,7 @@ public:
 	SensorCollection sensors_;  // maintains sensor type indexed collection of sensors
 	vector<unique_ptr<SensorBase>> sensor_storage_; // RAII for created sensors
 
+	
 protected: // must be implemented methods
 	virtual void resetImplementation() override
 	{
@@ -145,6 +154,8 @@ protected: // must be implemented methods
 	}
 	
 private:
+	CollisionInfo collision_info_;
+	Kinematics::State kinematics_;
 	
 };
 
