@@ -1,3 +1,5 @@
+
+
 #include "SimModeWorldJSBSim.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Logging/MessageLog.h"
@@ -5,10 +7,11 @@
 #include "GameFramework/PlayerController.h"
 
 #include "AirBlueprintLib.h"
-// JSBSimApiBase.hpp goes here
+#include "vehicles/jsbsim/api/JSBSimApiBase.hpp"
 #include "JSBSimPawnSimApi.h"
 #include "common/ClockFactory.hpp"
 #include <memory>
+#include "vehicles/jsbsim/api/JSBSimRpcLibServer.hpp"
 // JSBSimRpcLibServer.hpp
 
 void ASimModeWorldJSBSim::BeginPlay()
@@ -35,6 +38,10 @@ void ASimModeWorldJSBSim::setupClockSpeed()
 	// Setup clock in ClockFactory
 	std::string clock_type = getSettings().clock_type;
 
+
+	/* this clock is scalable for the purpose of the physical update frame-rate being different from the
+	 * graphic update rate
+	 */
 	if (clock_type == "ScalableClock")
 	{
 		// Scalable clock returns interval same as wall clock but multiplied by a scale factor
@@ -80,11 +87,17 @@ void ASimModeWorldJSBSim::getExistingVehiclePawns(TArray<AActor*>& pawns) const
 bool ASimModeWorldJSBSim::isVehicleTypeSupported(const std::string& vehicle_type) const
 {
 	/* Implement code to return a vehicle type form AirSimSettings, will probably inherit from FGExec by calling a script*/
+	return (vehicle_type == AirSimSettings::kVehicleTypePlaneFlight);
 }
 
 std::string ASimModeWorldJSBSim::getVehiclePawnPathName(const AirSimSettings::VehicleSetting& vehicle_setting) const
 {
 	/* get the path to the blueprint used for the aircraft in UE4, can probably use the same as was used in FixedWing initially*/
+	std::string pawn_path = vehicle_setting.pawn_path; // can set a seperate pawn path for a different aircraft
+	if (pawn_path == "")
+		pawn_path = "DefaultFixedWing";
+	
+	return pawn_path;
 }
 
 PawnEvents* ASimModeWorldJSBSim::getVehiclePawnEvents(APawn* pawn) const
@@ -102,6 +115,7 @@ void ASimModeWorldJSBSim::initializeVehiclePawn(APawn* pawn)
 	static_cast<TVehiclePawn*>(pawn)->initializeForBeginPlay();
 }
 
+// calls the initialise method from from the JSBSimPawnSimApi
 std::unique_ptr<PawnSimApi> ASimModeWorldJSBSim::createVehicleSimApi(
 	const PawnSimApi::Params& pawn_sim_api_params) const
 {

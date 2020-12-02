@@ -3,8 +3,10 @@
 
 AJSBSimPawn::AJSBSimPawn()
 {
-	
-}
+	/* place any simulation members attached to the actor that need to receive information to
+	 * update the control surface
+	 */
+}   
 
 void AJSBSimPawn::BeginPlay()
 {
@@ -28,6 +30,7 @@ void AJSBSimPawn::initializeForBeginPlay()
 void AJSBSimPawn::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    pawn_events_.getPawnTickSignal().emit(DeltaSeconds);
 }
 
 void AJSBSimPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -62,7 +65,8 @@ const common_utils::UniqueValueMap<std::string, APIPCamera*> AJSBSimPawn::getCam
     return cameras;
 }
 
-void AJSBSimPawn::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+void AJSBSimPawn::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, bool bSelfMoved,
+    FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
     pawn_events_.getCollisionSignal().emit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 }

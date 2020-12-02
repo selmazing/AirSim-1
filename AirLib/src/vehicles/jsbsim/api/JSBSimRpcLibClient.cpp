@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
 
 //in header only mode, control library is not available
 #ifndef AIRLIB_HEADER_ONLY
@@ -7,7 +5,7 @@
 #ifndef AIRLIB_NO_RPC
 //if using Unreal Build system then include precompiled header file first
 
-#include "vehicles/car/api/CarRpcLibClient.hpp"
+#include "vehicles/jsbsim/api/JSBSimRpcLibClient.hpp"
 
 #include "common/Common.hpp"
 #include "common/ClockFactory.hpp"
@@ -32,7 +30,7 @@ STRICT_MODE_OFF
 #endif
 #include "common/common_utils/WindowsApisCommonPost.hpp"
 
-#include "vehicles/car/api/CarRpcLibAdapators.hpp"
+#include "vehicles/jsbsim/api/JSBSimRpcLibClient.hpp"
 
 STRICT_MODE_ON
 #ifdef _MSC_VER
@@ -44,31 +42,31 @@ __pragma(warning( disable : 4239))
 namespace msr { namespace airlib {
 
 
-typedef msr::airlib_rpclib::CarRpcLibAdapators CarRpcLibAdapators;
+typedef msr::airlib_rpclib::JSBSimRpcLibAdaptors JsbSimRpcLibAdaptors;
 
-CarRpcLibClient::CarRpcLibClient(const string&  ip_address, uint16_t port, float timeout_sec)
+JSBSimRpcLibClient::JSBSimRpcLibClient(const string&  ip_address, uint16_t port, float timeout_sec)
     : RpcLibClientBase(ip_address, port, timeout_sec)
 {
 }
 
-CarRpcLibClient::~CarRpcLibClient()
+JSBSimRpcLibClient::~JSBSimRpcLibClient()
 {}
 
-void CarRpcLibClient::setCarControls(const CarApiBase::CarControls& controls, const std::string& vehicle_name)
+void JSBSimRpcLibClient::setJSBSimControls(const JSBSimApiBase::JSBSimControls& controls, const std::string& vehicle_name)
 {
     static_cast<rpc::client*>(getClient())->
-        call("setCarControls", CarRpcLibAdapators::CarControls(controls), vehicle_name);
+        call("setJSBSimControls", JSBSimRpcLibAdaptors::JSBSimControls(controls), vehicle_name);
 }
-
-CarApiBase::CarState CarRpcLibClient::getCarState(const std::string& vehicle_name)
+	
+JSBSimApiBase::JSBSimState JSBSimRpCLibClient::getJSBSimState(const std::string& vehicle_name)
 {
     return static_cast<rpc::client*>(getClient())->
-        call("getCarState", vehicle_name).as<CarRpcLibAdapators::CarState>().to();
+        call("getJSBSimState", vehicle_name).as<JSBSimRpcLibAdaptors::JSBSimState>().to();
 }
-CarApiBase::CarControls CarRpcLibClient::getCarControls(const std::string& vehicle_name)
+JSBSimApiBase::JSBSimControls JSBSimRpcLibClient::getJSBSimControls(const std::string& vehicle_name)
 {
 	return static_cast<rpc::client*>(getClient())->
-		call("getCarControls", vehicle_name).as<CarRpcLibAdapators::CarControls>().to();
+		call("getJSBSimControls", vehicle_name).as<JsbSimRpcLibAdaptors::JSBSimControls>().to();
 }
 
 

@@ -16,11 +16,11 @@ JSBSimPawnSimApi::JSBSimPawnSimApi(const Params& params)
 	Pose pose = getPose();
 	float pitch, roll, yaw;
 	VectorMath::toEulerianAngle(pose.orientation, pitch, roll, yaw);
-	pose.orientation = VectorMath::toQuaternion(0, 0, yaw);
+	pose.orientation = VectorMath::toQuaternion(0, 0, yaw); // start the aircraft at a level attitude
 	setPose(pose, false);
 }
 
-//TODO: Find way to sink jsbsim_ delta_t and AirSim dt provided in API
+//TODO: Find way to sync jsbsim_ delta_t and AirSim dt provided in API
 //TODO: Setup Paths to JSBSimFGFDMExec model, this should come in the model paths for JSBSim and done in API
 void JSBSimPawnSimApi::initialize()
 {

@@ -6,10 +6,13 @@
 #include "common/Common.hpp"
 #include "common/UpdatableObject.hpp"
 #include "common/CommonStructs.hpp"
-#include "AirLib/deps/JSBSim/FGFDMExec.h" // This is a relative path should be fine, would be better if it was absolute
+#include "Airlib/deps/JSBSim/jsbsim/FGFDMExec.h" // This is a relative path should be relative, linker problems
+#include "AirLib/deps/JSBSim/jsbsim/initialization/FGInitialCondition.h" // This is a relative path should be relative, linker problems
 
 #include "physics/Kinematics.hpp"
 #include <math.h>
+
+#include "AirLib/deps/JSBSim/jsbsim/simgear/misc/sg_path.hxx" // This is a relative path should be relative, linker problems, shouldn't need this the header in FGFDMExec should invoke this for inheritance
 
 namespace msr { namespace airlib {
 
@@ -32,9 +35,18 @@ public: //methods
 	virtual void initialize()
 	{
 		jsbsim_aircraft = JSBSim::FGFDMExec(); // construct JSBSim FGFDMExec class
-		jsbsim_aircraft.LoadModel(aircraft_path_, engine_path_, system_path_, model_path_);
+		loadJSBSimPaths(model_path_);
+		
+		const SGPath ic_file("/* Insert path to initial condition file */");
+		JSBSim::FGInitialCondition* fgic = jsbsim_aircraft.GetIC();
+		fgic->Load(ic_file);  // had to include header file to include FGInitialCondition
+		
 		jsbsim_aircraft.Setdt(delta_t_);
-		jsbsim_aircraft.RunIC(); // causes sim time to reset to 0.0, returns true if successful
+		const bool success = jsbsim_aircraft.RunIC(); // causes sim time to reset to 0.0, returns true if successful
+		if (!success)
+		{
+			std::cout << "JSBSim failed to initialize simulation conditions" << std::endl;
+		}
 	}
 
 	virtual void update() override
@@ -43,6 +55,12 @@ public: //methods
 		jsbsim_aircraft.Run();
 		updateKinematicState();
 		updateControlState();
+	}
+
+	virtual void resetImplementation() override
+	{
+		const int no_output_reset_mode = 0;
+		jsbsim_aircraft.ResetToInitialConditions(no_output_reset_mode); // multiple modes here not quite sure which is the best to set
 	}
 
 	void reportState(StateReporter& reporter) override
@@ -60,11 +78,8 @@ public: //methods
 		setProperty("fcs/rudder-cmd-norm", rudder); // range -1 ot +1 note x8 has no rudder
 	}
 
-	void setPaths(std::string aircraft_path, std::string engine_path, std::string system_path, std::string model_path)
+	void setModelPath(std::string model_path)
 	{
-		aircraft_path_ = aircraft_path;
-		engine_path_ = engine_path;
-		system_path_ = system_path;
 		model_path_ = model_path;
 	}
 
@@ -109,6 +124,14 @@ public: //methods
 	}
 
 protected:
+
+	void loadJSBSimPaths(std::string model_path)
+	{
+		SGPath aircraft_path("");
+		SGPath engine_path("");
+		SGPath system_path("");
+		jsbsim_aircraft.LoadModel(aircraft_path, engine_path, system_path, model_path);
+	}
 	
 	// get the the value of a property from JSBSim
 	virtual double getProperty(const std::string& property_name)
@@ -211,9 +234,6 @@ private:
 	Vector3r angular_velocity_;
 	Vector3r linear_acceleration_;
 	Vector3r angular_acceleration_;
-	std::string aircraft_path_;
-	std::string engine_path_;
-	std::string system_path_;
 	std::string model_path_;
 	double pi = 3.1415926535897932;
 	double delta_t_ = 0.0021; // set the simulation update rate, defaults to 480Hz

@@ -1,13 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 //in header only mode, control library is not available
 #ifndef AIRLIB_HEADER_ONLY
 //RPC code requires C++14. If build system like Unreal doesn't support it then use compiled binaries
 #ifndef AIRLIB_NO_RPC
 //if using Unreal Build system then include precompiled header file first
 
-#include "vehicles/car/api/CarRpcLibServer.hpp"
+#include "vehicles/jsbsim/api/JSBSimRpcLibServer.hpp"
 
 
 #include "common/Common.hpp"
@@ -29,42 +26,43 @@ STRICT_MODE_OFF
 #endif
 #include "common/common_utils/WindowsApisCommonPost.hpp"
 
-#include "vehicles/car/api/CarRpcLibAdapators.hpp"
+#include "vehicles/jsbsim/api/JSBSimRpcLibAdapators.hpp"
 
 
 STRICT_MODE_ON
 
-
 namespace msr { namespace airlib {
 
-typedef msr::airlib_rpclib::CarRpcLibAdapators CarRpcLibAdapators;
+typedef msr::airlib_rpclib::JSBSimRpcLibAdaptors JSBSimRpcLibAdaptors;
 
-CarRpcLibServer::CarRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port)
-    : RpcLibServerBase(api_provider, server_address, port)
+JSBSimRpcLibServer::JSBSimRpcLibServer(ApiProvider* api_provider, string server_address, uint16_t port)
+	: RpcLibServerBase(api_provider, server_address, port)
 {
-    (static_cast<rpc::server*>(getServer()))->
-        bind("getCarState", [&](const std::string& vehicle_name) -> CarRpcLibAdapators::CarState {
-        return CarRpcLibAdapators::CarState(getVehicleApi(vehicle_name)->getCarState());
-    });
-
-    (static_cast<rpc::server*>(getServer()))->
-        bind("setCarControls", [&](const CarRpcLibAdapators::CarControls& controls, const std::string& vehicle_name) -> void {
-        getVehicleApi(vehicle_name)->setCarControls(controls.to());
-    });
 	(static_cast<rpc::server*>(getServer()))->
-		bind("getCarControls", [&](const std::string& vehicle_name) -> CarRpcLibAdapators::CarControls {
-		return CarRpcLibAdapators::CarControls(getVehicleApi(vehicle_name)->getCarControls());
-	});
+		bind("getJSBSimState", [&](const std::string& vehicle_name) -> JSBSimRpcLibAdaptors::JSBSimState
+			{
+				return JSBSimRpcLibAdaptors::JSBSimState(getVehicleApi(vehicle_name)->getJSBSimState());
+			});
 
+	(static_cast<rpc::server*>(getServer()))->
+		bind("setJSBSimControls", [&](const JSBSimRpcLibAdaptors::JSBSimControls& controls, std::string& vehicle_name) -> void
+			{
+				getVehicleApi(vehicle_name)->setJSBSimControls(controls.to()); // set controls in base api via lib adapters
+			});
+
+	(static_cast<rpc::server*>(getServer()))->
+		bind("getJSBSimControls", [&](const std::string& vehicle_name) -> JSBSimRpcLibAdaptors::JSBSimControls
+			{
+				return JSBSimRpcLibAdaptors::JSBSimControls(getVehicleApi(vehicle_name)->getJSBSimControls());
+			});
 }
 
-//required for pimpl
-CarRpcLibServer::~CarRpcLibServer()
+// required for pimpl
+JSBSimRpcLibServer::~JSBSimRpcLibServer()
 {
 }
 
 }} //namespace
-
 
 #endif
 #endif

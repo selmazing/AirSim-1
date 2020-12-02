@@ -6,6 +6,7 @@ INCLUDE("${CMAKE_CURRENT_LIST_DIR}/../cmake-modules/CommonSetup.cmake")
 CommonSetup()
 
 IncludeEigen()
+IncludeJSBSim()
 
 include_directories(
   ${AIRSIM_ROOT}/AirLib/
