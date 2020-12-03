@@ -148,7 +148,7 @@ if [ ! -d "external/jsbsim/jsbsim-1.1.2"]; then
     mkdir -p "external/jsbsim"
     unzip -q v1.1.2.zip -d external/jsbsim
     rm v1.1.2.zip
-  fi
+fi
 
 # Download high-polycount SUV model
 if $downloadHighPolySuv; then
