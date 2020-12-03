@@ -32,6 +32,13 @@ if [ ! -d "./external/rpclib/rpclib-2.2.1" ]; then
     exit 1
 fi
 
+# check for jsbsim
+if [ ! -d "./external/jsbsim/jsbsim-1.1.2" ]; then
+    echo "ERROR: new version of AirSim requires newer jsbsim."
+    echo "please run setup.sh first and then run build.sh again"
+    exit 1
+fi
+
 # check for local cmake build created by setup.sh
 if [ -d "./cmake_build" ]; then
     if [ "$(uname)" == "Darwin" ]; then
@@ -48,7 +55,7 @@ if $debug; then
     build_dir=build_debug
 else
     build_dir=build_release
-fi 
+fi
 if [ "$(uname)" == "Darwin" ]; then
     export CC=/usr/local/opt/llvm@8/bin/clang
     export CXX=/usr/local/opt/llvm@8/bin/clang++
@@ -101,14 +108,17 @@ popd >/dev/null
 
 mkdir -p AirLib/lib/x64/$folder_name
 mkdir -p AirLib/deps/rpclib/lib
+mkdir -p AirLib/deps/jsbsim/lib
 mkdir -p AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/libAirLib.a AirLib/lib
 cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
+cp $build_dir/output/lib/libjsbsim.a AirLib/deps/jsbsim/lib/libjsbsim.a
 
 # Update AirLib/lib, AirLib/deps, Plugins folders with new binaries
 rsync -a --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name
 rsync -a --delete external/rpclib/rpclib-2.2.1/include AirLib/deps/rpclib
+rsync -a --delete external/jsbsim/jsbsim-1.1.2/include Airlib/deps/jsbsim
 rsync -a --delete MavLinkCom/include AirLib/deps/MavLinkCom
 rsync -a --delete AirLib Unreal/Plugins/AirSim/Source
 rm -rf Unreal/Plugins/AirSim/Source/AirLib/src

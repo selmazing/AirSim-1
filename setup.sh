@@ -110,7 +110,7 @@ else #linux
                 popd
             fi
         fi
-    
+
     else
         echo "Already have good version of cmake: $cmake_ver"
     fi
@@ -133,6 +133,22 @@ if [ ! -d "external/rpclib/rpclib-2.2.1" ]; then
     unzip -q v2.2.1.zip -d external/rpclib
     rm v2.2.1.zip
 fi
+
+# Download jsbsim
+if [ ! -d "external/jsbsim/jsbsim-1.1.2"]; then
+    echo "*********************************************************************************************"
+    echo "Downloading JSBSim..."
+    echo "*********************************************************************************************"
+
+    wget https://github.com/JSBSim-Team/jsbsim/archive/v1.1.2.zip
+
+    # remove previous versions
+    rm -rf "external/jsbsim"
+
+    mkdir -p "external/jsbsim"
+    unzip -q v1.1.2.zip -d external/jsbsim
+    rm v1.1.2.zip
+  fi
 
 # Download high-polycount SUV model
 if $downloadHighPolySuv; then
