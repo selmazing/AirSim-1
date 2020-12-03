@@ -43,12 +43,14 @@ public:
 		uint64_t timestamp;
 
 		JSBSimState()
-		{}
+		{	
+		}
 
-		JSBSimState(CollisionInfo& collision_val, Kinematics::State& kinematics_estimate_val,
+		JSBSimState(CollisionInfo collision_val, Kinematics::State kinematics_estimate_val,
 			uint64_t timestamp_val) : collision(collision_val),
 			kinematics_estimated(kinematics_estimate_val), timestamp(timestamp_val)
-		{}
+		{		
+		}
 
 		// useful shortcuts
 		const Vector3r& getPosition() const
