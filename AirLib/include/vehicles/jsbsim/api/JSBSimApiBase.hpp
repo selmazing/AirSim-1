@@ -135,7 +135,7 @@ public:
 	
 	virtual void setJSBSimControls(const JSBSimControls& controls) = 0;
 	virtual void updateJSBSimState(const JSBSimState& state) = 0;
-	// virtual const JSBSimState& getJSBSimState() const = 0;
+	virtual const JSBSimState& getJSBSimState() const = 0;
 	virtual const JSBSimControls& getJSBSimControls() const = 0;
 	
 	virtual ~JSBSimApiBase() = default;

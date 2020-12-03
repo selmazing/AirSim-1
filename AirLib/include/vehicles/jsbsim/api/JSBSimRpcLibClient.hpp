@@ -25,7 +25,7 @@ public:
 
 	void setJSBSimControls(const JSBSimApiBase::JSBSimControls& controls, const std::string& vehicle_name = "");
 	JSBSimApiBase::JSBSimState getJSBSimState(const std::string& vehicle_name = ""); // doesnt do anything?
-	JSBSimApiBase::JSBSimState getJSBSimControls(const std::string& vehicle_name = "");
+	JSBSimApiBase::JSBSimControls getJSBSimControls(const std::string& vehicle_name = "");
 	virtual ~JSBSimRpcLibClient(); // required for pimpl
 private:
 	struct impl;

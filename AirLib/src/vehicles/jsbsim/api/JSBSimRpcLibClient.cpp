@@ -30,7 +30,7 @@ STRICT_MODE_OFF
 #endif
 #include "common/common_utils/WindowsApisCommonPost.hpp"
 
-#include "vehicles/jsbsim/api/JSBSimRpcLibClient.hpp"
+#include "vehicles/jsbsim/api/JSBSimRpcLibAdapators.hpp"
 
 STRICT_MODE_ON
 #ifdef _MSC_VER
@@ -42,7 +42,7 @@ __pragma(warning( disable : 4239))
 namespace msr { namespace airlib {
 
 
-typedef msr::airlib_rpclib::JSBSimRpcLibAdaptors JsbSimRpcLibAdaptors;
+typedef msr::airlib_rpclib::JSBSimRpcLibAdaptors JSBSimRpcLibAdaptors;
 
 JSBSimRpcLibClient::JSBSimRpcLibClient(const string&  ip_address, uint16_t port, float timeout_sec)
     : RpcLibClientBase(ip_address, port, timeout_sec)
@@ -58,7 +58,7 @@ void JSBSimRpcLibClient::setJSBSimControls(const JSBSimApiBase::JSBSimControls& 
         call("setJSBSimControls", JSBSimRpcLibAdaptors::JSBSimControls(controls), vehicle_name);
 }
 	
-JSBSimApiBase::JSBSimState JSBSimRpCLibClient::getJSBSimState(const std::string& vehicle_name)
+JSBSimApiBase::JSBSimState JSBSimRpcLibClient::getJSBSimState(const std::string& vehicle_name)
 {
     return static_cast<rpc::client*>(getClient())->
         call("getJSBSimState", vehicle_name).as<JSBSimRpcLibAdaptors::JSBSimState>().to();
@@ -66,7 +66,7 @@ JSBSimApiBase::JSBSimState JSBSimRpCLibClient::getJSBSimState(const std::string&
 JSBSimApiBase::JSBSimControls JSBSimRpcLibClient::getJSBSimControls(const std::string& vehicle_name)
 {
 	return static_cast<rpc::client*>(getClient())->
-		call("getJSBSimControls", vehicle_name).as<JsbSimRpcLibAdaptors::JSBSimControls>().to();
+		call("getJSBSimControls", vehicle_name).as<JSBSimRpcLibAdaptors::JSBSimControls>().to();
 }
 
 
