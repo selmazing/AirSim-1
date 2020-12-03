@@ -9,10 +9,6 @@ macro(IncludeEigen)
     include_directories(${AIRSIM_ROOT}/AirLib/deps/eigen3)
 endmacro(IncludeEigen)
 
-macro(IncludeJSBSim)
-	include_directories(${AIRSIM_ROOT}/AirLib/deps/JSBSim)
-endmacro(IncludeJSBSim)
-
 macro(AddExecutableSource)
     set(PROJECT_CPP ${PROJECT_NAME}_sources)
     file(GLOB_RECURSE PROJECT_CPP "${AIRSIM_ROOT}/${PROJECT_NAME}/*.cpp")
