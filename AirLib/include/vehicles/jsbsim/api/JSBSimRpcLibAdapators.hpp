@@ -4,7 +4,7 @@
 #include "common/Common.hpp"
 #include "common/CommonStructs.hpp"
 #include "api/RpcLibAdapatorsBase.hpp"
-#include "vehicles/JSBSim/api/JSBSimApiBase.hpp"
+#include "vehicles/jsbsim/api/JSBSimApiBase.hpp"
 
 #include "common/common_utils/WindowsApisCommonPre.hpp"
 #include "rpc/msgpack.hpp"
