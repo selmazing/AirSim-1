@@ -135,7 +135,7 @@ if [ ! -d "external/rpclib/rpclib-2.2.1" ]; then
 fi
 
 # Download jsbsim
-if [ ! -d "external/jsbsim/jsbsim-1.1.2"]; then
+if [ ! -d "external/jsbsim/jsbsim-1.1.2" ]; then
     echo "*********************************************************************************************"
     echo "Downloading JSBSim..."
     echo "*********************************************************************************************"
