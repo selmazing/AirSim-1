@@ -46,7 +46,7 @@ public:
 		CollisionInfo collision;
 		KinematicsState kinematics_estimated;
 		uint64_t timestamp;
-		std::vector<std::string> controller_messages;
+		// std::vector<std::string> controller_messages;
 		// add MSGPACK_DEFINE_MAP
 
 		MSGPACK_DEFINE_MAP(collision, kinematics_estimated, timestamp);
