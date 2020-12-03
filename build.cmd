@@ -32,7 +32,7 @@ if "%2"=="--Release" set "buildMode=--Release"
 
 :noargs
 
-chdir /d %ROOT_DIR% 
+chdir /d %ROOT_DIR%
 
 REM //---------- Check cmake version ----------
 CALL check_cmake.bat
@@ -50,21 +50,21 @@ IF NOT EXIST external\rpclib mkdir external\rpclib
 IF NOT EXIST external\rpclib\rpclib-2.2.1 (
 	REM //leave some blank lines because powershell shows download banner at top of console
 	ECHO(
-	ECHO(   
-	ECHO(   
+	ECHO(
+	ECHO(
 	ECHO *****************************************************************************************
 	ECHO Downloading rpclib
 	ECHO *****************************************************************************************
 	@echo on
 	powershell -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/madratman/rpclib/archive/v2.2.1.zip -OutFile external\rpclib.zip }"
 	@echo off
-	
+
 	REM //remove any previous versions
 	rmdir external\rpclib /q /s
 
 	powershell -command "& { Expand-Archive -Path external\rpclib.zip -DestinationPath external\rpclib }"
 	del external\rpclib.zip /q
-	
+
 	REM //Don't fail the build if the high-poly car is unable to be downloaded
 	REM //Instead, just notify users that the gokart will be used.
 	IF NOT EXIST external\rpclib\rpclib-2.2.1 (
@@ -90,7 +90,7 @@ cmake --build . --config Release
 )
 
 if ERRORLEVEL 1 goto :buildfailed
-chdir /d %ROOT_DIR% 
+chdir /d %ROOT_DIR%
 
 REM //---------- copy rpclib binaries and include folder inside AirLib folder ----------
 set RPCLIB_TARGET_LIB=AirLib\deps\rpclib\lib\x64
@@ -113,14 +113,14 @@ IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv mkdir Unreal\Plugins\AirSi
 IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\v1.2.0 (
     IF NOT DEFINED noFullPolyCar (
         REM //leave some blank lines because powershell shows download banner at top of console
-        ECHO(   
-        ECHO(   
-        ECHO(   
+        ECHO(
+        ECHO(
+        ECHO(
         ECHO *****************************************************************************************
         ECHO Downloading high-poly car assets.... The download is ~37MB and can take some time.
         ECHO To install without this assets, re-run build.cmd with the argument --no-full-poly-car
         ECHO *****************************************************************************************
-       
+
         IF EXIST suv_download_tmp rmdir suv_download_tmp /q /s
         mkdir suv_download_tmp
         @echo on
@@ -131,7 +131,7 @@ IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV\v1.2.0 (
 		rmdir /S /Q Unreal\Plugins\AirSim\Content\VehicleAdv\SUV
         powershell -command "& { Expand-Archive -Path suv_download_tmp\car_assets.zip -DestinationPath Unreal\Plugins\AirSim\Content\VehicleAdv }"
         rmdir suv_download_tmp /q /s
-        
+
         REM //Don't fail the build if the high-poly car is unable to be downloaded
         REM //Instead, just notify users that the gokart will be used.
         IF NOT EXIST Unreal\Plugins\AirSim\Content\VehicleAdv\SUV ECHO Unable to download high-polycount SUV. Your AirSim build will use the default vehicle.
@@ -154,6 +154,60 @@ IF NOT EXIST AirLib\deps\eigen3 (
 )
 IF NOT EXIST AirLib\deps\eigen3 goto :buildfailed
 
+REM //---------- get JSBSim library ----------
+IF NOT EXIST external\jsbsim mkdir external\jsbsim
+IF NOT EXIST external\jsbsim\jsbsim-1.1.2 (
+	REM //leave some blank lines because powershell shows download banner at top of console
+	ECHO(
+	ECHO(
+	ECHO(
+	ECHO *****************************************************************************************
+	ECHO Downloading jsbsim
+	ECHO *****************************************************************************************
+	@echo on
+	powershell -command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr https://github.com/JSBSim-Team/jsbsim/archive/v1.1.2.zip -OutFile external\jsbsim.zip }"
+	@echo off
+  REM //remove any previous versions
+	rmdir external\jsbsim /q /s
+
+	powershell -command "& { Expand-Archive -Path external\jsbsim.zip -DestinationPath external\jsbsim }"
+	del external\jsbsim.zip /q
+)
+
+REM //---------- Build jsbsim ------------
+ECHO Starting cmake to build jsbsim...
+IF NOT EXIST external\jsbsim\jsbsim-1.1.2\build mkdir external\jsbsim\jsbsim-1.1.2\build
+cd external\jsbsim\jsbsim-1.1.2\build
+REM cmake -G"Visual Studio 14 2015 Win64" ..
+cmake -G"Visual Studio 16 2019" ..
+
+if "%buildMode%" == "--Debug" (
+cmake --build . --config Debug
+) else if "%buildMode%" == "--Release" (
+cmake --build . --config Release
+) else (
+cmake --build .
+cmake --build . --config Release
+)
+
+if ERRORLEVEL 1 goto :buildfailed
+chdir /d %ROOT_DIR%
+
+REM //---------- copy jsbsim binaries and include folder inside AirLib folder ----------
+set JSBSIM_TARGET_LIB=AirLib\deps\jsbsim\lib\x64
+if NOT exist %JSBSIM_TARGET_LIB% mkdir %JSBSIM_TARGET_LIB%
+set JSBSIM_TARGET_INCLUDE=AirLib\deps\jsbsim\include
+if NOT exist %JSBSIM_TARGET_INCLUDE% mkdir %JSBSIM_TARGET_INCLUDE%
+robocopy /MIR external\jsbsim\jsbsim-1.1.2\include %JSBSIM_TARGET_INCLUDE%
+
+if "%buildMode%" == "--Debug" (
+robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\Debug %JSBSIM_TARGET_LIB%\Debug
+) else if "%buildMode%" == "--Release" (
+robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\Release %JSBSIM_TARGET_LIB%\Release
+) else (
+robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\Debug %JSBSIM_TARGET_LIB%\Debug
+robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\Release %JSBSIM_TARGET_LIB%\Release
+)
 
 REM //---------- now we have all dependencies to compile AirSim.sln which will also compile MavLinkCom ----------
 if "%buildMode%" == "--Debug" (
@@ -165,7 +219,7 @@ if ERRORLEVEL 1 goto :buildfailed
 ) else (
 msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Debug AirSim.sln
 if ERRORLEVEL 1 goto :buildfailed
-msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Release AirSim.sln 
+msbuild -maxcpucount:12 /p:Platform=x64 /p:Configuration=Release AirSim.sln
 if ERRORLEVEL 1 goto :buildfailed
 )
 
@@ -190,8 +244,5 @@ echo(
 echo #### Build failed - see messages above. 1>&2
 
 :buildfailed_nomsg
-chdir /d %ROOT_DIR% 
+chdir /d %ROOT_DIR%
 exit /b 1
-
-
-
