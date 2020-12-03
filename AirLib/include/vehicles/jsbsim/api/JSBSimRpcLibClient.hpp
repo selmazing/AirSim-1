@@ -2,7 +2,7 @@
 #define air_JSBSimRpcLibClient_hpp
 
 #include "common/Common.hpp"
-#include "vehicles/JSBSim/api/JSBSimApiBase.hpp"
+#include "vehicles/jsbsim/api/JSBSimApiBase.hpp"
 #include "api/RpcLibClientBase.hpp"
 
 // This is really behaving as a header file
