@@ -11,7 +11,7 @@ endmacro(IncludeEigen)
 
 macro(IncludeJSBSim)
 	include_directories(${AIRSIM_ROOT}/AirLib/deps/JSBSim)
-endmacro
+endmacro(IncludeJSBSim)
 
 macro(AddExecutableSource)
     set(PROJECT_CPP ${PROJECT_NAME}_sources)
