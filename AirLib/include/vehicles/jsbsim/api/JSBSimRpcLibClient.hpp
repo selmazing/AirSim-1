@@ -28,8 +28,8 @@ public:
 	JSBSimApiBase::JSBSimControls getJSBSimControls(const std::string& vehicle_name = "");
 	virtual ~JSBSimRpcLibClient(); // required for pimpl
 private:
-	struct impl;
-	std::unique_ptr<impl> pimpl_; // hangover from multi-rotor not sure if this is necessary as unused in body
+	// struct impl;
+	// std::unique_ptr<impl> pimpl_; // hangover from multi-rotor not sure if this is necessary as unused in body
 };
 }
 }

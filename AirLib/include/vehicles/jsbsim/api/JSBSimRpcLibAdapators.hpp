@@ -17,10 +17,10 @@ class JSBSimRpcLibAdaptors : public RpcLibAdapatorsBase
 public:
 	struct JSBSimControls
 	{
-		double aileron;
-		double elevator;
-		double throttle;
-		double rudder;
+		double aileron = 0;
+		double elevator = 0;
+		double throttle = 0;
+		double rudder = 0;
 
 		MSGPACK_DEFINE_MAP(aileron, elevator, throttle, rudder);
 
@@ -64,8 +64,10 @@ public:
 
 		msr::airlib::JSBSimApiBase::JSBSimState to() const
 		{
-			return msr::airlib::JSBSimApiBase::JSBSimState(collision.to(),
-				kinematics_estimated.to(), timestamp);
+			return msr::airlib::JSBSimApiBase::JSBSimState(
+				collision.to(),
+				kinematics_estimated.to(),
+				timestamp);
 		}
 		
 	};
