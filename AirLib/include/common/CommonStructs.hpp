@@ -40,7 +40,7 @@ struct Wrench {
     {
     }
 
-    //support basic arithmatic
+    //support basic arithmetic
     Wrench operator+(const Wrench& other) const
     {
         Wrench result;

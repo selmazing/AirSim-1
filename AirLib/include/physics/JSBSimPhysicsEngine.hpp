@@ -6,8 +6,8 @@
 #include "common/Common.hpp"
 #include "common/UpdatableObject.hpp"
 #include "common/CommonStructs.hpp"
-#include "Airlib/deps/JSBSim/jsbsim/FGFDMExec.h" // This is a relative path should be relative, linker problems
-#include "AirLib/deps/JSBSim/jsbsim/initialization/FGInitialCondition.h" // This is a relative path should be relative, linker problems
+#include "Airlib/deps/JSBSim/jsbsim/FGFDMExec.h" // This is a absolute path should be relative, linker problems
+#include <JSBSim/jsbsim/initialization/FGInitialCondition.h> // This is a absolute path should be relative, linker problems
 
 #include "physics/Kinematics.hpp"
 #include <math.h>

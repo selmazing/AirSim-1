@@ -5,7 +5,7 @@
 #include "vehicles/JSBSim/api/JSBSimApiBase.hpp"
 #include "api/RpcLibClientBase.hpp"
 
-
+// This is really behaving as a header file
 namespace msr { namespace airlib {
 /*Deriving from RpcLibClientBase provides access to many camera and sensor APIs
  *The key methods to interact with the API should be provided here and these are inherited

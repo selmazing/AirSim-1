@@ -2,7 +2,6 @@
 #include "AirBlueprintLib.h"
 #include "UnrealSensors/UnrealSensorFactory.h"
 #include "AirLib/include/physics/JSBSimPhysicsEngine.hpp"
-#include "JSBSimPawnApi.h"
 #include <exception>
 
 #include "vehicles/jsbsim/JSBSimApiFactory.hpp"

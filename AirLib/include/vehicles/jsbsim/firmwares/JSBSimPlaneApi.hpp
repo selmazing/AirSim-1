@@ -30,7 +30,6 @@ public:
 	{
 		JSBSimApiBase::update();
 		last_jsbsim_state_ = getJSBSimState();
-		
 	}
 
 	virtual const SensorCollection& getSensors() const override
