@@ -717,7 +717,7 @@ public:
 		// roll (x-axis rotation)
 		double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
 		double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
-		euler(0) = std::atan2(sinr_cosp, cosr_cosp);
+		euler(0) = static_cast<float>(std::atan2(sinr_cosp, cosr_cosp));
 
 		// pitch (y-axis rotation)
 		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
