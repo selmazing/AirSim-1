@@ -734,8 +734,8 @@ public:
 		return euler;
 	}
 
-	// Tait-Bryan angle
-	static QuaternionT eulerToQuaternion(const Vector3f euler)
+	// Tait-Bryan angle, to quaternion already does this
+	/* static QuaternionT eulerToQuaternion(const Vector3f euler)
 	{
 		float yaw = euler(0);
 		float pitch = euler(1);
@@ -755,7 +755,7 @@ public:
 		q.z() = cr * cp * sy - sr * sp * cy;
 
 		return q;
-	}
+	} */
 	
 };
 typedef VectorMathT<Eigen::Vector3d, Eigen::Quaternion<double, Eigen::DontAlign>, double> VectorMathd;

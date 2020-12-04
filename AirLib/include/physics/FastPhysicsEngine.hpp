@@ -519,7 +519,7 @@ namespace msr {
                     Vector3r next_orientation = eulerOrientation + (orientation_dot * dt_real);
 
 
-                    next.pose.orientation = VectorMath::eulerToQuaternion(next_orientation);
+                    next.pose.orientation = VectorMath::toQuaternion(next_orientation[0], next_orientation[1], next_orientation[2]);
                     next.pose.position = current.pose.position + (position_dot * dt_real);
                     next.twist.linear = current.twist.linear + (next.accelerations.linear * dt_real);
                     next.twist.angular = current.twist.angular + (next.accelerations.angular * dt_real);
