@@ -741,12 +741,12 @@ public:
 		float pitch = euler(1);
 		float roll = euler(2);
 		// Abbreviations for the various angular functions, taken from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-		double cy = std::cos(yaw * 0.5);
-		double sy = std::sin(yaw * 0.5);
-		double cp = std::cos(pitch * 0.5);
-		double sp = std::sin(pitch * 0.5);
-		double cr = std::cos(roll * 0.5);
-		double sr = std::sin(roll * 0.5);
+		float cy = std::cos(yaw * 0.5);
+		float sy = std::sin(yaw * 0.5);
+		float cp = std::cos(pitch * 0.5);
+		float sp = std::sin(pitch * 0.5);
+		float cr = std::cos(roll * 0.5);
+		float sr = std::sin(roll * 0.5);
 
 		QuaternionT q;
 		q.w() = cr * cp * cy + sr * sp * sy;
