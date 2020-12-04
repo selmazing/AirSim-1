@@ -238,8 +238,6 @@ private:
 	double pi = 3.1415926535897932;
 	double delta_t_ = 0.0021; // set the simulation update rate, defaults to 480Hz
 	
-	
-	
 };
 }
 }
