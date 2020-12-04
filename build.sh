@@ -115,6 +115,8 @@ cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
 cp $build_dir/output/lib/libjsbsim.a AirLib/deps/jsbsim/lib/libjsbsim.a
 ls -l Airlib/deps/jsbsim/lib
+echo LOOK ABOVE
+banner "LOOK" || /bin/true
 
 # Update AirLib/lib, AirLib/deps, Plugins folders with new binaries
 rsync -a --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name
