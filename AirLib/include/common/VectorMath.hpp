@@ -722,7 +722,7 @@ public:
 		// pitch (y-axis rotation)
 		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
 		if (std::abs(sinp) >= 1)
-			euler(1) = static_cast<float>(std::copysign(M_PI / 2, sinp)); // use 90 degrees if out of range
+			euler(1) = static_cast<float>(std::copysign((3.14159265359f / 2.0f), sinp)); // use 90 degrees if out of range
 		else
 			euler(1) = static_cast<float>(std::asin(sinp));
 
