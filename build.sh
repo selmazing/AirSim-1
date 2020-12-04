@@ -99,6 +99,7 @@ if [[ ! -d $build_dir ]]; then
     fi
 fi
 
+echo end of build release
 
 pushd $build_dir  >/dev/null
 # final linking of the binaries can fail due to a missing libc++abi library
@@ -106,8 +107,6 @@ pushd $build_dir  >/dev/null
 # So we only build the libraries here for now
 make -j`nproc`
 popd >/dev/null
-
-echo make finished over here
 
 mkdir -p AirLib/lib/x64/$folder_name
 mkdir -p AirLib/deps/rpclib/lib
