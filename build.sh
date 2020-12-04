@@ -81,7 +81,7 @@ if [[ -d "./cmake/CMakeFiles" ]]; then
 fi
 
 folder_name=""
-
+echo got here
 if [[ ! -d $build_dir ]]; then
     mkdir -p $build_dir
     pushd $build_dir  >/dev/null
@@ -98,6 +98,9 @@ if [[ ! -d $build_dir ]]; then
         popd >/dev/null
     fi
 fi
+echo build completed
+banner "build" || /bin/true
+
 
 pushd $build_dir  >/dev/null
 # final linking of the binaries can fail due to a missing libc++abi library
