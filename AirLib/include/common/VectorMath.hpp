@@ -735,7 +735,7 @@ public:
 	}
 
 	// Tait-Bryan angle
-	static QuaternionT eulerToQuaternion(const Vector3T euler)
+	static QuaternionT eulerToQuaternion(const Vector3f euler)
 	{
 		float yaw = euler(0);
 		float pitch = euler(1);
