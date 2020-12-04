@@ -98,8 +98,6 @@ if [[ ! -d $build_dir ]]; then
         popd >/dev/null
     fi
 fi
-echo build completed
-banner "build" || /bin/true
 
 
 pushd $build_dir  >/dev/null
@@ -108,6 +106,8 @@ pushd $build_dir  >/dev/null
 # So we only build the libraries here for now
 make -j`nproc`
 popd >/dev/null
+
+echo make finished over here
 
 mkdir -p AirLib/lib/x64/$folder_name
 mkdir -p AirLib/deps/rpclib/lib
