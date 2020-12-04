@@ -715,21 +715,21 @@ public:
 		Vector3T euler;
 		// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 		// roll (x-axis rotation)
-		float sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
-		float cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
+		double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
+		double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
 		euler(0) = std::atan2(sinr_cosp, cosr_cosp);
 
 		// pitch (y-axis rotation)
-		float sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
 		if (std::abs(sinp) >= 1)
-			euler(1) = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+			euler(1) = static_cast<float>(std::copysign(M_PI / 2, sinp)); // use 90 degrees if out of range
 		else
-			euler(1) = std::asin(sinp);
+			euler(1) = static_cast<float>(std::asin(sinp));
 
 		// yaw (z-axis rotation)
-		float siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
-		float cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
-		euler(2) = std::atan2(siny_cosp, cosy_cosp);
+		double siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
+		double cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
+		euler(2) = static_cast<float>(std::atan2(siny_cosp, cosy_cosp));
 
 		return euler;
 	}
