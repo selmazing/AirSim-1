@@ -108,6 +108,8 @@ pushd $build_dir  >/dev/null
 make -j`nproc`
 popd >/dev/null
 
+echo make and pop
+
 mkdir -p AirLib/lib/x64/$folder_name
 mkdir -p AirLib/deps/rpclib/lib
 mkdir -p AirLib/deps/jsbsim/lib
