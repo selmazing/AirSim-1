@@ -80,6 +80,8 @@ if [[ -d "./cmake/CMakeFiles" ]]; then
     rm -rf "./cmake/CMakeFiles"
 fi
 
+
+
 folder_name=""
 echo got here
 if [[ ! -d $build_dir ]]; then
@@ -112,12 +114,11 @@ echo make and pop
 
 mkdir -p AirLib/lib/x64/$folder_name
 mkdir -p AirLib/deps/rpclib/lib
-mkdir -p AirLib/deps/jsbsim/lib
 mkdir -p AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/libAirLib.a AirLib/lib
 cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
-cp $build_dir/output/lib/libjsbsim.a AirLib/deps/jsbsim/lib/libjsbsim.a
+# cp $build_dir/output/lib/libjsbsim.a AirLib/deps/jsbsim/lib/libjsbsim.a
 ls -l Airlib/deps/jsbsim/lib
 echo LOOK ABOVE
 banner "LOOK" || /bin/true
@@ -125,7 +126,6 @@ banner "LOOK" || /bin/true
 # Update AirLib/lib, AirLib/deps, Plugins folders with new binaries
 rsync -a --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name
 rsync -a --delete external/rpclib/rpclib-2.2.1/include AirLib/deps/rpclib
-rsync -a --delete external/jsbsim/jsbsim-1.1.2/include Airlib/deps/jsbsim
 rsync -a --delete MavLinkCom/include AirLib/deps/MavLinkCom
 rsync -a --delete AirLib Unreal/Plugins/AirSim/Source
 rm -rf Unreal/Plugins/AirSim/Source/AirLib/src

@@ -192,6 +192,27 @@ else
     echo "Eigen is already installed."
 fi
 
+# build & install JSBSim
+if [! -d "AirLib/deps/jsbsim/lib" ]; then
+    echo "Installing JSBSim..."
+    # make and enter build directory
+    mkdir external/jsbsim/jsbsim-1.1.2/build
+    cd external/jsbsim/jsbsim-1.1.2/build
+    # cmake -DCMAKE_INSTALL_PREFIX=/tmp/install ..
+    cmake -DCMAKE_INSTALL_PREFIX=/tmp/install ..
+    # build make
+    make
+    # install make
+    make install
+    # leave build directory
+    cd ../../../..
+    # mv include files to AirLib/deps/jsbsim/include && lib files to Airlib/lib/
+    mkdir -p AirLib/deps/jsbsim
+    rsync -a --delete /tmp/install Airlib/deps/jsbsim
+    # rm -r /tmp/install
+    rm -r /tmp/install
+
+
 popd >/dev/null
 
 set +x
