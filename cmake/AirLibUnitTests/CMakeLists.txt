@@ -12,6 +12,7 @@ SetupConsoleBuild()
 include_directories(
   ${AIRSIM_ROOT}/AirLibUnitTests
   ${AIRSIM_ROOT}/AirLib/include
+  ${JSBSIM_INCLUDES}
   ${AIRSIM_ROOT}/MavLinkCom/include
 )
 
