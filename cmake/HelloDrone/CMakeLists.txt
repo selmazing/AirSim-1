@@ -23,5 +23,5 @@ AddExecutableSource()
 
 CommonTargetLink()
 target_link_libraries(${PROJECT_NAME} AirLib)
-# target_link_libraries(${PROJECT_NAME} ${JSBSIM})
+target_link_libraries(${PROJECT_NAME} ${JSBSIM})
 target_link_libraries(${PROJECT_NAME} ${RPC_LIB})

@@ -12,7 +12,7 @@ include_directories(
   ${AIRSIM_ROOT}/AirLib/include
   ${AIRSIM_ROOT}/MavLinkCom/include
   ${RPC_LIB_INCLUDES}
-  # ${JSBSIM_INCLUDES}
+  ${JSBSIM_INCLUDES}
 )
 
 file(GLOB_RECURSE ${PROJECT_NAME}_sources

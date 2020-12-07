@@ -44,7 +44,7 @@ macro(CommonSetup)
 
     #setup include and lib for jsbsim which will be referenced by other projects
     set(JSBSIM_VERSION_FOLDER jsbsim-1.1.2)
-    set(JSBSIM_INCLUDES " ${AIRSIM_ROOT}/external/jsbsim/${JSBSIM_VERSION_FOLDER}")
+    set(JSBSIM_INCLUDES " ${AIRSIM_ROOT}/external/jsbsim/${JSBSIM_VERSION_FOLDER}/src")
     #name of .a file with lib prefix
     set(JSBSIM jsbsim)
 
