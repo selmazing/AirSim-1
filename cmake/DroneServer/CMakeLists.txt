@@ -13,7 +13,7 @@ include_directories(
   ${AIRSIM_ROOT}/DroneServer
   ${AIRSIM_ROOT}/MavLinkCom/include
   ${RPC_LIB_INCLUDES}
-  # ${JSBSIM_INCLUDES}
+  ${JSBSIM_INCLUDES}
   ${AIRSIM_ROOT}/AirLib/include
 )
 
