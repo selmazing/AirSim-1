@@ -12,7 +12,7 @@ SetupConsoleBuild()
 include_directories(
   ${AIRSIM_ROOT}/DroneShell
   ${RPC_LIB_INCLUDES}
-  # ${JSBSIM_INCLUDES}
+  ${JSBSIM_INCLUDES}
   ${AIRSIM_ROOT}/DroneShell/include;
   ${AIRSIM_ROOT}/AirLib/include
   ${AIRSIM_ROOT}/MavLinkCom/include

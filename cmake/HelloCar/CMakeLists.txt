@@ -14,7 +14,7 @@ include_directories(
   ${AIRSIM_ROOT}/HelloCar
   ${AIRSIM_ROOT}/AirLib/include
   ${RPC_LIB_INCLUDES}
-  # ${JSBSIM_INCLUDES}
+  ${JSBSIM_INCLUDES}
   ${AIRSIM_ROOT}/MavLinkCom/include
   ${AIRSIM_ROOT}/MavLinkCom/common_utils
 )
