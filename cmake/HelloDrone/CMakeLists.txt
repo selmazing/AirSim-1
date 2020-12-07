@@ -13,7 +13,7 @@ SetupConsoleBuild()
 include_directories(
   ${AIRSIM_ROOT}/HelloDrone
   ${AIRSIM_ROOT}/AirLib/include
-  ${JSBSIM_INCLUDES}
+  # ${JSBSIM_INCLUDES}
   ${RPC_LIB_INCLUDES}
   ${AIRSIM_ROOT}/MavLinkCom/include
   ${AIRSIM_ROOT}/MavLinkCom/common_utils
