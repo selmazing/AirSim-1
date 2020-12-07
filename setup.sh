@@ -193,7 +193,7 @@ else
 fi
 
 # build & install JSBSim
-if [! -d "AirLib/deps/jsbsim/lib" ]; then
+if [ ! -d "AirLib/deps/jsbsim/lib" ]; then
     echo "Installing JSBSim..."
     # make and enter build directory
     mkdir external/jsbsim/jsbsim-1.1.2/build
