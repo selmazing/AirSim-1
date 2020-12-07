@@ -211,7 +211,7 @@ if [! -d "AirLib/deps/jsbsim/lib" ]; then
     rsync -a --delete /tmp/install Airlib/deps/jsbsim
     # rm -r /tmp/install
     rm -r /tmp/install
-
+fi
 
 popd >/dev/null
 
