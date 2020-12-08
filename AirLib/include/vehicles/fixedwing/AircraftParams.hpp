@@ -57,7 +57,15 @@ namespace msr
 
 		struct PropulsionDerivatives
 		{
-			real_T thrust_tla_coefficient = 0; // CTtla, thrust produced with tla deflection
+			real_T thrust_tla_coefficient = 0; // CTtla, thrust produced with tla deflection (original simplified definition)
+			real_T propeller_area = 0; // Sprop, propellor area
+			real_T propeller_thrust_coefficient = 0; // CTv, thrust produced by the propellor at a given velocity
+			real_T k_motor_coefficient = 0; // k_motor, efficiency of the motor in terms of velocity change produced
+			real_T propeller_torque_coefficient = 0; // K_omega, torque produced by propellor due to rate of rotation
+			real_T motor_torque_coefficient = 0; // K_tp, torque produced due to thrust
+			
+
+
 		};
 
 		struct Dimensions

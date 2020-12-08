@@ -39,8 +39,8 @@ namespace msr
 				AirplanePose airplane_pose; // full aircraft pose
 
 				/*parameters set with defaults*/
-				real_T restitution = 0.55f; // needed for FixedWingPawnSimApi.cpp API creation
-				real_T friction = 0.5f; // needed for FixedWingPawnSimApi.cpp API creation
+				real_T restitution = 0.1f; // needed for FixedWingPawnSimApi.cpp API creation
+				real_T friction = 0.05f; // needed for FixedWingPawnSimApi.cpp API creation
 				uint control_count = 4; // number of control variables (elevator, aileron, rudder, TLA)
 				uint airplane_count = 1; // number of aircraft (Should not normally be more than 1)
 			};
@@ -103,12 +103,12 @@ namespace msr
 			{
 				// Basic Parameters //
 				params.mass = 2.0f; //mass in [kg]
-				params.inertia(0, 0) = 1.0f; // Ixx [Kgm^-2]
-				params.inertia(1, 1) = 1.0f; // Iyy [Kgm^-2]
-				params.inertia(2, 2) = 1.0f; //Izz [Kgm^-2]
-				params.inertia(0, 2) = params.inertia(2,0) = 0.05f; // Ixz [Kgm^-2]
-				params.inertia(0, 1) = params.inertia(1, 0) = 0.05f; // Ixy [Kgm^-2], symmetric
-				params.inertia(2, 1) = params.inertia(1, 2) = 0.05f; // Iyz [Kgm^-2], symmetric
+				params.inertia(0, 0) = 0.045f; // Ixx [Kgm^-2]
+				params.inertia(1, 1) = 0.0005f; // Iyy [Kgm^-2]
+				params.inertia(2, 2) = 0.005f; //Izz [Kgm^-2]
+				params.inertia(0, 2) = params.inertia(2, 0) = 0.00001f; // Ixz [Kgm^-2]
+				params.inertia(0, 1) = params.inertia(1, 0) = 0.00001f; // Ixy [Kgm^-2], symmetric
+				params.inertia(2, 1) = params.inertia(1, 2) = 0.00001f; // Iyz [Kgm^-2], symmetric
 
 				// Reference Areas //
 				params.dimensions.main_plane_area = 0.45f; // S [m^2]
@@ -161,7 +161,7 @@ namespace msr
 				params.derivatives.rudder_roll_coefficient = 0.082f;
 
 				// Propulsion Terms //
-				params.prop_derivatives.thrust_tla_coefficient = 100.0; // set arbitrarily
+				params.prop_derivatives.thrust_tla_coefficient = 1.0f; // set arbitrarily
 				
 			}
 
@@ -171,7 +171,7 @@ namespace msr
 				params.inertia(0, 0) = 1.2290f; // Ixx [Kgm^-2]
 				params.inertia(1, 1) = 0.1702f; // Iyy [Kgm^-2]
 				params.inertia(2, 2) = 0.8808f; //Izz [Kgm^-2]
-				params.inertia(0, 2) = params.inertia(2, 0) = 0.9343f; // Ixz [Kgm^-2]
+				params.inertia(0, 2) = params.inertia(2, 0) = -0.9343f; // Ixz [Kgm^-2]
 				params.inertia(0, 1) = params.inertia(1, 0) = 0; // Ixy [Kgm^-2], symmetric
 				params.inertia(2, 1) = params.inertia(1, 2) = 0; // Iyz [Kgm^-2], symmetric
 
@@ -201,7 +201,7 @@ namespace msr
 				params.derivatives.sidevelocity_sideforce_coefficient = 0.0f;
 
 				params.derivatives.zero_roll_coefficient = 0.0f;
-				params.derivatives.beta_roll_coefficient = 0.0f;
+				params.derivatives.beta_roll_coefficient = -0.0849f;
 				params.derivatives.rollrate_roll_coefficient = -0.4042f;
 				params.derivatives.yawrate_roll_coefficient = 0.0555f;
 
@@ -226,6 +226,14 @@ namespace msr
 				params.derivatives.rudder_yaw_coefficient = 0.0f;
 				params.derivatives.rudder_sideforce_coefficient = 0.0f;
 				params.derivatives.rudder_roll_coefficient = 0.0f;
+
+				// Propulsion Terms //
+				params.prop_derivatives.thrust_tla_coefficient = 40.0f; // set arbitrarily
+				params.prop_derivatives.propeller_area = 0.1018f;
+				params.prop_derivatives.propeller_thrust_coefficient = 1.0f;
+				params.prop_derivatives.k_motor_coefficient = 40.0f;
+				params.prop_derivatives.propeller_torque_coefficient = 0.0f;
+				params.prop_derivatives.motor_torque_coefficient = 0.0f;
 			}
 
 			void setupFrameCherokee(Params& params)

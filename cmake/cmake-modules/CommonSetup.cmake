@@ -42,6 +42,12 @@ macro(CommonSetup)
     #name of .a file with lib prefix
     set(RPC_LIB rpc)
 
+    #setup include and lib for jsbsim which will be referenced by other projects
+    set(JSBSIM_VERSION_FOLDER jsbsim-1.1.2)
+    set(JSBSIM_INCLUDES " ${AIRSIM_ROOT}/external/jsbsim/${JSBSIM_VERSION_FOLDER}/lib")
+    #name of .a file with lib prefix
+    set(JSBSIM jsbsim)
+
     #what is our build type debug or release?
     string( TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 
@@ -99,4 +105,3 @@ macro(CommonSetup)
     endif()
 
 endmacro(CommonSetup)
-

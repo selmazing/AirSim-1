@@ -33,6 +33,8 @@ public: //types
     static constexpr char const * kVehicleTypeComputerVision = "computervision";
     static constexpr char const * kVehicleTypeArduPlane = "arduplane";
     static constexpr char const * kVehicleTypePX4Plane = "px4plane";
+    static constexpr char const * kVehicleTypePlaneFlight = "planeflight";
+    static constexpr char const * kVehicleTypeJSBSimPlane = "JSBSimPlane";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -724,12 +726,13 @@ private:
         std::unique_ptr<VehicleSetting> vehicle_setting;
         if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo
             || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover
-            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane)
+            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane
+            || vehicle_type == kVehicleTypeJSBSimPlane)
             vehicle_setting = createMavLinkVehicleSetting(settings_json);
         //for everything else we don't need derived class yet
         else {
             vehicle_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-            if (vehicle_type == kVehicleTypeSimpleFlight) {
+            if (vehicle_type == kVehicleTypeSimpleFlight || vehicle_type == kVehicleTypePlaneFlight) {
                 //TODO: we should be selecting remote if available else keyboard
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;
@@ -795,13 +798,27 @@ private:
         cv_setting->vehicle_type = kVehicleTypeComputerVision;
         vehicles[cv_setting->vehicle_name] = std::move(cv_setting);
 
+    	//create default JSBSim vehicle
+        auto jsbsim_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+        jsbsim_setting->vehicle_name = "JSBSimPlane";
+        jsbsim_setting->vehicle_type = kVehicleTypeJSBSimPlane;
+        vehicles[jsbsim_setting->vehicle_name] = std::move(jsbsim_setting);
 
     	/* This Broke the call as there was a null pointer call
     	create default fixedwing vehicle -> variable arduplane set as default*/
-        auto arduplane_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-        arduplane_setting->vehicle_name = "arduplane";
+        auto plane_flight_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+        plane_flight_setting->vehicle_name = "PlaneFlight";
+        plane_flight_setting->vehicle_type = kVehicleTypePlaneFlight;
+        plane_flight_setting->rc.remote_control_id = 0;
+        vehicles[plane_flight_setting->vehicle_name] = std::move(plane_flight_setting);
+
+
+        /* This Broke the call as there was a null pointer call
+        create default fixedwing vehicle -> variable arduplane set as default*/
+        /*auto arduplane_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
+        arduplane_setting->vehicle_name = "ArduPlane";
         arduplane_setting->vehicle_type = kVehicleTypeArduPlane;
-        vehicles[arduplane_setting->vehicle_name] = std::move(arduplane_setting);
+        vehicles[arduplane_setting->vehicle_name] = std::move(arduplane_setting);  */
     }
 
     static void loadVehicleSettings(const std::string& simmode_name, const Settings& settings_json,

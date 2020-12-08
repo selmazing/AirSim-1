@@ -4,6 +4,7 @@
 #ifndef air_VectorMath_hpp
 #define air_VectorMath_hpp
 
+#include <cmath>
 #include "common/common_utils/Utils.hpp"
 #include "common_utils/RandomGenerator.hpp"
 STRICT_MODE_OFF
@@ -25,12 +26,14 @@ public:
 	typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign> Vector2d;
 	typedef Eigen::Vector3f Vector3f;
 	typedef Eigen::Vector3d Vector3d;
+	typedef Eigen::Matrix<float, 6, 1> Vector6f;
 	typedef Eigen::Array3f Array3f;
 	typedef Eigen::Array3d Array3d;
 	typedef Eigen::Quaternion<float, Eigen::DontAlign> Quaternionf;
 	typedef Eigen::Quaternion<double, Eigen::DontAlign> Quaterniond;
 	typedef Eigen::Matrix<double, 3, 3> Matrix3x3d;
 	typedef Eigen::Matrix<float, 3, 3> Matrix3x3f;
+	typedef Eigen::Matrix<float, 6, 6> Matrix6x6f;
 	typedef Eigen::AngleAxisd AngleAxisd;
 	typedef Eigen::AngleAxisf AngleAxisf;
 
@@ -309,7 +312,7 @@ public:
 		RealT t4 = +1.0f - 2.0f * (ysqr + q.z() * q.z());
 		yaw = std::atan2(t3, t4);
 	}
-
+	
     static RealT angleBetween(const Vector3T& v1, const Vector3T& v2, bool assume_normalized = false)
     {
         Vector3T v1n = v1;
@@ -333,9 +336,9 @@ public:
 		RealT p_e, r_e, y_e;
 		toEulerianAngle(end, p_e, r_e, y_e);
 
-		RealT p_rate = (p_e - p_s) / dt;
-		RealT r_rate = (r_e - r_s) / dt;
-		RealT y_rate = (y_e - y_s) / dt;
+		RealT p_rate = normalizeAngle(p_e - p_s, (RealT)(2 * M_PI)) / dt;
+		RealT r_rate = normalizeAngle(r_e - r_s, (RealT)(2 * M_PI)) / dt;
+		RealT y_rate = normalizeAngle(y_e - y_s, (RealT)(2 * M_PI)) / dt;
 
 		//TODO: optimize below
 		//Sec 1.3, https://ocw.mit.edu/courses/mechanical-engineering/2-154-maneuvering-and-control-of-surface-and-underwater-vehicles-13-49-fall-2004/lecture-notes/lec1.pdf
@@ -675,6 +678,85 @@ public:
 		static Vector3T v(0, -1, 0);
 		return v;
 	}
+
+
+	//skew-symmetric cross - product operator
+	static Matrix3x3f sMatrixTransform(Vector3T v)
+	{
+		Matrix3x3f S;
+		S <<    0, -v(2),  v(1),
+			 v(2),     0, -v(0),
+			-v(1),  v(0),    0;
+		return S;
+	}
+
+	//full euler angle transformation matrix
+	static Matrix3x3f eulerTransformMatrix(RealT phi, RealT theta, RealT psi)
+	{
+		Matrix3x3f R;
+		R << (cos(psi) * cos(theta)), (-sin(psi) * cos(phi) + cos(psi) * sin(theta) * sin(phi)), (sin(psi) * sin(phi) + cos(psi) * cos(phi) * sin(theta)),
+			(sin(psi) * cos(theta)),  (cos(psi) * cos(phi) + sin(phi) * sin(theta) * sin(psi)),  (-cos(psi) * sin(phi) + sin(theta) * sin(psi) * cos(phi)),
+			(-sin(theta)),            (cos(theta) * sin(phi)),									 (cos(theta) * cos(phi));
+		return R;
+	}
+
+	// not quite sure how the transformation matrix is derived initially
+	static Matrix3x3f phiThetaTransformationMatrix(RealT phi, RealT theta)
+	{
+		Matrix3x3f R;
+		R << 1, (sin(phi) * (sin(theta) / cos(theta))), (cos(phi) * (sin(theta) / cos(theta))),
+			 0, (cos(phi)),                             (-sin(phi)),
+			 0, (sin(phi) / cos(theta)),                (cos(phi) / cos(theta));
+		return R;
+	}
+
+	static Vector3T toEuler(const QuaternionT quaternion)
+	{
+		Vector3T euler;
+		// Converts a quaternion to an euler angle, shamelessly using method from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+		// roll (x-axis rotation)
+		double sinr_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().z());
+		double cosr_cosp = 1 - 2 * (quaternion.coeffs().x() * quaternion.coeffs().x() + quaternion.coeffs().y() * quaternion.coeffs().y());
+		euler(0) = static_cast<float>(std::atan2(sinr_cosp, cosr_cosp));
+
+		// pitch (y-axis rotation)
+		double sinp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().y() - quaternion.coeffs().z() * quaternion.coeffs().x());
+		if (std::abs(sinp) >= 1)
+			euler(1) = static_cast<float>(std::copysign((3.14159265359f / 2.0f), sinp)); // use 90 degrees if out of range
+		else
+			euler(1) = static_cast<float>(std::asin(sinp));
+
+		// yaw (z-axis rotation)
+		double siny_cosp = 2 * (quaternion.coeffs().w() * quaternion.coeffs().z() + quaternion.coeffs().x() * quaternion.coeffs().y());
+		double cosy_cosp = 1 - 2 * (quaternion.coeffs().y() * quaternion.coeffs().y() + quaternion.coeffs().z() * quaternion.coeffs().z());
+		euler(2) = static_cast<float>(std::atan2(siny_cosp, cosy_cosp));
+
+		return euler;
+	}
+
+	// Tait-Bryan angle, to quaternion already does this
+	/* static QuaternionT eulerToQuaternion(const Vector3f euler)
+	{
+		float yaw = euler(0);
+		float pitch = euler(1);
+		float roll = euler(2);
+		// Abbreviations for the various angular functions, taken from wikipedia https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+		float cy = std::cos(yaw * 0.5);
+		float sy = std::sin(yaw * 0.5);
+		float cp = std::cos(pitch * 0.5);
+		float sp = std::sin(pitch * 0.5);
+		float cr = std::cos(roll * 0.5);
+		float sr = std::sin(roll * 0.5);
+
+		QuaternionT q;
+		q.w() = cr * cp * cy + sr * sp * sy;
+		q.x() = sr * cp * cy - cr * sp * sy;
+		q.y() = cr * sp * cy + sr * cp * sy;
+		q.z() = cr * cp * sy - sr * sp * cy;
+
+		return q;
+	} */
+	
 };
 typedef VectorMathT<Eigen::Vector3d, Eigen::Quaternion<double, Eigen::DontAlign>, double> VectorMathd;
 typedef VectorMathT<Eigen::Vector3f, Eigen::Quaternion<float, Eigen::DontAlign>, float> VectorMathf;

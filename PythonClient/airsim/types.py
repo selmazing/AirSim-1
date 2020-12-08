@@ -356,7 +356,7 @@ class FixedWingState(MsgpackMixin):
     timestamp = np.uint64(0)
     landed_state = LandedState.Landed
     rc_data = RCData()
-    ready = false
+    ready = False
     ready_message = ""
     can_arm = False
 

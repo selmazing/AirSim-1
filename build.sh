@@ -32,6 +32,13 @@ if [ ! -d "./external/rpclib/rpclib-2.2.1" ]; then
     exit 1
 fi
 
+# check for jsbsim
+if [ ! -d "./external/jsbsim/jsbsim-1.1.2" ]; then
+    echo "ERROR: new version of AirSim requires newer jsbsim."
+    echo "please run setup.sh first and then run build.sh again"
+    exit 1
+fi
+
 # check for local cmake build created by setup.sh
 if [ -d "./cmake_build" ]; then
     if [ "$(uname)" == "Darwin" ]; then
@@ -48,7 +55,7 @@ if $debug; then
     build_dir=build_debug
 else
     build_dir=build_release
-fi 
+fi
 if [ "$(uname)" == "Darwin" ]; then
     export CC=/usr/local/opt/llvm@8/bin/clang
     export CXX=/usr/local/opt/llvm@8/bin/clang++
@@ -73,8 +80,10 @@ if [[ -d "./cmake/CMakeFiles" ]]; then
     rm -rf "./cmake/CMakeFiles"
 fi
 
-folder_name=""
 
+
+folder_name=""
+echo got here
 if [[ ! -d $build_dir ]]; then
     mkdir -p $build_dir
     pushd $build_dir  >/dev/null
@@ -92,6 +101,8 @@ if [[ ! -d $build_dir ]]; then
     fi
 fi
 
+echo end of build release
+
 pushd $build_dir  >/dev/null
 # final linking of the binaries can fail due to a missing libc++abi library
 # (happens on Fedora, see https://bugzilla.redhat.com/show_bug.cgi?id=1332306).
@@ -99,12 +110,18 @@ pushd $build_dir  >/dev/null
 make -j`nproc`
 popd >/dev/null
 
+echo make and pop
+
 mkdir -p AirLib/lib/x64/$folder_name
 mkdir -p AirLib/deps/rpclib/lib
 mkdir -p AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/libAirLib.a AirLib/lib
 cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
+# cp $build_dir/output/lib/libjsbsim.a AirLib/deps/jsbsim/lib/libjsbsim.a
+ls -l Airlib/deps/jsbsim/lib
+echo LOOK ABOVE
+banner "LOOK" || /bin/true
 
 # Update AirLib/lib, AirLib/deps, Plugins folders with new binaries
 rsync -a --delete $build_dir/output/lib/ AirLib/lib/x64/$folder_name

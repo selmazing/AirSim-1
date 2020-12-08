@@ -30,6 +30,7 @@ typedef unsigned int uint;
 
 //well known types
 typedef msr::airlib::VectorMathf VectorMath;
+typedef VectorMath::Vector6f Vector6r;
 typedef VectorMath::Vector3f Vector3r;
 typedef VectorMath::Vector2f Vector2r;
 typedef VectorMath::Vector1f Vector1r;
@@ -37,6 +38,7 @@ typedef VectorMath::Array3f Array3r;
 typedef VectorMath::Pose Pose;
 typedef VectorMath::Quaternionf Quaternionr;
 typedef VectorMath::Matrix3x3f Matrix3x3r;
+typedef VectorMath::Matrix6x6f Matrix6x6r;
 typedef VectorMath::AngleAxisf AngleAxisr;
 typedef common_utils::RandomGeneratorF RandomGeneratorR;
 typedef common_utils::RandomGeneratorGaussianF RandomGeneratorGausianR;

@@ -96,6 +96,7 @@ void ASimModeWorldFixedWing::getExistingVehiclePawns(TArray<AActor*>& pawns) con
 bool ASimModeWorldFixedWing::isVehicleTypeSupported(const std::string& vehicle_type) const
 {
     return ((vehicle_type == AirSimSettings::kVehicleTypePX4Plane) ||
+			(vehicle_type == AirSimSettings::kVehicleTypePlaneFlight) ||
             (vehicle_type == AirSimSettings::kVehicleTypeArduPlane));
 }
 

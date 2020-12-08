@@ -110,7 +110,7 @@ else #linux
                 popd
             fi
         fi
-    
+
     else
         echo "Already have good version of cmake: $cmake_ver"
     fi
@@ -132,6 +132,22 @@ if [ ! -d "external/rpclib/rpclib-2.2.1" ]; then
     mkdir -p "external/rpclib"
     unzip -q v2.2.1.zip -d external/rpclib
     rm v2.2.1.zip
+fi
+
+# Download jsbsim
+if [ ! -d "external/jsbsim/jsbsim-1.1.2" ]; then
+    echo "*********************************************************************************************"
+    echo "Downloading JSBSim..."
+    echo "*********************************************************************************************"
+
+    wget https://github.com/JSBSim-Team/jsbsim/archive/v1.1.2.zip
+
+    # remove previous versions
+    rm -rf "external/jsbsim"
+
+    mkdir -p "external/jsbsim"
+    unzip -q v1.1.2.zip -d external/jsbsim
+    rm v1.1.2.zip
 fi
 
 # Download high-polycount SUV model
@@ -174,6 +190,27 @@ if [ ! -d "AirLib/deps/eigen3" ]; then
     rm eigen3.zip
 else
     echo "Eigen is already installed."
+fi
+
+# build & install JSBSim
+if [ ! -d "AirLib/deps/jsbsim/lib" ]; then
+    echo "Installing JSBSim..."
+    # make and enter build directory
+    mkdir external/jsbsim/jsbsim-1.1.2/build
+    cd external/jsbsim/jsbsim-1.1.2/build
+    # cmake -DCMAKE_INSTALL_PREFIX=/tmp/install ..
+    cmake -DCMAKE_INSTALL_PREFIX=/tmp/install ..
+    # build make
+    make
+    # install make
+    make install
+    # leave build directory
+    cd ../../../..
+    # mv include files to AirLib/deps/jsbsim/include && lib files to Airlib/lib/
+    mkdir -p AirLib/deps/jsbsim
+    rsync -a --delete /tmp/install Airlib/deps/jsbsim
+    # rm -r /tmp/install
+    rm -r /tmp/install
 fi
 
 popd >/dev/null
