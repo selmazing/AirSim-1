@@ -119,7 +119,7 @@ cp $build_dir/output/lib/libAirLib.a AirLib/lib
 cp $build_dir/output/lib/libMavLinkCom.a AirLib/deps/MavLinkCom/lib
 cp $build_dir/output/lib/librpc.a AirLib/deps/rpclib/lib/librpc.a
 # cp $build_dir/output/lib/libjsbsim.a AirLib/deps/jsbsim/lib/libjsbsim.a
-ls -l Airlib/deps/jsbsim/lib
+# ls -l Airlib/deps/jsbsim/lib
 echo LOOK ABOVE
 banner "LOOK" || /bin/true
 

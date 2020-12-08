@@ -9,6 +9,10 @@ macro(IncludeEigen)
     include_directories(${AIRSIM_ROOT}/AirLib/deps/eigen3)
 endmacro(IncludeEigen)
 
+macro(IncludeJSBSim)
+    include_directories(${AIRSIM_ROOT}/Airlib/deps/jsbsim)
+endmacro(IncludeJSBSim)
+
 macro(AddExecutableSource)
     set(PROJECT_CPP ${PROJECT_NAME}_sources)
     file(GLOB_RECURSE PROJECT_CPP "${AIRSIM_ROOT}/${PROJECT_NAME}/*.cpp")
@@ -42,11 +46,11 @@ macro(CommonSetup)
     #name of .a file with lib prefix
     set(RPC_LIB rpc)
 
-    #setup include and lib for jsbsim which will be referenced by other projects
-    set(JSBSIM_VERSION_FOLDER jsbsim-1.1.2)
-    set(JSBSIM_INCLUDES " ${AIRSIM_ROOT}/external/jsbsim/${JSBSIM_VERSION_FOLDER}/lib")
-    #name of .a file with lib prefix
-    set(JSBSIM jsbsim)
+    # #setup include and lib for jsbsim which will be referenced by other projects
+    # set(JSBSIM_VERSION_FOLDER jsbsim-1.1.2)
+    # set(JSBSIM_INCLUDES " ${AIRSIM_ROOT}/external/jsbsim/${JSBSIM_VERSION_FOLDER}/lib")
+    # #name of .a file with lib prefix
+    # set(JSBSIM jsbsim)
 
     #what is our build type debug or release?
     string( TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
