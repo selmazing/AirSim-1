@@ -26,7 +26,7 @@ namespace msr
 				initialize(kinematics, environment);
 				Utils::log("Hello Physics!");
 			}
-			
+
 			//*** Start: UpdatableState implementation ***//
 			virtual void resetImplementation() override
 			{
@@ -94,7 +94,7 @@ namespace msr
 				return params_->getParams().control_count;
 			}
 
-			
+
 			virtual uint wrenchVertexCount() const override
 			{
 				return params_->getParams().airplane_count;
@@ -109,23 +109,11 @@ namespace msr
 				return airplane_;
 			}
 
-
-
-
-
-
-
-
-			
 			ControlSurface::Output getControlSurfaceOutput(uint control_index) const
 			{
 				return airplane_.controls_.at(control_index).getOutput();
 			}
 
-			
-		
-
-			
 			virtual real_T getRestitution() const override
 			{
 				return params_->getParams().restitution;
@@ -149,7 +137,7 @@ namespace msr
 				PhysicsBody::initialize(params_->getParams().mass, params_->getParams().inertia, kinematics, environment);
 
 				createAirplane(*params_, airplane_, environment, kinematics);
-				
+
 				initSensors(*params_, getKinematics(), getEnvironment());
 			}
 
@@ -158,7 +146,7 @@ namespace msr
 				const FixedWingParams::AirplanePose& airplane_pose = params.getParams().airplane_pose;
 				airplane = Airplane(airplane_pose.position, airplane_pose.normal, params.getParams().derivatives, params.getParams().prop_derivatives, params.getParams().dimensions, environment, kinematics);
 			}
-			
+
 			void reportSensors(FixedWingParams& params, StateReporter& reporter)
 			{
 				params.getSensors().reportState(reporter);
