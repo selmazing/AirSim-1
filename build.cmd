@@ -206,15 +206,15 @@ if NOT exist %JSBSIM_TARGET_LIB% mkdir %JSBSIM_TARGET_LIB%
 set JSBSIM_TARGET_INCLUDE=AirLib\deps\jsbsim\include
 if NOT exist %JSBSIM_TARGET_INCLUDE% mkdir %JSBSIM_TARGET_INCLUDE%
 robocopy /MIR \tmp\install\include %JSBSIM_TARGET_INCLUDE%
-REM robocopy /MIR \tmp\install\lib %JSBSIM_TARGET_LIB%
-if "%buildMode%" == "--Debug" (
-robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Debug %JSBSIM_TARGET_LIB%\Debug
-) else if "%buildMode%" == "--Release" (
-robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Release %JSBSIM_TARGET_LIB%\Release
-) else (
-robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Debug %JSBSIM_TARGET_LIB%\Debug
-robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Release %JSBSIM_TARGET_LIB%\Release
-)
+robocopy /MIR \tmp\install\lib %JSBSIM_TARGET_LIB%
+REM if "%buildMode%" == "--Debug" (
+REM robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Debug %JSBSIM_TARGET_LIB%\Debug
+REM ) else if "%buildMode%" == "--Release" (
+REM robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Release %JSBSIM_TARGET_LIB%\Release
+REM ) else (
+REM robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Debug %JSBSIM_TARGET_LIB%\Debug
+REM robocopy /MIR external\jsbsim\jsbsim-1.1.2\build\src\Release %JSBSIM_TARGET_LIB%\Release
+REM )
 
 rd /s/q \tmp\install
 
