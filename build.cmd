@@ -201,7 +201,7 @@ if ERRORLEVEL 1 goto :buildfailed
 chdir /d %ROOT_DIR%
 
 REM //---------- copy jsbsim binaries and include folder inside AirLib folder ----------
-set JSBSIM_TARGET_LIB=AirLib\deps\jsbsim\lib
+set JSBSIM_TARGET_LIB=AirLib\deps\jsbsim\lib\x64
 if NOT exist %JSBSIM_TARGET_LIB% mkdir %JSBSIM_TARGET_LIB%
 set JSBSIM_TARGET_INCLUDE=AirLib\deps\jsbsim\include
 if NOT exist %JSBSIM_TARGET_INCLUDE% mkdir %JSBSIM_TARGET_INCLUDE%
