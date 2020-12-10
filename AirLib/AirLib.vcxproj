@@ -217,6 +217,11 @@
       <Project>{8510c7a4-bf63-41d2-94f6-d8731d137a5a}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\external\jsbsim\jsbsim-1.1.2\JSBSim.vcxproj">
+      <Project>{AF971B4F-3D53-4655-8A03-97E8054DC58B}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4BFB7231-077A-4671-BD21-D3ADE3EA36E7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -302,7 +307,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MavLinkCom.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MavLinkCom.lib;JSBSim.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Lib>
@@ -370,7 +375,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MavLinkCom.lib;Setupapi.lib;Cfgmgr32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MavLinkCom.lib;JSBSim.lib;Setupapi.lib;Cfgmgr32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalDependencies>rpc.lib</AdditionalDependencies>
@@ -405,7 +410,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>deps\rpclib\lib\Debug;deps\JSBSim\lib\Debug;deps\MavLinkCom\lib\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MavLinkCom.lib;Setupapi.lib;Cfgmgr32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MavLinkCom.lib;JSBSim.lib;Setupapi.lib;Cfgmgr32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
       <AdditionalDependencies>rpc.lib</AdditionalDependencies>
