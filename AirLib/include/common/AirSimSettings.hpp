@@ -34,7 +34,7 @@ public: //types
     static constexpr char const * kVehicleTypeArduPlane = "arduplane";
     static constexpr char const * kVehicleTypePX4Plane = "px4plane";
     static constexpr char const * kVehicleTypePlaneFlight = "planeflight";
-    static constexpr char const * kVehicleTypeJSBSimPlane = "JSBSimPlane";
+    static constexpr char const * kVehicleTypeJSBSim = "jsbsim";
 
     static constexpr char const * kVehicleInertialFrame = "VehicleInertialFrame";
     static constexpr char const * kSensorLocalFrame = "SensorLocalFrame";
@@ -496,7 +496,7 @@ private:
         bool has_docs = settings_json.getString("SeeDocsAt", "") != ""
             || settings_json.getString("see_docs_at", "") != "";
         //we had spelling mistake so we are currently supporting SettingsVersion or SettingdVersion :(
-        version = settings_json.getFloat("SettingsVersion", settings_json.getFloat("SettingdVersion", 0));
+        version = settings_json.getFloat("SettingsVersion", settings_json.getFloat("SettingsVersion", 0));
 
         //If we have pre-V1 settings and only element is docs link
         has_default |= settings_json.size() == 1 && has_docs;
@@ -537,7 +537,7 @@ private:
         std::string view_mode_string = settings_json.getString("ViewMode", "");
 
         if (view_mode_string == "") {
-            if (simmode_name == "Multirotor" || simmode_name == "FixedWing")
+            if (simmode_name == "Multirotor" || simmode_name == "FixedWing" || simmode_name == "JSBSim")
                 view_mode_string = "FlyWithMe";
             else if (simmode_name == "ComputerVision")
                 view_mode_string = "Fpv";
@@ -726,13 +726,12 @@ private:
         std::unique_ptr<VehicleSetting> vehicle_setting;
         if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo
             || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover
-            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane
-            || vehicle_type == kVehicleTypeJSBSimPlane)
+            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane)
             vehicle_setting = createMavLinkVehicleSetting(settings_json);
         //for everything else we don't need derived class yet
         else {
             vehicle_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-            if (vehicle_type == kVehicleTypeSimpleFlight || vehicle_type == kVehicleTypePlaneFlight) {
+            if (vehicle_type == kVehicleTypeSimpleFlight || vehicle_type == kVehicleTypePlaneFlight || vehicle_type == kVehicleTypeJSBSim) {
                 //TODO: we should be selecting remote if available else keyboard
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;
@@ -800,8 +799,8 @@ private:
 
     	//create default JSBSim vehicle
         auto jsbsim_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-        jsbsim_setting->vehicle_name = "JSBSimPlane";
-        jsbsim_setting->vehicle_type = kVehicleTypeJSBSimPlane;
+        jsbsim_setting->vehicle_name = "jsbsim";
+        jsbsim_setting->vehicle_type = kVehicleTypeJSBSim;
         vehicles[jsbsim_setting->vehicle_name] = std::move(jsbsim_setting);
 
     	/* This Broke the call as there was a null pointer call
@@ -855,6 +854,8 @@ private:
         pawn_paths.emplace("DefaultComputerVision",
             PawnPath("Class'/AirSim/Blueprints/BP_ComputerVisionPawn.BP_ComputerVisionPawn_C'"));
         pawn_paths.emplace("DefaultFixedWing",
+            PawnPath("Class'/AirSim/Blueprints/BP_FixedWingPawn.BP_FixedWingPawn_C'"));
+        pawn_paths.emplace("DefaultJSBSim",
             PawnPath("Class'/AirSim/Blueprints/BP_FixedWingPawn.BP_FixedWingPawn_C'"));
     }
 
@@ -1142,7 +1143,7 @@ private:
             clock_type = "ScalableClock";
 
             //override if multirotor simmode with simple_flight
-            if (simmode_name == "Multirotor" || simmode_name == "FixedWing") {
+            if (simmode_name == "Multirotor" || simmode_name == "FixedWing" || simmode_name == "JSBSim") {
                 //TODO: this won't work if simple_flight and PX4 is combined together!
 
                 //for multirotors we select steppable fixed interval clock unless we have
@@ -1314,7 +1315,7 @@ private:
     static void createDefaultSensorSettings(const std::string& simmode_name,
         std::map<std::string, std::unique_ptr<SensorSetting>>& sensors)
     {
-        if (simmode_name == "Multirotor" || simmode_name == "FixedWing") {
+        if (simmode_name == "Multirotor" || simmode_name == "FixedWing" || simmode_name == "JSBSim") {
             sensors["imu"] = createSensorSetting(SensorBase::SensorType::Imu, "imu", true);
             sensors["magnetometer"] = createSensorSetting(SensorBase::SensorType::Magnetometer, "magnetometer", true);
             sensors["gps"] = createSensorSetting(SensorBase::SensorType::Gps, "gps", true);

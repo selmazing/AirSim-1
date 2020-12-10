@@ -28,7 +28,8 @@ void JSBSimPawnSimApi::initialize()
 	//create the vehicle API
 	std::shared_ptr<UnrealSensorFactory> sensor_factory = std::make_shared<UnrealSensorFactory>(getPawn(), &getNedTransform());
 	/*Insert code here for vehicle_params_ and vehicle_api for the JSBSim API*/
-	// vehicle_api_ = JSBSimApiFactory::createApi(getVehicleSetting(), sensor_factory, );
+	vehicle_api_ = JSBSimApiFactory::createApi(getVehicleSetting(), sensor_factory,
+		(*getGroundTruthKinematics()), (*getGroundTruthEnvironment()), params_.home_geopoint);
 	
 	//setup JSBSim
 	/*Insert code to setup a JSBSim engine, just call JSBSim init method?*/

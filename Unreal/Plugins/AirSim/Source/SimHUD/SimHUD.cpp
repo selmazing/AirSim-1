@@ -7,6 +7,7 @@
 #include "Vehicles/Multirotor/SimModeWorldMultiRotor.h"
 #include "Vehicles/Car/SimModeCar.h"
 #include "Vehicles/ComputerVision/SimModeComputerVision.h"
+#include "vehicles/JSBSim/SimModeWorldJSBSim.h"
 
 #include "common/AirSimSettings.hpp"
 #include <stdexcept>
@@ -305,6 +306,9 @@ void ASimHUD::createSimMode()
             FRotator::ZeroRotator, simmode_spawn_params);
     else if (simmode_name == "FixedWing")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldFixedWing>(FVector::ZeroVector,
+            FRotator::ZeroRotator, simmode_spawn_params);
+    else if (simmode_name == "JSBSim")
+        simmode_ = this->GetWorld()->SpawnActor<ASimModeWorldJSBSim>(FVector::ZeroVector,
             FRotator::ZeroRotator, simmode_spawn_params);
     else if (simmode_name == "Car")
         simmode_ = this->GetWorld()->SpawnActor<ASimModeCar>(FVector::ZeroVector,

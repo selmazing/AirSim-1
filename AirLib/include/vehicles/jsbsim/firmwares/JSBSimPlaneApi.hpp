@@ -11,8 +11,8 @@ class JSBSimPlaneApi : public JSBSimApiBase
 {
 public:
 	JSBSimPlaneApi(const AirSimSettings::VehicleSetting* vehicle_setting, std::shared_ptr<SensorFactory> sensor_factory,
-		const Kinematics::State& state, const Environment& environment) :
-	JSBSimApiBase(vehicle_setting, sensor_factory, state, environment)
+		const Kinematics::State& state, const Environment& environment, const msr::airlib::GeoPoint& home_geopoint) :
+	JSBSimApiBase(vehicle_setting, sensor_factory, state, environment), home_geopoint_(home_geopoint)
 	{/*insert constructor code*/}
 
 	~JSBSimPlaneApi()
@@ -69,9 +69,9 @@ public:
 		last_jsbsim_state_ = jsbsim_state;
 	}
 
-	virtual JSBSimState& getJSBSimState() const
+	virtual const JSBSimState& getJSBSimState() const override
 	{
-		// return last_jsbsim_state_;
+		return last_jsbsim_state_;
 	}
 
 	virtual const JSBSimControls& getJSBSimControls() const override
@@ -81,13 +81,14 @@ public:
 
 	virtual GeoPoint getHomeGeoPoint() const override
 	{
-		
+		return home_geopoint_;
 	};
 
 private:
 	bool api_control_enabled_ = false;
 	JSBSimControls last_controls_;
 	JSBSimState last_jsbsim_state_;
+	GeoPoint home_geopoint_;
 	
 };	
 }

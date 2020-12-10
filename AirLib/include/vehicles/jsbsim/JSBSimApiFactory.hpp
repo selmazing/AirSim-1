@@ -12,12 +12,13 @@ class JSBSimApiFactory {
 public:
 	static std::unique_ptr<JSBSimApiBase> createApi(const AirSimSettings::VehicleSetting* vehicle_setting,
 													std::shared_ptr<SensorFactory> sensor_factory,
-													const Kinematics::State& state, const Environment& environment)
+													const Kinematics::State& state, const Environment& environment,
+													const msr::airlib::GeoPoint& home_geopoint)
 	{
-		if (vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypeJSBSimPlane)
+		if (vehicle_setting->vehicle_type == AirSimSettings::kVehicleTypeJSBSim)
 		{
 			return std::unique_ptr<JSBSimApiBase>(new JSBSimPlaneApi(vehicle_setting, sensor_factory,
-				state, environment));
+				state, environment, home_geopoint));
 		}
 		else
 			throw std::runtime_error(Utils::stringf(
