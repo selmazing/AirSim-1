@@ -6,13 +6,17 @@
 #include "common/Common.hpp"
 #include "common/UpdatableObject.hpp"
 #include "common/CommonStructs.hpp"
-#include <jsbsim/FGFDMExec.h> // This is a absolute path should be relative, linker problems
-#include <jsbsim/initialization/FGInitialCondition.h> // This is a absolute path should be relative, linker problems
+#include <JSBSim/FGFDMExec.h> // This is a absolute path should be relative, linker problems
+// #include <JSBSim/initialization/FGInitialCondition.h> // This is a absolute path should be relative, linker problems
+// #include <JSBSim/simgear/misc/sg_path.hxx> // This is a relative path should be relative, linker problems, shouldn't need this the header in FGFDMExec should invoke this for inheritance
+
+/* #include "Airlib/deps/JSBSim/include/JSBSim/FGFDMExec.h"
+#include "Airlib/deps/JSBSim/include/JSBSim/initialization/FGInitialCondition.h"
+#include "Airlib/deps/JSBSim/include/JSBSim/simgear/misc/sg_path.hxx" */
 
 #include "physics/Kinematics.hpp"
 #include <math.h>
 
-#include <jsbsim/simgear/misc/sg_path.hxx> // This is a relative path should be relative, linker problems, shouldn't need this the header in FGFDMExec should invoke this for inheritance
 
 namespace msr { namespace airlib {
 

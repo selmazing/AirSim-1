@@ -41,6 +41,7 @@ public class AirSim : ModuleRules
     private void SetupCompileMode(CompileMode mode, ReadOnlyTargetRules Target)
     {
         LoadAirSimDependency(Target, "MavLinkCom", "MavLinkCom");
+        LoadAirSimDependency(Target, "JSBSim", "JSBSim");
 
         switch (mode)
         {
