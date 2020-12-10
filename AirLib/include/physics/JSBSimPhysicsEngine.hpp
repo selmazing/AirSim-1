@@ -40,10 +40,9 @@ public: //methods
 	{
 		jsbsim_aircraft = JSBSim::FGFDMExec(); // construct JSBSim FGFDMExec class
 		loadJSBSimPaths(model_path_);
-		
 		const SGPath ic_file("/* Insert path to initial condition file */");
 		JSBSim::FGInitialCondition* fgic = jsbsim_aircraft.GetIC();
-		fgic->Load(ic_file);  // had to include header file to include FGInitialCondition
+		// fgic->Load(ic_file);  // had to include header file to include FGInitialCondition
 		
 		jsbsim_aircraft.Setdt(delta_t_);
 		const bool success = jsbsim_aircraft.RunIC(); // causes sim time to reset to 0.0, returns true if successful
@@ -164,30 +163,30 @@ protected:
 	// gets the effective control deflection in radians
 	virtual void updateControlState()
 	{
-		double aileron = getProperty("fcs/effective-aileron-pos");
-		double elevator = getProperty("fcs/elevator-pos-rad");
-		double throttle = getProperty("propulsion/engine/thrust-lbs"); // pounds of thrust engine is producing
-		double rudder = getProperty("fcs/rudder-pos-norm");
+		const float aileron = getProperty("fcs/effective-aileron-pos");
+		const float elevator = getProperty("fcs/elevator-pos-rad");
+		const float throttle = getProperty("propulsion/engine/thrust-lbs"); // pounds of thrust engine is producing
+		const float rudder = getProperty("fcs/rudder-pos-norm");
 		jsbsim_control_state_ = { aileron, elevator, throttle, rudder };
 	}
 	
 	// get the distance from the earth zero point in metres
 	void getPositionMeters()
 	{
-		double lat_deg = getProperty("position/lat-geod-deg");
-		double long_deg = getProperty("position/long-gc-deg");
-		double altitude_m = getProperty("position/h-sl-ft") / 3.28;
-		double lat_m = 111320 * lat_deg;
-		double long_m = 40075000 * long_deg * cos(lat_deg * (pi / 180.0)) / 360.0;
+		const float lat_deg = getProperty("position/lat-geod-deg");
+		const float long_deg = getProperty("position/long-gc-deg");
+		const float altitude_m = getProperty("position/h-sl-ft") / 3.28;
+		const float lat_m = 111320 * lat_deg;
+		const float long_m = 40075000 * long_deg * cos(lat_deg * (pi / 180.0)) / 360.0;
 		position_ = { lat_m, long_m, - altitude_m };
 	}
 
 	// get the aircraft's orientation in radians
 	void getOrientationRadians()
 	{
-		double pitch = getProperty("attitude/pitch-rad");
-		double roll = getProperty("attitude/roll-rad");
-		double yaw = getProperty("attitude/psi-deg") * (pi / 180.0);
+		const float pitch = getProperty("attitude/pitch-rad");
+		const float roll = getProperty("attitude/roll-rad");
+		const float yaw = getProperty("attitude/psi-deg") * (pi / 180.0);
 		Vector3r euler_orientation = { pitch, roll, yaw };
 		orientation_ = VectorMath::toQuaternion(euler_orientation[0],
 			euler_orientation[1],
@@ -196,33 +195,33 @@ protected:
 
 	void getLinearVelocity()
 	{
-		double north_vel = getProperty("velocities/v-north-fps") / 3.28;
-		double east_vel = getProperty("velocities/v-east-fps") / 3.28;
-		double vertical_vel = getProperty("velocities/v-down-fps") / 3.28;
+		const float north_vel = getProperty("velocities/v-north-fps") / 3.28;
+		const float east_vel = getProperty("velocities/v-east-fps") / 3.28;
+		const float vertical_vel = getProperty("velocities/v-down-fps") / 3.28;
 		linear_velocity_ = { north_vel, east_vel, -vertical_vel };
 	}
 
 	void getAngularVelocity()
 	{
-		double p = getProperty("velocities/p-rad_sec");
-		double q = getProperty("velocities/q-rad_sec");
-		double r = getProperty("velocities/r-rad_sec");
+		const float p = getProperty("velocities/p-rad_sec");
+		const float q = getProperty("velocities/q-rad_sec");
+		const float r = getProperty("velocities/r-rad_sec");
 		angular_velocity_ = { p, q, r };
 	}
 
 	void getLinearAccel()
 	{
-		double ax = getProperty("accelerations/udot-ft_sec2") / 3.28;
-		double ay = getProperty("accelerations/vdot-ft_sec2") / 3.28;
-		double az = getProperty("accelerations/wdot-ft_sec2") / 3.28;
+		const float ax = getProperty("accelerations/udot-ft_sec2") / 3.28;
+		const float ay = getProperty("accelerations/vdot-ft_sec2") / 3.28;
+		const float az = getProperty("accelerations/wdot-ft_sec2") / 3.28;
 		linear_acceleration_ = { ax, ay, az };
 	}
 
 	void getAngularAccel()
 	{
-		double pdot = getProperty("accelerations/pdot-rad_sec2");
-		double qdot = getProperty("accelerations/qdot-rad_sec2");
-		double rdot = getProperty("accelerations/rdot-rad_sec2");
+		const float pdot = getProperty("accelerations/pdot-rad_sec2");
+		const float qdot = getProperty("accelerations/qdot-rad_sec2");
+		const float rdot = getProperty("accelerations/rdot-rad_sec2");
 		angular_acceleration_ = {pdot, qdot, rdot};
 	}
 	

@@ -69,15 +69,20 @@ public:
 		last_jsbsim_state_ = jsbsim_state;
 	}
 
-	virtual JSBSimState getJSBSimState() const
+	virtual JSBSimState& getJSBSimState() const
 	{
-		return last_jsbsim_state_;
+		// return last_jsbsim_state_;
 	}
 
 	virtual const JSBSimControls& getJSBSimControls() const override
 	{
 		return last_controls_;
 	}
+
+	virtual GeoPoint getHomeGeoPoint() const override
+	{
+		
+	};
 
 private:
 	bool api_control_enabled_ = false;

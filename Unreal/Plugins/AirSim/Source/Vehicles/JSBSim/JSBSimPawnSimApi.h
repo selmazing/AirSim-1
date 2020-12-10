@@ -34,7 +34,7 @@ public:
 
 	virtual void setPose(const Pose& pose, bool ignore_collision) override;
 	virtual Pose getPose() const override; // get the pose from the simulation
-	virtual void updateApiState(); // updates the JSBSimState Struct in JSBSimApiBase 
+	//virtual void updateApiState(); // updates the JSBSimState Struct in JSBSimApiBase 
 	virtual Kinematics::State getState() const;
 	virtual void pawnTick(float dt) override;
 
