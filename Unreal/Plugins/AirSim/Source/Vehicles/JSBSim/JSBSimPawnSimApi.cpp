@@ -20,7 +20,6 @@ JSBSimPawnSimApi::JSBSimPawnSimApi(const Params& params)
 }
 
 //TODO: Find way to sync jsbsim_ delta_t and AirSim dt provided in API
-//TODO: Setup Paths to JSBSimFGFDMExec model, this should come in the model paths for JSBSim and done in API
 void JSBSimPawnSimApi::initialize()
 {
 	PawnSimApi::initialize();
@@ -32,7 +31,7 @@ void JSBSimPawnSimApi::initialize()
 		(*getGroundTruthKinematics()), (*getGroundTruthEnvironment()), params_.home_geopoint);
 	
 	//setup JSBSim
-	/*Insert code to setup a JSBSim engine, just call JSBSim init method?*/
+	/*Insert code to setup a JSBSim simulation, just call JSBSim init method?*/
 	// jsbsim_->setDeltaT(); // sets the value of DeltaT not sure where to get the value from though?
 	// jsbsim_->setPaths(); // sets the paths to the model used for JSBSim 
 	jsbsim_->initialize(); // initialize JSBSim
@@ -63,6 +62,7 @@ void JSBSimPawnSimApi::updateRenderedState(float dt)
 		return;
 	}
 
+	jsbsim_->setDeltaT(dt);
 	const CollisionInfo& collision_info = getCollisionInfo();
 	jsbsim_->setCollisionInfo(collision_info);
 
@@ -94,6 +94,7 @@ void JSBSimPawnSimApi::updateRendering(float dt)
 	/* Implement code to update the aircraft's rendered state
 	 * Multirotor implementation deals with the graphic collision render hand-off here too
 	 */
+	
 	if(reset_pending_)
 	{
 		//continue to wait for reset
@@ -108,7 +109,7 @@ void JSBSimPawnSimApi::updateRendering(float dt)
 			return;
 		}
 	}
-
+	
 	if (!VectorMath::hasNan(last_phys_pose_))
 	{
 		if (pending_pose_status_ == PendingPoseStatus::RenderPending)

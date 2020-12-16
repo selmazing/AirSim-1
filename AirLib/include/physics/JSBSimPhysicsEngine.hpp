@@ -1,4 +1,3 @@
-
 #ifndef airsim_core_JSBSimPhysicsEngine_hpp
 #define airsim_core_JSBSimPhysicsEngine_hpp
 
@@ -6,17 +5,10 @@
 #include "common/Common.hpp"
 #include "common/UpdatableObject.hpp"
 #include "common/CommonStructs.hpp"
-#include <JSBSim/FGFDMExec.h> // This is a absolute path should be relative, linker problems
-// #include <JSBSim/initialization/FGInitialCondition.h> // This is a absolute path should be relative, linker problems
-// #include <JSBSim/simgear/misc/sg_path.hxx> // This is a relative path should be relative, linker problems, shouldn't need this the header in FGFDMExec should invoke this for inheritance
-
-/* #include "Airlib/deps/JSBSim/include/JSBSim/FGFDMExec.h"
-#include "Airlib/deps/JSBSim/include/JSBSim/initialization/FGInitialCondition.h"
-#include "Airlib/deps/JSBSim/include/JSBSim/simgear/misc/sg_path.hxx" */
+#include <JSBSim/FGFDMExec.h>
 
 #include "physics/Kinematics.hpp"
 #include <math.h>
-
 
 namespace msr { namespace airlib {
 
@@ -41,13 +33,13 @@ public: //methods
 		initialize();
 	}
 	
-	virtual void initialize()
+	void initialize()
 	{
 		jsbsim_aircraft = JSBSim::FGFDMExec(); // construct JSBSim FGFDMExec class
-		loadJSBSimPaths(model_path_);
+		loadJSBSimPaths(model_name_);
 		const SGPath ic_file("/* Insert path to initial condition file */");
 		JSBSim::FGInitialCondition* fgic = jsbsim_aircraft.GetIC();
-		// fgic->Load(ic_file);  // had to include header file to include FGInitialCondition
+		// fgic->Load(ic_file);
 		
 		jsbsim_aircraft.Setdt(delta_t_);
 		const bool success = jsbsim_aircraft.RunIC(); // causes sim time to reset to 0.0, returns true if successful
@@ -60,6 +52,7 @@ public: //methods
 	virtual void update() override
 	{
 		UpdatableObject::update();
+		jsbsim_aircraft.Setdt(delta_t_);
 		jsbsim_aircraft.Run();
 		updateKinematicState();
 		updateControlState();
@@ -86,9 +79,12 @@ public: //methods
 		setProperty("fcs/rudder-cmd-norm", rudder); // range -1 ot +1 note x8 has no rudder
 	}
 
-	void setModelPath(std::string model_path)
+	void setModelPath(std::string model_name)
 	{
-		model_path_ = model_path;
+		model_name_ = model_name;
+		if(model_name == "") {
+			model_name_ = "c172x";
+		}
 	}
 
 	void setCollisionInfo(CollisionInfo& collision_info) const
@@ -135,9 +131,9 @@ protected:
 
 	void loadJSBSimPaths(std::string model_path)
 	{
-		SGPath aircraft_path("");
-		SGPath engine_path("");
-		SGPath system_path("");
+		SGPath aircraft_path("external/jsbsim/jsbsim-1.1.2/aircraft");
+		SGPath engine_path("external/jsbsim/jsbsim-1.1.2/engine");
+		SGPath system_path("external/jsbsim/jsbsim-1.1.2/systems");
 		jsbsim_aircraft.LoadModel(aircraft_path, engine_path, system_path, model_path);
 	}
 	
@@ -243,7 +239,7 @@ private:
 	Vector3r linear_acceleration_;
 	Vector3r angular_acceleration_;
 	CollisionResponse collision_response_;
-	std::string model_path_;
+	std::string model_name_;
 	double pi = 3.1415926535897932;
 	double delta_t_ = 0.0021; // set the simulation update rate, defaults to 480Hz
 	
