@@ -2,6 +2,7 @@
 
 #include "GameFramework/RotatingMovementComponent.h"
 #include "PIPCamera.h"
+
 #include "common/common_utils/UniqueValueMap.hpp"
 #include "JSBSimPawnEvents.h"
 
@@ -30,7 +31,7 @@ public:
 	//interface with UnrealEngine
 	void initializeForBeginPlay();
 	const common_utils::UniqueValueMap<std::string, APIPCamera*> getCameras() const;
-	AJSBSimPawnEvents* getPawnEvents()
+	JSBSimPawnEvents* getPawnEvents()
 	{
 		return &pawn_events_;
 	}
@@ -43,6 +44,6 @@ private:
 	UPROPERTY() APIPCamera* camera_back_center_;
 	UPROPERTY() APIPCamera* camera_bottom_center_;
 
-	AJSBSimPawnEvents pawn_events_;
+	JSBSimPawnEvents pawn_events_;
 };
 

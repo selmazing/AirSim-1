@@ -11,7 +11,7 @@
  * The class used in JSBSSimPawn should probably just be instanced there. 
  */
 
-class AJSBSimPawnEvents : public PawnEvents 
+class JSBSimPawnEvents : public PawnEvents 
 {
 public:
 	typedef msr::airlib::real_T real_T;	

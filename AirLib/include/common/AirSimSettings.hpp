@@ -726,12 +726,12 @@ private:
         std::unique_ptr<VehicleSetting> vehicle_setting;
         if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo
             || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover
-            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane)
+            || vehicle_type == kVehicleTypeArduPlane || vehicle_type == kVehicleTypePX4Plane || vehicle_type == kVehicleTypeJSBSim)
             vehicle_setting = createMavLinkVehicleSetting(settings_json);
         //for everything else we don't need derived class yet
         else {
             vehicle_setting = std::unique_ptr<VehicleSetting>(new VehicleSetting());
-            if (vehicle_type == kVehicleTypeSimpleFlight || vehicle_type == kVehicleTypePlaneFlight || vehicle_type == kVehicleTypeJSBSim) {
+            if (vehicle_type == kVehicleTypeSimpleFlight || vehicle_type == kVehicleTypePlaneFlight) {
                 //TODO: we should be selecting remote if available else keyboard
                 //currently keyboard is not supported so use rc as default
                 vehicle_setting->rc.remote_control_id = 0;

@@ -33,7 +33,7 @@ public:
 	virtual void reportState(StateReporter& reporter) override;
 
 	virtual void setPose(const Pose& pose, bool ignore_collision) override;
-	virtual Pose getPose() const override; // get the pose from the simulation
+	// virtual Pose getPose() const override; // get the pose from the simulation
 	//virtual void updateApiState(); // updates the JSBSimState Struct in JSBSimApiBase 
 	virtual Kinematics::State getState() const;
 	virtual void pawnTick(float dt) override;
@@ -57,8 +57,13 @@ public:
 	}
 
 private:
+	//api and params needed to be setup & updated
+	std::unique_ptr<msr::airlib::JSBSimApiBase> vehicle_api_;
+	// std::unique_ptr<JSBSimPawnSimApi> pawn_api_;
+	std::unique_ptr<JSBSimPhysicsEngine> jsbsim_;
+	
 	//show info on collision response from UE4
-	msr::airlib::CollisionResponse collision_response;
+	CollisionResponse collision_response;
 
 	// when pose needs to be set from a non-physics thread it should be set as pending
 	bool pending_pose_collisions_;
@@ -67,13 +72,10 @@ private:
 	} pending_pose_status_;
 	Pose pending_phys_pose_; //force new pose through API
 	
-	AJSBSimPawnEvents* pawn_events_;
+	JSBSimPawnEvents* pawn_events_;
 	Params params_;
 	Pose last_phys_pose_; // to obtain trace lines from the API
 	std::vector<std::string> vehicle_api_messages_;
-	std::unique_ptr<msr::airlib::JSBSimApiBase> vehicle_api_;
-	std::unique_ptr<JSBSimPawnSimApi> pawn_api_;
-	std::unique_ptr<JSBSimPhysicsEngine> jsbsim_;
 
 	//reset must happen while World is locked so its async task initiated from API thread
 	bool reset_pending_;

@@ -29,6 +29,11 @@ public: //interface for virtual functions to be implemented by a derived class
 	{
 		collision_info_ = collision_info;
 	}
+
+	CollisionResponse& getCollisionResponseInfo()
+	{
+		return collision_response_;
+	}
 	
 public: //methods
 	JSBSimPhysicsEngine()
@@ -237,6 +242,7 @@ private:
 	Vector3r angular_velocity_;
 	Vector3r linear_acceleration_;
 	Vector3r angular_acceleration_;
+	CollisionResponse collision_response_;
 	std::string model_path_;
 	double pi = 3.1415926535897932;
 	double delta_t_ = 0.0021; // set the simulation update rate, defaults to 480Hz

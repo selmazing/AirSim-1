@@ -10,7 +10,7 @@ using namespace msr::airlib; // scoping across the whole namespace like this cou
 
 JSBSimPawnSimApi::JSBSimPawnSimApi(const Params& params)
 	: PawnSimApi(params),
-	pawn_events_(static_cast<AJSBSimPawnEvents*>(params.pawn_events))
+	pawn_events_(static_cast<JSBSimPawnEvents*>(params.pawn_events))
 {
 	Pose pose = getPose();
 	float pitch, roll, yaw;
@@ -73,7 +73,7 @@ void JSBSimPawnSimApi::updateRenderedState(float dt)
 	}
 
 	last_phys_pose_ = jsbsim_->getPose(); // getPose from JSBSim
-	// collision_response = jsbsim_->getCollisionResponseInfo(); // used to get the response of the aircraft colliding with the ground
+	collision_response = jsbsim_->getCollisionResponseInfo(); // used to get the response of the aircraft colliding with the ground
 	vehicle_api_->getStatusMessages(vehicle_api_messages_);
 }
 
@@ -144,10 +144,10 @@ void JSBSimPawnSimApi::setPose(const Pose& pose, bool ignore_collision)
 	pending_pose_status_ = PendingPoseStatus::RenderStatePending;
 }
 
-Pose JSBSimPawnSimApi::getPose() const
+/* Pose JSBSimPawnSimApi::getPose() const
 {
 	return pending_phys_pose_;
-}
+} */
 
 Kinematics::State JSBSimPawnSimApi::getState() const
 {

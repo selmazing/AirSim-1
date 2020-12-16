@@ -18,7 +18,7 @@ void ASimModeWorldJSBSim::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Let base class setup the physics world
+	// Let base class setup the physics world, don't know if this is needed?
 	initializeForPlay();
 }
 
