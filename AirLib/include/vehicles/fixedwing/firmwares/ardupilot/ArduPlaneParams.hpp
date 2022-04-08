@@ -38,6 +38,7 @@ protected:
         setupFrameGenericAircraft(params); */
 
     	// Using Skywalker X8 instead
+        // change-s
         setupFrameSkywalkerX8(params);
     }
 
