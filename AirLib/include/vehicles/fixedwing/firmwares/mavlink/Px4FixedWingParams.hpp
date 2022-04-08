@@ -32,7 +32,7 @@ namespace msr
 			virtual void setupParams() override
 			{
 				auto& params = getParams();
-
+				// change-s
 				if (connection_info_.model == "Cherokee")
 				{
 					setupFrameCherokee(params);
